@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Istu.Navigation.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5048b16a38bf8b05cd222a28af901fb613ead054")]
 [assembly: System.Reflection.AssemblyProductAttribute("Istu.Navigation.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Istu.Navigation.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
