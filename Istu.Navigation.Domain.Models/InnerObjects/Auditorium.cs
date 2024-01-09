@@ -1,6 +1,6 @@
 ﻿namespace Istu.Navigation.Domain.Models;
 
-public class Auditorium(Guid id, string title, double x, double y)
-    : InnerObject(id, InnerObjectType.Auditorium, title, x, y)
+public class Auditorium(Guid id, string title, Guid buildingId, int floor, double x, double y)
+    : InnerObject(id, InnerObjectType.Auditorium, title, buildingId, floor, x, y)
 {
 }

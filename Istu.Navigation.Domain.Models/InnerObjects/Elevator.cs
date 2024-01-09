@@ -1,7 +1,7 @@
 ﻿namespace Istu.Navigation.Domain.Models;
 
-public class Elevator(Guid id, string title, double x, double y)
-    : InnerObject(id, InnerObjectType.Elevator, title, x, y)
+public class Elevator(Guid id, string title, Guid buildingId, int floor, double x, double y)
+    : InnerObject(id, InnerObjectType.Elevator, title, buildingId, floor, x, y)
 {
     
 }

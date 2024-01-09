@@ -1,7 +1,4 @@
 ﻿
 namespace Istu.Navigation.Domain.Models;
-public class Cafe(Guid id, string title, double x, double y)
-    : InnerObject(id, InnerObjectType.Cafe, title, x, y)
-{
-    
-}
+public class Cafe(Guid id, string title, Guid buildingId, int floor, double x, double y)
+    : InnerObject(id, InnerObjectType.Cafe, title, buildingId, floor, x, y);
