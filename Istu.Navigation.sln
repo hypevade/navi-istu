@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Istu.Navigation.Api", "Istu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{3D5D4546-FDB2-49AA-BF68-93A31507BBC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isti.Navigation.Domain.Models", "Isti.Navigation.Domain.Models\Isti.Navigation.Domain.Models.csproj", "{81E0E3F5-5A0A-4FBE-91A2-9806231D2BB3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Istu.Navigation.Domain.Models", "Istu.Navigation.Domain.Models\Istu.Navigation.Domain.Models.csproj", "{81E0E3F5-5A0A-4FBE-91A2-9806231D2BB3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Istu.Navigation.Domain.Services", "Istu.Navigation.Domain.Services\Istu.Navigation.Domain.Services.csproj", "{0A2EDD0F-CC3B-46E4-A58E-8F2C3B8E221E}"
 EndProject
