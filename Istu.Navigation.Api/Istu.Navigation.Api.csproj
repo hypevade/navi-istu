@@ -19,4 +19,10 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Istu.Navigation.Domain.Models\Istu.Navigation.Domain.Models.csproj" />
+      <ProjectReference Include="..\Istu.Navigation.Domain.Services\Istu.Navigation.Domain.Services.csproj" />
+      <ProjectReference Include="..\Istu.Navigation.Public.Models\Istu.Navigation.Public.Models.csproj" />
+    </ItemGroup>
+
 </Project>

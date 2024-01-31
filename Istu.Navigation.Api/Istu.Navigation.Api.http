@@ -1,6 +1,0 @@
-@Istu.Navigation.Api_HostAddress = http://localhost:5183
-
-GET {{Istu.Navigation.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

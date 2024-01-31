@@ -5,22 +5,22 @@ namespace Istu.Navigation.Infrastructure.Memory;
 
 public class InnerObjectsRepository : IInnerObjectsRepository
 {
-    public InnerObject[] GetAllByTypeInBuilding(Guid buildingId, InnerObjectType[] types)
+    public Task<InnerObject[]> GetAllByTypeInBuilding(Guid buildingId, InnerObjectType[] types)
     {
         throw new NotImplementedException();
     }
 
-    public InnerObject[] GetAllByBuilding(Guid buildingId)
+    public Task<InnerObject[]> GetAllByBuilding(Guid buildingId)
     {
         throw new NotImplementedException();
     }
 
-    public InnerObject[] GetAllByFloor(Guid buildingId, int floor)
+    public Task<InnerObject[]> GetAllByFloor(Guid buildingId, int floor)
     {
         throw new NotImplementedException();
     }
 
-    public InnerObject GetById(Guid innerObjectId)
+    public Task<InnerObject?> GetById(Guid innerObjectId)
     {
         throw new NotImplementedException();
     }

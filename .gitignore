@@ -422,3 +422,6 @@ fabric.properties
 
 rider.project.restore.info
 rider.project.model.nuget.info
+
+# Ignore directory obj
+/Istu.Navigation.Api/obj/

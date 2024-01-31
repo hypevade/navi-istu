@@ -4,8 +4,8 @@ namespace Istu.Navigation.Domain.Repositories;
 
 public interface IInnerObjectsRepository
 {
-    public InnerObject[] GetAllByTypeInBuilding(Guid buildingId, InnerObjectType[] types);
-    public InnerObject[] GetAllByBuilding(Guid buildingId);
-    public InnerObject[] GetAllByFloor(Guid buildingId, int floor);
-    public InnerObject GetById(Guid innerObjectId);
+    public Task<InnerObject[]> GetAllByTypeInBuilding(Guid buildingId, InnerObjectType[] types);
+    public Task<InnerObject[]> GetAllByBuilding(Guid buildingId);
+    public Task<InnerObject[]> GetAllByFloor(Guid buildingId, int floor);
+    public Task<InnerObject?> GetById(Guid innerObjectId);
 }

@@ -9,4 +9,5 @@ public abstract class InnerObject(Guid id, InnerObjectType type, string title, G
     
     public double X { get; set; } = x;
     public double Y { get; set; } = y;
+    public List<InnerObject>? ConnectedObjects { get; set; } = null;
 }
