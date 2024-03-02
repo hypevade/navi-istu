@@ -1,4 +1,4 @@
-﻿namespace Istu.Navigation.Domain.Models;
+﻿namespace Istu.Navigation.Domain.Models.InnerObjects;
 
 public enum InnerObjectType
 {

@@ -1,4 +1,5 @@
 ﻿using Istu.Navigation.Domain.Models;
+using Istu.Navigation.Domain.Models.InnerObjects;
 using Istu.Navigation.Domain.Repositories;
 
 namespace Istu.Navigation.Infrastructure.Memory;

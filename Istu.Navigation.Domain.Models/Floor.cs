@@ -1,4 +1,6 @@
-﻿namespace Istu.Navigation.Domain.Models;
+﻿using Istu.Navigation.Domain.Models.InnerObjects;
+
+namespace Istu.Navigation.Domain.Models;
 
 public class Floor(List<InnerObject> objects)
 {

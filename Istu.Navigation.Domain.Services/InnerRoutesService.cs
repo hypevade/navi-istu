@@ -1,4 +1,5 @@
 ﻿using Istu.Navigation.Domain.Models;
+using Istu.Navigation.Domain.Models.InnerObjects;
 using Istu.Navigation.Domain.Repositories;
 
 namespace Istu.Navigation.Domain.Services;
@@ -20,11 +21,19 @@ public class InnerRoutesService(IInnerObjectsRepository innerObjectRepository, I
 
         var floors = await GetFloors(fromObject, toObject).ConfigureAwait(false);
         
-        var tasks = floors.Select(floor => routeSearcher.SearchRoute(fromObject, toObject, floor)).ToList();
+        var tasks = floors.Select(floor => routeSearcher.CreateRoute(fromObject, toObject, floor)).ToList();
         await Task.WhenAll(tasks).ConfigureAwait(false);
         var result = tasks.Select(task => task.Result).ToList();
         return result;
     }
+    
+    public async GetRouteById(Guid routeId)
+    {
+        //TODO: Сделать нормальное прокидование ошибки 
+        var route = await routeSearcher.CreateRoute(routeId).ConfigureAwait(false);
+        return route;
+    }
+    
 
     private async Task<IEnumerable<Floor>> GetFloors(InnerObject fromInnerObject, InnerObject toInnerObject)
     {

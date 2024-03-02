@@ -1,4 +1,5 @@
 ﻿using Istu.Navigation.Domain.Models;
+using Istu.Navigation.Domain.Models.InnerObjects;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
