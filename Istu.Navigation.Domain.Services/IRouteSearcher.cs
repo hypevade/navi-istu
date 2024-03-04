@@ -14,17 +14,9 @@ public interface IRouteSearcher
 
 public class RouteSearcher : IRouteSearcher
 {
-    private IBuildingObjectsRepository buildingObjectRepository;
-
-
-    Func<Edge<BuildingObject>, double> edgeWeightFunc = edge =>
+    private readonly Func<Edge<BuildingObject>, double> edgeWeightFunc = edge =>
         Math.Sqrt((edge.Source.X - edge.Target.X) * (edge.Source.X - edge.Target.X) +
                   (edge.Source.Y - edge.Target.Y) * (edge.Source.Y - edge.Target.Y));
-
-    public RouteSearcher(IBuildingObjectsRepository buildingObjectRepository)
-    {
-        this.buildingObjectRepository = buildingObjectRepository;
-    }
 
     public FloorRoute CreateRoute(BuildingObject fromBuildingObject, BuildingObject toBuildingObject, Floor floor)
     {
