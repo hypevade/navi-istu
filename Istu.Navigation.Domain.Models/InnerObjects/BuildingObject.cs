@@ -20,7 +20,7 @@ public class FloorObject
     public void AddEdge(BuildingObject targetObject, double weight)
     {
         //Todo: может быть тут понадобиться проверять на существование ребра
-        var edge = new Edge(BuildingObject, targetObject, weight);
+        var edge = new Edge(BuildingObject, targetObject);
         Edges.Add(edge);
     }
     

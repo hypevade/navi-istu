@@ -4,12 +4,10 @@ public class Edge
 {
     public BuildingObject From { get; set; }
     public BuildingObject To { get; set; }
-    public double Weight { get; set; }
 
-    public Edge(BuildingObject from, BuildingObject to, double weight)
+    public Edge(BuildingObject from, BuildingObject to)
     {
         From = from;
         To = to;
-        Weight = weight;
     }
 }
