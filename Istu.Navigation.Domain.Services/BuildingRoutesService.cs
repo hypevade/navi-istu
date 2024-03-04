@@ -4,11 +4,12 @@ using Istu.Navigation.Domain.Repositories;
 
 namespace Istu.Navigation.Domain.Services;
 
-public class BuildingRoutesService(IBuildingObjectsRepository buildingObjectRepository, IBuildingsRepository buildingsRepository, IRouteSearcher routeSearcher, IImageService imageService, IRouteRepository routeRepository)
+public class BuildingRoutesService(IBuildingObjectsRepository buildingObjectRepository, IBuildingsRepository buildingsRepository, IRouteSearcher routeSearcher, IImageService imageService, IRouteRepository routeRepository, IEdgesRepository edgesRepository)
 {
     private IBuildingObjectsRepository buildingObjectRepository = buildingObjectRepository;
     private IBuildingsRepository buildingsRepository = buildingsRepository;
     private IRouteRepository routeRepository = routeRepository;
+    private IEdgesRepository edgesRepository = edgesRepository;
     
     private IRouteSearcher routeSearcher = routeSearcher;
     private IImageService imageService = imageService;
@@ -65,12 +66,14 @@ public class BuildingRoutesService(IBuildingObjectsRepository buildingObjectRepo
 
             var floorImageLink = await imageService.GetFloorImageLink(buildingId, floorNumber)
                 .ConfigureAwait(false);
+            var edges = await edgesRepository.GetAllByFloor(buildingId, floorNumber).ConfigureAwait(false);
             var floor = new Floor()
             {
                 BuildingId = buildingId,
                 Number = floorNumber,
                 Objects = objects.ToList(),
-                ImageLink = floorImageLink 
+                ImageLink = floorImageLink, 
+                Edges = edges.ToList()
             };
             floors.Add(floor);
         }
