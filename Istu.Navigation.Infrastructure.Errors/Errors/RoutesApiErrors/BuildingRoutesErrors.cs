@@ -2,7 +2,7 @@
 
 public class BuildingRoutesErrors : ErrorBase
 {
-    protected override string Nid => CommonConstans.RoutesApiNid;
+    protected new string Nid = CommonConstans.RoutesApiNid;
 
     public ApiError BuildingObjectNotFoundError(Guid buildingObjectId)
     {
@@ -14,5 +14,11 @@ public class BuildingRoutesErrors : ErrorBase
     {
         return new ApiError(404, $"Ребро между объектами с идентификаторами {fromObjectId} и {toObjectId} не найдено.",
             GetUrn("building-edge-not-found"));
+    }
+    
+    public static ApiError BuildingRouteNotFoundError(Guid fromObjectId, Guid toObjectId)
+    {
+        return new ApiError(404, $"Путь между объектами с идентификаторами {fromObjectId} и {toObjectId} не найден.",
+            GetUrn("building-route-not-found"));
     }
 }

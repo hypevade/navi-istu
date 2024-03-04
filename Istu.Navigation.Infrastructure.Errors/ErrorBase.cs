@@ -3,10 +3,10 @@
 public abstract class ErrorBase
 {
     private static readonly string UrnPrefix = CommonConstans.Urn;
+
+    protected static string Nid = null!;
     
-    protected abstract string Nid { get; }
-    
-    protected string GetUrn(string nss)
+    protected static string GetUrn(string nss)
     {
         return $"{UrnPrefix}:{Nid}:{nss}";
     }

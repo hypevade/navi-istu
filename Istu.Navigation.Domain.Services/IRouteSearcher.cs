@@ -1,6 +1,8 @@
 ﻿using Istu.Navigation.Domain.Models;
 using Istu.Navigation.Domain.Models.InnerObjects;
 using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Infrastructure.Errors;
+using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 using QuikGraph;
 using QuikGraph.Algorithms.Observers;
 using QuikGraph.Algorithms.ShortestPath;
@@ -10,6 +12,9 @@ namespace Istu.Navigation.Domain.Services;
 public interface IRouteSearcher
 {
     public FloorRoute CreateRoute(BuildingObject fromBuildingObject, BuildingObject toBuildingObject, Floor floor);
+    
+    //TODO: tmp
+    public OperationResult<FloorRoute> CreateRouteOR(BuildingObject fromBuildingObject, BuildingObject toBuildingObject, Floor floor);
 }
 
 public class RouteSearcher : IRouteSearcher
@@ -48,5 +53,41 @@ public class RouteSearcher : IRouteSearcher
             Objects = shortestPath
         };
 
+    }
+
+    public OperationResult<FloorRoute> CreateRouteOR(BuildingObject fromBuildingObject, BuildingObject toBuildingObject, Floor floor)
+    {
+        if(floor.Objects.Count == 0 || floor.Edges.Count == 0)
+            return OperationResult<FloorRoute>.Failure(BuildingRoutesErrors.BuildingRouteNotFoundError(fromBuildingObject.Id, toBuildingObject.Id));
+        
+        var floorGraph = new AdjacencyGraph<BuildingObject, Edge<BuildingObject>>();
+        floor.Objects
+            .ForEach(bO => { floorGraph.AddVertex(bO); });
+
+        floor.Edges.ForEach(bO => { floorGraph.AddEdge(new Edge<BuildingObject>(bO.From, bO.To)); });
+
+        var pathAlgorithm =
+            new DijkstraShortestPathAlgorithm<BuildingObject, Edge<BuildingObject>>(floorGraph, edgeWeightFunc);
+        var predecessorObserver =
+            new VertexPredecessorRecorderObserver<BuildingObject, Edge<BuildingObject>>();
+        predecessorObserver.Attach(pathAlgorithm);
+
+        pathAlgorithm.Compute(fromBuildingObject);
+        
+        if (!predecessorObserver.TryGetPath(toBuildingObject, out var path))
+            return OperationResult<FloorRoute>.Failure(BuildingRoutesErrors.BuildingRouteNotFoundError(fromBuildingObject.Id, toBuildingObject.Id));
+        
+        var shortestPath = new List<BuildingObject> { fromBuildingObject };
+        foreach (var edge in path)
+            shortestPath.Add(edge.Target);
+        
+        var floorRoute =  new FloorRoute
+        {
+            StartObject = fromBuildingObject,
+            FinishObject = toBuildingObject,
+            Objects = shortestPath
+        };
+        
+        return OperationResult<FloorRoute>.Success(floorRoute);
     }
 }

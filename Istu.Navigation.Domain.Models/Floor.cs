@@ -9,8 +9,6 @@ public class Floor
     
     public required List<BuildingObject> Objects { get; set; }
     public required List<Edge> Edges { get; set; }
-    //TODO: еще 10 раз подумать нужно ли это поле
-    public FloorRoute? FloorRoute { get; set; }
     
     public required string ImageLink { get; set; }
 }
