@@ -6,15 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 [ApiController]
 
-[Route("api/routes")]
-public class InnerRoutesController: ControllerBase
+[Route("api/buildings/routes")]
+public class BuildingRoutesController: ControllerBase
 {
-    private readonly InnerRoutesService innerRoutesService;
+    private readonly BuildingRoutesService buildingRoutesService;
     private readonly IRoutesConverter routesConverter;
 
-    public InnerRoutesController(InnerRoutesService innerRoutesService, IRoutesConverter routesConverter)
+    public BuildingRoutesController(BuildingRoutesService buildingRoutesService, IRoutesConverter routesConverter)
     {
-        this.innerRoutesService = innerRoutesService;
+        this.buildingRoutesService = buildingRoutesService;
         this.routesConverter = routesConverter;
     }
 
@@ -22,7 +22,7 @@ public class InnerRoutesController: ControllerBase
     [Route("create")]
     public async Task<ActionResult<BuildingRouteResponse>> CreateRoute([FromBody] BuildingRouteRequest request)
     {
-        var internalRoute = await innerRoutesService
+        var internalRoute = await buildingRoutesService
             .CreateRoute(request.BuildingId, request.ToId, request.FromId ?? default).ConfigureAwait(false);
 
         var publicRoute = routesConverter.ConvertToPublicRoute(internalRoute);
@@ -33,7 +33,10 @@ public class InnerRoutesController: ControllerBase
     [Route("{routeId:guid}")]
     public async Task<ActionResult<BuildingRouteResponse>> GetRouteById(Guid routeId)
     {
-        return Ok();
+        var internalRoute = await buildingRoutesService.GetRouteById(routeId).ConfigureAwait(false);
+
+        var publicRoute = routesConverter.ConvertToPublicRoute(internalRoute);
+        return Ok(publicRoute);
     }
     
     //Todo: реализовать поиск созданных путей по фильтру 

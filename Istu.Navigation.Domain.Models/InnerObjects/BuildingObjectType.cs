@@ -1,6 +1,6 @@
 ﻿namespace Istu.Navigation.Domain.Models.InnerObjects;
 
-public enum InnerObjectType
+public enum BuildingObjectType
 {
     Node,
     Auditorium,

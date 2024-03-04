@@ -6,11 +6,11 @@ namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
 [Route("api/buildings")]
-public class InnerObjectsController : ControllerBase
+public class BuildingObjectsController : ControllerBase
 {
     [HttpGet]
     [Route("{buildingId}/objectsByTypes")]
-    public IActionResult GetAllByTypeInBuilding(Guid buildingId, [FromQuery] InnerObjectType[] types)
+    public IActionResult GetAllByTypeInBuilding(Guid buildingId, [FromQuery] BuildingObjectType[] types)
     {
         throw new InvalidOperationException();
     }

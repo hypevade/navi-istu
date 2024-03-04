@@ -2,11 +2,11 @@
 
 public class Edge
 {
-    public InnerObject From { get; set; }
-    public InnerObject To { get; set; }
+    public BuildingObject From { get; set; }
+    public BuildingObject To { get; set; }
     public double Weight { get; set; }
 
-    public Edge(InnerObject from, InnerObject to, double weight)
+    public Edge(BuildingObject from, BuildingObject to, double weight)
     {
         From = from;
         To = to;

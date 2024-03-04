@@ -6,5 +6,5 @@ namespace Istu.Navigation.Api.Converters;
 
 public interface IRoutesConverter
 {
-    public BuildingRouteResponse ConvertToPublicRoute(List<(Floor, Route)> internalBuildingRoute); 
+    public BuildingRouteResponse ConvertToPublicRoute(BuildingRoute internalBuildingRoute); 
 }

@@ -2,10 +2,10 @@
 
 namespace Istu.Navigation.Domain.Models;
 
-public class Route(InnerObject from, InnerObject to, List<InnerObject>? objects = null)
+public class Route(BuildingObject from, BuildingObject to, List<BuildingObject>? objects = null)
 {
-    public required InnerObject From { get; init; } = from;
-    public required InnerObject To { get; init; } = to;
+    public required BuildingObject From { get; init; } = from;
+    public required BuildingObject To { get; init; } = to;
 
-    public List<InnerObject>? Objects { get; set; } = objects;
+    public List<BuildingObject>? Objects { get; set; } = objects;
 }

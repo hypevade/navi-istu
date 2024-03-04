@@ -4,24 +4,24 @@ using Istu.Navigation.Domain.Repositories;
 
 namespace Istu.Navigation.Infrastructure.Memory;
 
-public class InnerObjectsRepository : IInnerObjectsRepository
+public class BuildingObjectsRepository : IBuildingObjectsRepository
 {
-    public Task<InnerObject[]> GetAllByTypeInBuilding(Guid buildingId, InnerObjectType[] types)
+    public Task<List<BuildingObject>> GetAllByTypeInBuilding(Guid buildingId, BuildingObjectType[] types)
     {
         throw new NotImplementedException();
     }
 
-    public Task<InnerObject[]> GetAllByBuilding(Guid buildingId)
+    public Task<List<BuildingObject>> GetAllByBuilding(Guid buildingId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<InnerObject[]> GetAllByFloor(Guid buildingId, int floor)
+    public Task<List<BuildingObject>> GetAllByFloor(Guid buildingId, int floor)
     {
         throw new NotImplementedException();
     }
 
-    public Task<InnerObject?> GetById(Guid innerObjectId)
+    public Task<BuildingObject?> GetById(Guid buildingObjectId)
     {
         throw new NotImplementedException();
     }

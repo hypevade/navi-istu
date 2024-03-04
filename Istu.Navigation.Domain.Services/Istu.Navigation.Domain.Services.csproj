@@ -11,4 +11,8 @@
       <ProjectReference Include="..\Istu.Navigation.Domain.Repositories\Istu.Navigation.Domain.Repositories.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="QuikGraph.Serialization" Version="2.5.0" />
+    </ItemGroup>
+
 </Project>
