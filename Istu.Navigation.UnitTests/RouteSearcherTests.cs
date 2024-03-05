@@ -2,26 +2,29 @@
 using Istu.Navigation.Domain.Models;
 using Istu.Navigation.Domain.Models.InnerObjects;
 using Istu.Navigation.Domain.Services;
+using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
 namespace Istu.Navigation.UnitTests;
 
 public class RouteSearcherTests
 {
-    private IRouteSearcher routeSearcher = new RouteSearcher();
+    private readonly IRouteSearcher routeSearcher = new RouteSearcher();
 
     [Test]
-    public void Should_return_shortest_route()
+    public void Should_return_correct_route_when_two_obj()
     {
-        var objects = GenerateBuildingObjects();
-        var edges = new List<Edge>()
+        var points = new List<(double X, double Y)>
         {
-            new Edge(objects[0], objects[1]),
-            new Edge(objects[1], objects[2]),
-            new Edge(objects[2], objects[3]),
-            new Edge(objects[3], objects[4]),
-            new Edge(objects[0], objects[4]),
+            (0, 0),
+            (1, 1),
         };
-        
+
+        var objects = GenerateBuildingObjects(points);
+        var edges = new List<Edge>
+        {
+            new(objects[0], objects[1]),
+        };
+
         var floor = new Floor
         {
             BuildingId = Guid.Empty,
@@ -31,68 +34,156 @@ public class RouteSearcherTests
             ImageLink = "test"
         };
 
-        var result = routeSearcher.CreateRouteOR(objects[0], objects[4], floor);
+        var result = routeSearcher.CreateRoute(objects[0], objects[1], floor);
         result.IsSuccess.Should().BeTrue();
         result.Data.Should().NotBeNull();
-        Console.WriteLine(result.Data!.Objects.Count);
-        result.Data.Objects.ForEach(x=>Console.WriteLine(x.Title));
+
+        result.Data!.Objects.Count.Should().Be(2);
+        result.Data.Objects.Should().BeEquivalentTo(objects);
+    }
+    
+    [Test]
+    public void Should_return_shortest_route_when_two_routes_exist()
+    {
+        var points = new List<(double X, double Y)>
+        {
+            (0, 0),
+            (1, 0),
+            (1, 1)
+        };
+
+        var objects = GenerateBuildingObjects(points);
+        var edges = new List<Edge>
+        {
+            new(objects[0], objects[1]),
+            new(objects[1], objects[2]),
+            new(objects[0], objects[2]),
+        };
+
+        var floor = new Floor
+        {
+            BuildingId = Guid.Empty,
+            Number = 0,
+            Objects = objects,
+            Edges = edges,
+            ImageLink = "test"
+        };
+
+        var result = routeSearcher.CreateRoute(objects[0], objects[2], floor);
+        result.IsSuccess.Should().BeTrue();
+        result.Data.Should().NotBeNull();
+
+        result.Data!.Objects.Count.Should().Be(2);
+        result.Data.Objects[0].Should().BeEquivalentTo(objects[0]);
+        result.Data.Objects[1].Should().BeEquivalentTo(objects[2]);
+    }
+    
+    [Test]
+    public void Should_return_error_when_no_edges()
+    {
+        var points = new List<(double X, double Y)>
+        {
+            (0, 0),
+            (1, 1),
+        };
+
+        var objects = GenerateBuildingObjects(points);
+        var emptyEdges = new List<Edge>();
+
+        var floor = new Floor
+        {
+            BuildingId = Guid.Empty,
+            Number = 0,
+            Objects = objects,
+            Edges = emptyEdges,
+            ImageLink = "test"
+        };
+
+        var result = routeSearcher.CreateRoute(objects[0], objects[1], floor);
+        result.IsSuccess.Should().BeFalse();
+        result.Data.Should().BeNull();
+
+        result.ApiError.Should().NotBeNull();
+        result.ApiError!.Urn.Should()
+            .BeEquivalentTo(BuildingRoutesErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
+    }
+    
+    [Test]
+    public void Should_return_error_when_empty_floor()
+    {
+        var points = new List<(double X, double Y)>
+        {
+            (0, 0),
+            (1, 1),
+        };
+
+        var objects = GenerateBuildingObjects(points);
+
+        var floor = new Floor
+        {
+            BuildingId = Guid.Empty,
+            Number = 0,
+            Objects = [],
+            Edges = [],
+            ImageLink = "test"
+        };
+
+        var result = routeSearcher.CreateRoute(objects[0], objects[1], floor);
+        result.IsSuccess.Should().BeFalse();
+        result.ApiError.Should().NotBeNull();
+        result.ApiError!.Urn.Should().Be(BuildingRoutesErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
+    }
+    
+    [Test]
+    public void Should_return_not_found_when_no_route_between_obj()
+    {
+        var points = new List<(double X, double Y)>
+        {
+            (0, 0),
+            (1, 1),
+            (2, 2),
+        };
+
+        var objects = GenerateBuildingObjects(points);
+        var edges = new List<Edge>()
+        {
+            new(objects[0], objects[1]),
+        };
+
+        var floor = new Floor
+        {
+            BuildingId = Guid.Empty,
+            Number = 0,
+            Objects = objects,
+            Edges = edges,
+            ImageLink = "test"
+        };
+
+        var result = routeSearcher.CreateRoute(objects[0], objects[2], floor);
+        result.IsSuccess.Should().BeFalse();
+        result.ApiError.Should().NotBeNull();
+        result.ApiError!.Urn.Should().Be(BuildingRoutesErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
     }
 
-    private static List<BuildingObject> GenerateBuildingObjects()
+    private static List<BuildingObject> GenerateBuildingObjects(List<(double X, double Y)> points)
     {
-        var objects = new List<BuildingObject>
+        var objects = new List<BuildingObject>();
+        var buildingId = Guid.NewGuid();
+
+        for (var index = 0; index < points.Count; index++)
         {
-            new BuildingObject
+            var point = points[index];
+            objects.Add(new BuildingObject
             {
                 Id = Guid.NewGuid(),
-                Title = "Object 1",
+                Title = $"Object {index}",
                 Floor = 1,
-                BuildingId = Guid.NewGuid(),
+                BuildingId = buildingId,
                 Type = BuildingObjectType.Node,
-                X = 10.0,
-                Y = 20.0
-            },
-            new BuildingObject
-            {
-                Id = Guid.NewGuid(),
-                Title = "Object 2",
-                Floor = 2,
-                BuildingId = Guid.NewGuid(),
-                Type = BuildingObjectType.Node,
-                X = 20.0,
-                Y = 40.0
-            },
-            new BuildingObject
-            {
-                Id = Guid.NewGuid(),
-                Title = "Object 3",
-                Floor = 3,
-                BuildingId = Guid.NewGuid(),
-                Type = BuildingObjectType.Entrance,
-                X = 30.0,
-                Y = 60.0
-            },
-            new BuildingObject
-            {
-                Id = Guid.NewGuid(),
-                Title = "Object 4",
-                Floor = 4,
-                BuildingId = Guid.NewGuid(),
-                Type = BuildingObjectType.Node,
-                X = 40.0,
-                Y = 80.0
-            },
-            new BuildingObject
-            {
-                Id = Guid.NewGuid(),
-                Title = "Object 5",
-                Floor = 5,
-                BuildingId = Guid.NewGuid(),
-                Type = BuildingObjectType.Node,
-                X = 50.0,
-                Y = 100.0
-            }
-        };
+                X = point.X,
+                Y = point.Y
+            });
+        }
 
         return objects;
     }

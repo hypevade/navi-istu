@@ -35,7 +35,7 @@ public class BuildingRoutesService(IBuildingObjectsRepository buildingObjectRepo
             BuildingId = buildingId,
             BuildingTitle = building.Title,
             Floors = floors,
-            FloorRoutes = floorRoutes,
+            FloorRoutes = floorRoutes.Select(x=>x.Data).ToList(),
             CreationDate = DateTime.UtcNow,
             CreatedByUser = userId,
             RouteId = Guid.NewGuid(),
