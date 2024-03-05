@@ -22,9 +22,16 @@ public class BuildingRoutesController: ControllerBase
     [Route("create")]
     public async Task<ActionResult<BuildingRouteResponse>> CreateRoute([FromBody] BuildingRouteRequest request)
     {
-        var internalRoute = await buildingRoutesService
+        var getInternalRoute = await buildingRoutesService
             .CreateRoute(request.BuildingId, request.ToId, request.FromId ?? default).ConfigureAwait(false);
-
+        if (getInternalRoute.IsFailure)
+        {
+            //TODO: временно написал return NotFound, надо переделать
+            //Можно написать метод расширения, для конвертации OperationResult в ActionResult
+            //Им будет проще пользоваться
+            return NotFound();
+        }
+        var internalRoute = getInternalRoute.Data;
         var publicRoute = routesConverter.ConvertToPublicRoute(internalRoute);
         return Ok(publicRoute);
     }
@@ -33,7 +40,15 @@ public class BuildingRoutesController: ControllerBase
     [Route("{routeId:guid}")]
     public async Task<ActionResult<BuildingRouteResponse>> GetRouteById(Guid routeId)
     {
-        var internalRoute = await buildingRoutesService.GetRouteById(routeId).ConfigureAwait(false);
+        var getInternalRoute = await buildingRoutesService.GetRouteById(routeId).ConfigureAwait(false);
+        if (getInternalRoute.IsFailure)
+        {
+            //TODO: временно написал return NotFound, надо переделать
+            //Можно написать метод расширения, для конвертации OperationResult в ActionResult
+            //Им будет проще пользоваться
+            return NotFound();
+        }
+        var internalRoute = getInternalRoute.Data;
 
         var publicRoute = routesConverter.ConvertToPublicRoute(internalRoute);
         return Ok(publicRoute);

@@ -21,4 +21,16 @@ public class BuildingRoutesErrors : ErrorBase
         return new ApiError(404, $"Путь между объектами с идентификаторами {fromObjectId} и {toObjectId} не найден.",
             GetUrn("building-route-not-found"));
     }
+    
+    public static ApiError FloorContainsNoObjectsError(Guid buildingId, int floor)
+    {
+        return new ApiError(400, $"Этаж {floor} в здании с идентификатором {buildingId} не содержит объектов. Возможно вам стоит добавить их.",
+            GetUrn("floor-contains-no-objects"));
+    }
+    
+    public static ApiError FloorContainsNoEdgesError(Guid buildingId, int floor)
+    {
+        return new ApiError(400, $"Этаж {floor} в здании с идентификатором {buildingId} не содержит ребер между объектами. Возможно вам стоит добавить их.",
+            GetUrn("floor-contains-no-edges"));
+    }
 }

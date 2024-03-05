@@ -1,6 +1,7 @@
 ﻿using Istu.Navigation.Domain.Models;
 using Istu.Navigation.Domain.Models.InnerObjects;
 using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Infrastructure.Errors;
 
 namespace Istu.Navigation.Domain.Services;
 
@@ -14,28 +15,45 @@ public class BuildingRoutesService(IBuildingObjectsRepository buildingObjectRepo
     private IRouteSearcher routeSearcher = routeSearcher;
     private IImageService imageService = imageService;
 
-    public async Task<BuildingRoute> CreateRoute(Guid userId, Guid buildingId, Guid toId, Guid fromId = default)
+    public async Task<OperationResult<BuildingRoute>> CreateRoute(Guid userId, Guid buildingId, Guid toId, Guid fromId = default)
     {
         //TODO: Добавить  поддержку, когда fromID = default
         
-        var toObject = await buildingObjectRepository.GetById(toId).ConfigureAwait(false);
-        var fromObject = await buildingObjectRepository.GetById(fromId).ConfigureAwait(false);
+        var getToObject = await buildingObjectRepository.GetById(toId).ConfigureAwait(false);
+        if (getToObject.IsFailure)
+            return OperationResult<BuildingRoute>.Failure(getToObject.ApiError);
         
-        //TODO: Сделать нормальное прокидование ошибки 
-        if (toObject is null || fromObject is null)
-            throw new KeyNotFoundException();
+        var getFromObject = await buildingObjectRepository.GetById(fromId).ConfigureAwait(false);
+        if (getFromObject.IsFailure)
+            return OperationResult<BuildingRoute>.Failure(getFromObject.ApiError);
 
-        var floors = await GetFloors(fromObject, toObject, buildingId).ConfigureAwait(false);
-        var floorRoutes = floors.Select(floor => routeSearcher.CreateRoute(fromObject, toObject, floor)).ToList();
+        var toObject = getToObject.Data;
+        var fromObject = getFromObject.Data;
 
-        var building = await buildingsRepository.GetById(buildingId).ConfigureAwait(false);
+        var getFloors = await GetFloors(fromObject, toObject, buildingId).ConfigureAwait(false);
+        if(getFloors.IsFailure)
+            return OperationResult<BuildingRoute>.Failure(getFloors.ApiError);
         
-        var resultRoute = new BuildingRoute()
+        //TODO: неправильно работает, так как from и toObject на каждом этаже разные
+        var getFloorRoutes = getFloors.Data.Select(floor => routeSearcher.CreateRoute(fromObject, toObject, floor)).ToList();
+        
+        if(getFloorRoutes.Any(x=>x.IsFailure))
+            return OperationResult<BuildingRoute>.Failure(getFloorRoutes.First(x=>x.IsFailure).ApiError);
+        
+        var getBuilding = await buildingsRepository.GetById(buildingId).ConfigureAwait(false);
+        if(getBuilding.IsFailure)
+            return OperationResult<BuildingRoute>.Failure(getBuilding.ApiError);
+        
+        var floors = getFloors.Data;
+        var floorRoutes = getFloorRoutes.Select(x => x.Data).ToList();
+        var building = getBuilding.Data;
+        
+        var resultRoute = new BuildingRoute
         {
             BuildingId = buildingId,
             BuildingTitle = building.Title,
             Floors = floors,
-            FloorRoutes = floorRoutes.Select(x=>x.Data).ToList(),
+            FloorRoutes = floorRoutes,
             CreationDate = DateTime.UtcNow,
             CreatedByUser = userId,
             RouteId = Guid.NewGuid(),
@@ -43,41 +61,51 @@ public class BuildingRoutesService(IBuildingObjectsRepository buildingObjectRepo
             FinishObject = toObject
         };
         
-        await routeRepository.CreateRoute(resultRoute).ConfigureAwait(false);
+        var createRoute = await routeRepository.CreateRoute(resultRoute).ConfigureAwait(false);
 
-        return resultRoute;
+        return createRoute.IsFailure 
+            ? OperationResult<BuildingRoute>.Failure(createRoute.ApiError) 
+            : OperationResult<BuildingRoute>.Success(resultRoute);
     }
     
-    public async Task<BuildingRoute> GetRouteById(Guid routeId)
+    public async Task<OperationResult<BuildingRoute>> GetRouteById(Guid routeId)
     {
         var route = await routeRepository.GetById(routeId).ConfigureAwait(false);
         return route;
     }
     
 
-    private async Task<List<Floor>> GetFloors(BuildingObject fromBuildingObject, BuildingObject toBuildingObject, Guid buildingId)
+    private async Task<OperationResult<List<Floor>>> GetFloors(BuildingObject fromBuildingObject, BuildingObject toBuildingObject, Guid buildingId)
     {
         var numbersOfFloors = GetFloorsNumbers(fromBuildingObject, toBuildingObject);
         var floors = new List<Floor>();
         foreach (var floorNumber in numbersOfFloors)
         {
-            var objects = await buildingObjectRepository.GetAllByFloor(buildingId, floorNumber)
+            var getObjects = await buildingObjectRepository.GetAllByFloor(buildingId, floorNumber)
                 .ConfigureAwait(false);
+            if (!getObjects.IsSuccess)
+                return OperationResult<List<Floor>>.Failure(getObjects.ApiError);
 
-            var floorImageLink = await imageService.GetFloorImageLink(buildingId, floorNumber)
+            var getFloorImageLink = await imageService.GetFloorImageLink(buildingId, floorNumber)
                 .ConfigureAwait(false);
-            var edges = await edgesRepository.GetAllByFloor(buildingId, floorNumber).ConfigureAwait(false);
+            
+            if (!getFloorImageLink.IsSuccess)
+                return OperationResult<List<Floor>>.Failure(getFloorImageLink.ApiError);
+            
+            var getEdges = await edgesRepository.GetAllByFloor(buildingId, floorNumber).ConfigureAwait(false);
+            if(!getEdges.IsSuccess)
+                return OperationResult<List<Floor>>.Failure(getEdges.ApiError);
             var floor = new Floor()
             {
                 BuildingId = buildingId,
                 Number = floorNumber,
-                Objects = objects.ToList(),
-                ImageLink = floorImageLink, 
-                Edges = edges.ToList()
+                Objects = getObjects.Data.ToList(),
+                ImageLink = getFloorImageLink.Data, 
+                Edges = getEdges.Data.ToList()
             };
             floors.Add(floor);
         }
-        return floors;
+        return OperationResult<List<Floor>>.Success(floors);
     }
 
     private IEnumerable<int> GetFloorsNumbers(BuildingObject fromBuildingObject, BuildingObject toBuildingObject)

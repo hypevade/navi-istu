@@ -21,9 +21,14 @@ public class RouteSearcher : IRouteSearcher
     
     public OperationResult<FloorRoute> CreateRoute(BuildingObject fromBuildingObject, BuildingObject toBuildingObject, Floor floor)
     {
-        if(floor.Objects.Count == 0 || floor.Edges.Count == 0)
-            return OperationResult<FloorRoute>.Failure(BuildingRoutesErrors.BuildingRouteNotFoundError(fromBuildingObject.Id, toBuildingObject.Id));
+        if (floor.Objects.Count == 0)
+            return OperationResult<FloorRoute>.Failure(
+                BuildingRoutesErrors.FloorContainsNoObjectsError(floor.BuildingId, floor.Number));
         
+        if (floor.Edges.Count == 0)
+            return OperationResult<FloorRoute>.Failure(
+                BuildingRoutesErrors.FloorContainsNoEdgesError(floor.BuildingId, floor.Number));
+
         var floorGraph = new AdjacencyGraph<BuildingObject, Edge<BuildingObject>>();
         floor.Objects
             .ForEach(bO => { floorGraph.AddVertex(bO); });

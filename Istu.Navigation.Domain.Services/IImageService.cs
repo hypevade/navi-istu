@@ -1,8 +1,10 @@
-﻿namespace Istu.Navigation.Domain.Services;
+﻿using Istu.Navigation.Infrastructure.Errors;
+
+namespace Istu.Navigation.Domain.Services;
 
 public interface IImageService
 {
-    public Task<List<string>> GetObjectImageLinks(Guid objectId);
+    public Task<OperationResult<List<string>>> GetObjectImageLinks(Guid objectId);
     
-    public Task<string> GetFloorImageLink(Guid buildingId, int floor);
+    public Task<OperationResult<string>> GetFloorImageLink(Guid buildingId, int floor);
 }

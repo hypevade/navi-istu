@@ -1,27 +1,27 @@
-﻿using Istu.Navigation.Domain.Models;
-using Istu.Navigation.Domain.Models.InnerObjects;
+﻿using Istu.Navigation.Domain.Models.InnerObjects;
 using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Infrastructure.Errors;
 
 namespace Istu.Navigation.Infrastructure.Memory;
 
 public class BuildingObjectsRepository : IBuildingObjectsRepository
 {
-    public Task<List<BuildingObject>> GetAllByTypeInBuilding(Guid buildingId, BuildingObjectType[] types)
+    public Task<OperationResult<List<BuildingObject>>> GetAllByTypeInBuilding(Guid buildingId, BuildingObjectType[] types)
     {
         throw new NotImplementedException();
     }
 
-    public Task<List<BuildingObject>> GetAllByBuilding(Guid buildingId)
+    public Task<OperationResult<List<BuildingObject>>> GetAllByBuilding(Guid buildingId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<List<BuildingObject>> GetAllByFloor(Guid buildingId, int floor)
+    public Task<OperationResult<List<BuildingObject>>> GetAllByFloor(Guid buildingId, int floor)
     {
         throw new NotImplementedException();
     }
 
-    public Task<BuildingObject?> GetById(Guid buildingObjectId)
+    public Task<OperationResult<BuildingObject>> GetById(Guid buildingObjectId)
     {
         throw new NotImplementedException();
     }
