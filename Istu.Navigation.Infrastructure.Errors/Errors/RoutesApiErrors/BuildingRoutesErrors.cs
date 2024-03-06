@@ -22,6 +22,12 @@ public class BuildingRoutesErrors : ErrorBase
             GetUrn("building-route-not-found"));
     }
     
+    public static ApiError TargetObjectIsEqualToSourceError(Guid objectId)
+    {
+        return new ApiError(400, $"Объект с идентификатором {objectId} является целевым и совпадает с исходным.",
+            GetUrn("target-object-is-equal-to-source"));
+    }
+    
     public static ApiError FloorContainsNoObjectsError(Guid buildingId, int floor)
     {
         return new ApiError(400, $"Этаж {floor} в здании с идентификатором {buildingId} не содержит объектов. Возможно вам стоит добавить их.",

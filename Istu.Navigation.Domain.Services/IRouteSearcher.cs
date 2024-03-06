@@ -29,6 +29,9 @@ public class RouteSearcher : IRouteSearcher
             return OperationResult<FloorRoute>.Failure(
                 BuildingRoutesErrors.FloorContainsNoEdgesError(floor.BuildingId, floor.Number));
 
+        if (fromBuildingObject.Id == toBuildingObject.Id)
+            return OperationResult<FloorRoute>.Failure(BuildingRoutesErrors.TargetObjectIsEqualToSourceError(fromBuildingObject.Id));
+
         var floorGraph = new AdjacencyGraph<BuildingObject, Edge<BuildingObject>>();
         floor.Objects
             .ForEach(bO => { floorGraph.AddVertex(bO); });

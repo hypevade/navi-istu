@@ -13,17 +13,7 @@ public class RouteSearcherTests
     [Test]
     public void Should_return_correct_route_when_two_obj()
     {
-        var points = new List<(double X, double Y)>
-        {
-            (0, 0),
-            (1, 1),
-        };
-
-        var objects = GenerateBuildingObjects(points);
-        var edges = new List<Edge>
-        {
-            new(objects[0], objects[1]),
-        };
+        var (objects, edges) = GetObjectsAndEdges();
 
         var floor = new Floor
         {
@@ -38,7 +28,7 @@ public class RouteSearcherTests
         result.IsSuccess.Should().BeTrue();
         result.Data.Should().NotBeNull();
 
-        result.Data!.Objects.Count.Should().Be(2);
+        result.Data.Objects.Count.Should().Be(2);
         result.Data.Objects.Should().BeEquivalentTo(objects);
     }
     
@@ -73,29 +63,44 @@ public class RouteSearcherTests
         result.IsSuccess.Should().BeTrue();
         result.Data.Should().NotBeNull();
 
-        result.Data!.Objects.Count.Should().Be(2);
+        result.Data.Objects.Count.Should().Be(2);
         result.Data.Objects[0].Should().BeEquivalentTo(objects[0]);
         result.Data.Objects[1].Should().BeEquivalentTo(objects[2]);
     }
-    
     [Test]
-    public void Should_return_error_when_no_edges()
+    public void Should_return_error_when_source_and_target_are_the_same()
     {
-        var points = new List<(double X, double Y)>
-        {
-            (0, 0),
-            (1, 1),
-        };
-
-        var objects = GenerateBuildingObjects(points);
-        var emptyEdges = new List<Edge>();
+        var (objects, edges) = GetObjectsAndEdges();
 
         var floor = new Floor
         {
             BuildingId = Guid.Empty,
             Number = 0,
             Objects = objects,
-            Edges = emptyEdges,
+            Edges = edges,
+            ImageLink = "test"
+        };
+
+        var result = routeSearcher.CreateRoute(objects[0], objects[0], floor);
+        result.IsFailure.Should().BeTrue();
+        result.Data.Should().BeNull();
+
+        result.ApiError.Urn.Should()
+            .BeEquivalentTo(BuildingRoutesErrors.TargetObjectIsEqualToSourceError(objects[0].Id).Urn);
+        result.Data.Objects.Should().BeEquivalentTo(objects);
+    }
+    
+    [Test]
+    public void Should_return_error_when_no_edges()
+    {
+        var (objects, _) = GetObjectsAndEdges();
+
+        var floor = new Floor
+        {
+            BuildingId = Guid.Empty,
+            Number = 0,
+            Objects = objects,
+            Edges = new List<Edge>(),
             ImageLink = "test"
         };
 
@@ -104,21 +109,15 @@ public class RouteSearcherTests
         result.Data.Should().BeNull();
 
         result.ApiError.Should().NotBeNull();
-        result.ApiError!.Urn.Should()
+        result.ApiError.Urn.Should()
             .BeEquivalentTo(BuildingRoutesErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
     }
     
     [Test]
     public void Should_return_error_when_empty_floor()
     {
-        var points = new List<(double X, double Y)>
-        {
-            (0, 0),
-            (1, 1),
-        };
-
-        var objects = GenerateBuildingObjects(points);
-
+        var (objects, _) = GetObjectsAndEdges();
+        
         var floor = new Floor
         {
             BuildingId = Guid.Empty,
@@ -131,7 +130,7 @@ public class RouteSearcherTests
         var result = routeSearcher.CreateRoute(objects[0], objects[1], floor);
         result.IsSuccess.Should().BeFalse();
         result.ApiError.Should().NotBeNull();
-        result.ApiError!.Urn.Should().Be(BuildingRoutesErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
+        result.ApiError.Urn.Should().Be(BuildingRoutesErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
     }
     
     [Test]
@@ -162,7 +161,23 @@ public class RouteSearcherTests
         var result = routeSearcher.CreateRoute(objects[0], objects[2], floor);
         result.IsSuccess.Should().BeFalse();
         result.ApiError.Should().NotBeNull();
-        result.ApiError!.Urn.Should().Be(BuildingRoutesErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
+        result.ApiError.Urn.Should().Be(BuildingRoutesErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
+    }
+
+    private static (List<BuildingObject> objects, List<Edge> edges) GetObjectsAndEdges()
+    {
+        var points = new List<(double X, double Y)>
+        {
+            (0, 0),
+            (1, 1),
+        };
+
+        var objects = GenerateBuildingObjects(points);
+        var edges = new List<Edge>
+        {
+            new(objects[0], objects[1]),
+        };
+        return (objects, edges);
     }
 
     private static List<BuildingObject> GenerateBuildingObjects(List<(double X, double Y)> points)
