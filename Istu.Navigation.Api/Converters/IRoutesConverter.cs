@@ -1,6 +1,5 @@
-﻿using Istu.Navigation.Domain.Models;
+﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Public.Models;
-using Route = Istu.Navigation.Domain.Models.Route;
 
 namespace Istu.Navigation.Api.Converters;
 

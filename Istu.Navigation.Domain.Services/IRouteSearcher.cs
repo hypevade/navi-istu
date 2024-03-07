@@ -1,5 +1,4 @@
-﻿using Istu.Navigation.Domain.Models;
-using Istu.Navigation.Domain.Models.InnerObjects;
+﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 using QuikGraph;
@@ -54,12 +53,7 @@ public class RouteSearcher : IRouteSearcher
         foreach (var edge in path)
             shortestPath.Add(edge.Target);
         
-        var floorRoute =  new FloorRoute
-        {
-            StartObject = fromBuildingObject,
-            FinishObject = toBuildingObject,
-            Objects = shortestPath
-        };
+        var floorRoute =  new FloorRoute(shortestPath, floor, fromBuildingObject, toBuildingObject);
         
         return OperationResult<FloorRoute>.Success(floorRoute);
     }

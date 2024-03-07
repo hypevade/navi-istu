@@ -1,4 +1,4 @@
-﻿namespace Istu.Navigation.Domain.Models.InnerObjects;
+﻿namespace Istu.Navigation.Domain.Models.BuildingRoutes;
 
 public enum BuildingObjectType
 {

@@ -1,4 +1,4 @@
-﻿using Istu.Navigation.Domain.Models;
+﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Infrastructure.Errors;
 
 namespace Istu.Navigation.Domain.Repositories;
