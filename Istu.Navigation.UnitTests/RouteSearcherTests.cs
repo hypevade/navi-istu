@@ -67,16 +67,22 @@ public class RouteSearcherTests
     public void Should_return_error_when_source_and_target_are_the_same()
     {
         var (objects, edges) = GetObjectsAndEdges();
-        
-        var floor = new Floor(id: floorId, number: 1, objects: objects, edges: edges, buildingId: Guid.NewGuid(),
-            imageLink: testImageLink);
+    
+        var floor = new Floor(
+            id: floorId,
+            number: 1,
+            objects: objects,
+            edges: edges,
+            buildingId: Guid.NewGuid(),
+            imageLink: testImageLink
+        );
 
         var result = routeSearcher.CreateRoute(objects[0], objects[0], floor);
         result.IsFailure.Should().BeTrue();
         result.Data.Should().BeNull();
 
-        result.ApiError.Urn.Should()
-            .BeEquivalentTo(BuildingRoutesErrors.TargetObjectIsEqualToSourceError(objects[0].Id).Urn);
+        result.ApiError.Urn.Should().BeEquivalentTo(
+            BuildingRoutesErrors.TargetObjectIsEqualToSourceError(objects[0].Id).Urn);
     }
     
     [Test]
