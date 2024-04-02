@@ -1,4 +1,5 @@
-﻿using Istu.Navigation.Api.Converters;
+﻿using AutoMapper;
+using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Public.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +11,12 @@ namespace Istu.Navigation.Api.Controllers;
 public class BuildingRoutesController: ControllerBase
 {
     private readonly BuildingRoutesService buildingRoutesService;
-    private readonly IRoutesConverter routesConverter;
+    private readonly IMapper mapper;
 
-    public BuildingRoutesController(BuildingRoutesService buildingRoutesService, IRoutesConverter routesConverter)
+    public BuildingRoutesController(BuildingRoutesService buildingRoutesService, IMapper mapper)
     {
         this.buildingRoutesService = buildingRoutesService;
-        this.routesConverter = routesConverter;
+        this.mapper = mapper;
     }
 
     [HttpPost]
@@ -26,17 +27,17 @@ public class BuildingRoutesController: ControllerBase
             .CreateRoute(request.BuildingId, request.ToId, request.FromId ?? default).ConfigureAwait(false);
         if (getInternalRoute.IsFailure)
         {
-            //TODO: временно написал return NotFound, надо переделать
-            //Можно написать метод расширения, для конвертации OperationResult в ActionResult
-            //Им будет проще пользоваться
-            return NotFound();
+            var apiError = getInternalRoute.ApiError;
+            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
         }
-        var internalRoute = getInternalRoute.Data;
-        var publicRoute = routesConverter.ConvertToPublicRoute(internalRoute);
+        
+        var publicRoute = mapper.Map<BuildingRouteResponse>(getInternalRoute.Data);
         return Ok(publicRoute);
     }
+    
+    
 
-    [HttpGet]
+    /*[HttpGet]
     [Route("{routeId:guid}")]
     public async Task<ActionResult<BuildingRouteResponse>> GetRouteById(Guid routeId)
     {
@@ -52,7 +53,7 @@ public class BuildingRoutesController: ControllerBase
 
         var publicRoute = routesConverter.ConvertToPublicRoute(internalRoute);
         return Ok(publicRoute);
-    }
+    }*/
     
     //Todo: реализовать поиск созданных путей по фильтру 
     /*[HttpGet]

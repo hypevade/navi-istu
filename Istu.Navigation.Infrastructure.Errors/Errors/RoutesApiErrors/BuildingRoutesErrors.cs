@@ -1,30 +1,108 @@
-﻿namespace Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
+
+namespace Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
 public class BuildingRoutesErrors : ErrorBase
 {
     protected new string Nid = CommonConstans.RoutesApiNid;
 
-    public ApiError BuildingObjectNotFoundError(Guid buildingObjectId)
+    public static ApiError BuildingObjectNotFoundError(Guid buildingObjectId)
     {
-        return new ApiError(404, $"Объект с идентификатором {buildingObjectId} не найден.",
+        return new ApiError(404, $"Объект с идентификатором '{buildingObjectId}' не найден.",
             GetUrn("building-object-not-found"));
     }
-
-    public ApiError BuildingEdgeNotFoundError(Guid fromObjectId, Guid toObjectId)
+    
+    public static ApiError BuildingObjectsNotFoundError(Guid buildingId, BuildingObjectType[] types)
     {
-        return new ApiError(404, $"Ребро между объектами с идентификаторами {fromObjectId} и {toObjectId} не найдено.",
+        return new ApiError(404,
+            $"Объектов типа '{string.Join(", ", types)}' в здании с идентификатором '{buildingId}' не найдено.",
+            GetUrn("building-objects-with-id-and-type-not-found"));
+    }
+    
+    public static ApiError BuildingObjectsNotFoundError(Guid buildingId)
+    {
+        return new ApiError(404,
+            $"Объектов в здании с идентификатором '{buildingId}' не найдено.",
+            GetUrn("building-objects-with-id-not-found"));
+    }
+    
+    public static ApiError BuildingObjectsNotFoundError(Guid buildingId, int floor)
+    {
+        return new ApiError(404,
+            $"Объектов в здании с идентификатором '{buildingId}' на этаже '{floor}' не найдено.",
+            GetUrn("building-objects-with-id-and-floor-not-found"));
+    }
+
+    public static ApiError BuildingEdgeNotFoundError(Guid fromObjectId, Guid toObjectId)
+    {
+        return new ApiError(404, $"Ребро между объектами с идентификаторами '{fromObjectId}' и '{toObjectId}' не найдено.",
             GetUrn("building-edge-not-found"));
     }
     
     public static ApiError BuildingRouteNotFoundError(Guid fromObjectId, Guid toObjectId)
     {
-        return new ApiError(404, $"Путь между объектами с идентификаторами {fromObjectId} и {toObjectId} не найден.",
+        return new ApiError(404, $"Путь между объектами с идентификаторами '{fromObjectId}' и '{toObjectId}' не найден.",
             GetUrn("building-route-not-found"));
+    }
+    
+    public static ApiError BuildingsWithTitleNotFoundError(string title)
+    {
+        return new ApiError(404, $"Зданий с названием '{title}' не найдено.",
+            GetUrn("buildings-with-title-not-found"));
+    }
+    
+    public static ApiError BuildingWithIdNotFoundError(Guid buildingId)
+    {
+        return new ApiError(404, $"Здание с идентификатором '{buildingId}' не найдено.",
+            GetUrn("building-with-id-not-found"));
+    }
+
+    public static ApiError EdgesWithBuildingIdNotFoundError(Guid buildingId)
+    {
+        return new ApiError(404, $"Ребер в здании с идентификатором '{buildingId}' не найдено.",
+            GetUrn("edges-with-building-id-not-found"));
+    }
+    
+    public static ApiError EdgeWithIdNotFoundError(Guid edgeId)
+    {
+        return new ApiError(404, $"Ребро с идентификатором '{edgeId}' не найдено.",
+            GetUrn("edge-with-id-not-found"));
+    }
+    
+    public static ApiError EdgesWithBuildingIdAndFloorNotFoundError(Guid buildingId, int floor)
+    {
+        return new ApiError(404, $"Ребер на этаже '{floor}' в здании с идетификатором '{buildingId}' не найдено.",
+            GetUrn("edge-with-building-id-and-floor-not-found"));
+    }
+    
+    public static ApiError EdgesWithBuildingObjectIdNotFoundError(Guid buildingObjectId)
+    {
+        return new ApiError(404, $"У объекта с идентификатором '{buildingObjectId}' нет ребер.",
+            GetUrn("edge-with-building-object-id-not-found"));
+    }
+    
+    public static ApiError FloorsWithBuildingIdNotFoundError(Guid buildingId)
+    {
+        return new ApiError(404, $"Этажи в здании с идентификатором '{buildingId}' не найдены.",
+            GetUrn("floors-with-building-id-not-found"));
+    }
+    
+    public static ApiError FloorWithBuildingAndFloorNumberIdNotFoundError(Guid buildingId, int floorNumber)
+    {
+        return new ApiError(404, $"Этаж '{floorNumber}' в здании с идентификатором '{buildingId}' не найден.",
+            GetUrn("floor-with-building-id-and-floor-number-not-found"));
+    }
+
+    public static ApiError EmptyListTypesError()
+    {
+        return new ApiError(400,
+            "Невозможно найти объекты с пустым списком типов.",
+            GetUrn("building-objects-with-id-and-type-not-found"));
     }
     
     public static ApiError TargetObjectIsEqualToSourceError(Guid objectId)
     {
-        return new ApiError(400, $"Объект с идентификатором {objectId} является целевым и совпадает с исходным.",
+        return new ApiError(400, $"Объект с идентификатором '{objectId}' является целевым и совпадает с исходным.",
             GetUrn("target-object-is-equal-to-source"));
     }
     
@@ -33,6 +111,8 @@ public class BuildingRoutesErrors : ErrorBase
         return new ApiError(400, $"Этаж {floor} в здании с идентификатором {buildingId} не содержит объектов. Возможно вам стоит добавить их.",
             GetUrn("floor-contains-no-objects"));
     }
+    
+    
     
     public static ApiError FloorContainsNoEdgesError(Guid buildingId, int floor)
     {

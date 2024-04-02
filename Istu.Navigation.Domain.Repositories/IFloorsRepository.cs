@@ -5,6 +5,6 @@ namespace Istu.Navigation.Domain.Repositories;
 
 public interface IFloorsRepository
 {
-    public Task<OperationResult<Floor>> GetById(Guid floorId);
-    public Task<OperationResult<List<Floor>>> GetByBuilding(Guid buildingId, int take = 0, int skip = 0);
+    public Task<OperationResult<Floor>> GetById(Guid buildingId, int floorNumber);
+    public Task<OperationResult<List<Floor>>> GetAllByBuilding(Guid buildingId);
 }

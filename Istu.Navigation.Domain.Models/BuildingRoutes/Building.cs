@@ -31,11 +31,12 @@ public class Building
 
     public string? Description { get; set; }
 
-    public static BuildingDto ToDto(Building building) => new()
+    public static BuildingEntity ToDto(Building building) => new()
     {
         Id = building.Id,
         Title = building.Title,
         FloorNumbers = building.FloorNumbers,
-        Description = building.Description
+        Description = building.Description,
+        IsDeleted = false
     };
 }

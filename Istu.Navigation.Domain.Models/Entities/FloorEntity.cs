@@ -1,9 +1,9 @@
 ﻿namespace Istu.Navigation.Domain.Models.Entities;
 
-public class FloorDto
+public class FloorEntity
 {
-    public required Guid Id { get; set; }
     public required Guid BuildingId { get; set; }
     public required Guid ImageId { get; set; }
-    public required int Number { get; set; }
+    public required int FloorNumber { get; set; }
+    public required bool IsDeleted { get; set; }
 }

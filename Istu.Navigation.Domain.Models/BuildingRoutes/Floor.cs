@@ -4,33 +4,31 @@ namespace Istu.Navigation.Domain.Models.BuildingRoutes;
 
 public class Floor
 {
-    public Floor(Guid id, Guid buildingId, int number, List<BuildingObject> objects, List<Edge> edges, ImageLink imageLink)
+    public Floor( Guid buildingId, int floorNumber, List<BuildingObject> objects, List<Edge> edges, ImageLink imageLink)
     {
-        Id = id;
         BuildingId = buildingId;
-        Number = number;
+        FloorNumber = floorNumber;
         Objects = objects;
         Edges = edges;
         ImageLink = imageLink;
     }
-
-    public Guid Id { get; set; }
+    
     public Guid BuildingId { get; set; }
-    public int Number { get; set; }
+    public int FloorNumber { get; set; }
 
     public List<BuildingObject> Objects { get; set; }
     public List<Edge> Edges { get; set; }
 
     public ImageLink ImageLink { get; set; }
 
-    public static FloorDto ToDto(Floor floor)
+    public static FloorEntity ToDto(Floor floor)
     {
-        return new FloorDto
+        return new FloorEntity
         {
             BuildingId = floor.BuildingId,
-            Number = floor.Number,
+            FloorNumber = floor.FloorNumber,
             ImageId = floor.ImageLink.Id,
-            Id = floor.Id
+            IsDeleted = false
         };
     }
 }

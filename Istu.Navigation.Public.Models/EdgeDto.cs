@@ -2,14 +2,12 @@
 
 public class EdgeDto
 {
-    public FloorObjectDto From { get; set; }
-    public FloorObjectDto To { get; set; }
-    public double Weight { get; set; }
+    public BuildingObjectDto From { get; set; }
+    public BuildingObjectDto To { get; set; }
 
-    public EdgeDto(FloorObjectDto from, FloorObjectDto to, double weight)
+    public EdgeDto(BuildingObjectDto from, BuildingObjectDto to, double weight)
     {
         From = from;
         To = to;
-        Weight = weight; // Вес может представлять длину коридора, время перемещения и т.д.
     }
 }

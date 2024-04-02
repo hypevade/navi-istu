@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Istu.Navigation.Domain.Models\Istu.Navigation.Domain.Models.csproj" />
+    </ItemGroup>
+
 </Project>

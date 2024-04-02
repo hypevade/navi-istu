@@ -2,13 +2,13 @@
 
 public class BuildingObject
 {
-    public BuildingObject(Guid id, Guid buildingId, string title, int floor, BuildingObjectType type, double x, double y, string? description = null)
+    public BuildingObject(Guid id, Guid buildingId, string title, int floorNumber, BuildingObjectType type, double x, double y, string? description = null)
     {
         Id = id;
         BuildingId = buildingId;
         Title = title;
         Description = description;
-        Floor = floor;
+        FloorNumber = floorNumber;
         Type = type;
         X = x;
         Y = y;
@@ -22,17 +22,17 @@ public class BuildingObject
 
     public string? Description { get; set; }
 
-    public int Floor
+    public int FloorNumber
     {
-        get => floor;
+        get => floorNumber;
         init
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(value, nameof(Floor));
-            floor = value;
+            ArgumentOutOfRangeException.ThrowIfNegative(value, nameof(FloorNumber));
+            floorNumber = value;
         }
     }
 
-    private readonly int floor;
+    private readonly int floorNumber;
 
     public BuildingObjectType Type { get; set; }
 

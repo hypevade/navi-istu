@@ -35,10 +35,5 @@ public class BuildingObjectsController : ControllerBase
         return NotFound();
     }
     
-
-    public IActionResult Create()
-    {
-        throw new InvalidOperationException();
-    }
     
 }
