@@ -1,7 +1,9 @@
 ﻿using Istu.Navigation.Api.Middlewares;
+using Istu.Navigation.Domain.Models;
 using Istu.Navigation.Domain.Repositories;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Infrastructure.EF;
+using Istu.Navigation.Public.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Istu.Navigation.Api;
@@ -20,7 +22,9 @@ public class Startup
         services.AddDbContext<BuildingsDbContext>(options =>
             options.UseNpgsql(Configuration.GetConnectionString("BuildingsDatabase")));
         services.AddSwaggerGen();
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        
+        services.AddAutoMapper(typeof(PublicMappingProfile).Assembly);
+        services.AddAutoMapper(typeof(MappingProfile).Assembly);
         
         services.AddScoped<IBuildingObjectsRepository, BuildingObjectsRepository>();
         services.AddScoped<IBuildingsRepository, BuildingsRepository>();
@@ -28,10 +32,10 @@ public class Startup
         services.AddScoped<IFloorsRepository, FloorsRepository>();
         services.AddScoped<IImageRepository, ImageRepository>();
         services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
+        services.AddScoped<IBuildingObjectsService, BuildingObjectsService>();
         
         services.AddSingleton<IRouteSearcher, RouteSearcher>();
-
-        //TODO: регистрация сервисов
+        
         services.AddControllers();
     }
 

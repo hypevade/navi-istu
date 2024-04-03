@@ -1,4 +1,4 @@
-﻿namespace Istu.Navigation.Public.Models;
+﻿namespace Istu.Navigation.Public.Models.BuildingRoutes;
 
 public class BuildingRouteResponse
 {

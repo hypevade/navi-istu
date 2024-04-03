@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Domain.Services;
-using Istu.Navigation.Public.Models;
+using Istu.Navigation.Public.Models.BuildingRoutes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;

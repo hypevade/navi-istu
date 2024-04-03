@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
+using Istu.Navigation.Public.Models.BuildingRoutes;
 
 namespace Istu.Navigation.Public.Models;
 
@@ -8,6 +9,7 @@ public class PublicMappingProfile : Profile
     public PublicMappingProfile()
     {
         CreateMap<BuildingObject, BuildingObjectDto>();
+        CreateMap<PublicObjectType, BuildingObjectType>();
         CreateMap<Edge, EdgeDto>();
         CreateMap<FloorRoute, FloorDto>()
             .ForMember(x => x.ImageLink, x => x.MapFrom(src => src.Floor.ImageLink))
@@ -24,5 +26,17 @@ public class PublicMappingProfile : Profile
             .ForMember(x => x.RouteId, x => x.MapFrom(src => src.RouteId))
             .ForMember(x => x.StartObjectDto, x => x.MapFrom(src => src.StartObject))
             .ForMember(x => x.FinishObjectDto, x => x.MapFrom(src => src.FinishObject));
+        CreateMap<FullBuildingObjectDto, BuildingObject>();
+        
+        /*CreateMap<FullBuildingObjectDto, BuildingObject>()
+            .ForMember(x => x.BuildingId, x => x.MapFrom(src => src.BuildingId))
+            .ForMember(x => x.FloorNumber, x => x.MapFrom(src => src.FloorNumber))
+            .ForMember(x => x.Id, x => x.MapFrom(src => src.Id))
+            .ForMember(x => x.Type, x => x.MapFrom(src => src.Type))
+            .ForMember(x => x.Title, x => x.MapFrom(src => src.Title))
+            .ForMember(x => x.X, x => x.MapFrom(src => src.X))
+            .ForMember(x => x.Y, x => x.MapFrom(src => src.Y))
+            .ForMember(x => x.Description, x => x.MapFrom(src => src.Description));
+    */
     }
 }
