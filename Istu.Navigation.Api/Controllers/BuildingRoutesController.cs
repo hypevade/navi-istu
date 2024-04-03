@@ -10,10 +10,10 @@ namespace Istu.Navigation.Api.Controllers;
 [Route("api/buildings/routes")]
 public class BuildingRoutesController: ControllerBase
 {
-    private readonly BuildingRoutesService buildingRoutesService;
+    private readonly IBuildingRoutesService buildingRoutesService;
     private readonly IMapper mapper;
 
-    public BuildingRoutesController(BuildingRoutesService buildingRoutesService, IMapper mapper)
+    public BuildingRoutesController(IBuildingRoutesService buildingRoutesService, IMapper mapper)
     {
         this.buildingRoutesService = buildingRoutesService;
         this.mapper = mapper;

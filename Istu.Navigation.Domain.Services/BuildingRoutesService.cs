@@ -8,8 +8,8 @@ namespace Istu.Navigation.Domain.Services;
 public class BuildingRoutesService(
     IBuildingObjectsRepository buildingObjectRepository,
     IBuildingsRepository buildingsRepository,
-    IRouteSearcher routeSearcher,
-    IFloorsRepository floorsRepository): IBuildingRoutesService
+    IFloorsRepository floorsRepository,
+    IRouteSearcher routeSearcher): IBuildingRoutesService
 {
     private readonly IBuildingObjectsRepository buildingObjectRepository = buildingObjectRepository;
     private readonly IBuildingsRepository buildingsRepository = buildingsRepository;

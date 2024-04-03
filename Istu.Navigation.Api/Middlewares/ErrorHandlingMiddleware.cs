@@ -6,20 +6,24 @@ namespace Istu.Navigation.Api.Middlewares;
 public class ErrorHandlingMiddleware
 {
     private readonly RequestDelegate next;
+    private readonly ILogger<ErrorHandlingMiddleware> logger;
 
-    public ErrorHandlingMiddleware(RequestDelegate next)
+    public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
     {
         this.next = next;
+        this.logger = logger;
     }
 
     public async Task Invoke(HttpContext context)
     {
         try
         {
+            
             await next(context);
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An unexpected error occurred.");
             await HandleExceptionAsync(context, ex);
         }
     }
