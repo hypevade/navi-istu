@@ -27,6 +27,7 @@ public class PublicMappingProfile : Profile
             .ForMember(x => x.StartObjectDto, x => x.MapFrom(src => src.StartObject))
             .ForMember(x => x.FinishObjectDto, x => x.MapFrom(src => src.FinishObject));
         CreateMap<FullBuildingObjectDto, BuildingObject>();
+        CreateMap<BuildingDto, Building>();
         
         /*CreateMap<FullBuildingObjectDto, BuildingObject>()
             .ForMember(x => x.BuildingId, x => x.MapFrom(src => src.BuildingId))

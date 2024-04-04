@@ -22,46 +22,14 @@ public class BuildingObject
 
     public string? Description { get; set; }
 
-    public int FloorNumber
-    {
-        get => floorNumber;
-        init
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(value, nameof(FloorNumber));
-            floorNumber = value;
-        }
-    }
-
-    private readonly int floorNumber;
+    public int FloorNumber { get; set; }
 
     public BuildingObjectType Type { get; set; }
 
-    public double X
-    {
-        get => x;
-        set
-        {
-            if (!CoordinatesIsValid(value))
-                throw new ArgumentOutOfRangeException(nameof(X), "Координаты должны быть в диапазоне от 0 до 1");
-            x = value;
-        }
-    }
-
-    private double x;
+    public double X { get; set; }
 
 
-    public double Y
-    {
-        get => y;
-        set
-        {
-            if (!CoordinatesIsValid(value))
-                throw new ArgumentOutOfRangeException(nameof(Y), "Координаты должны быть в диапазоне от 0 до 1");
-            y = value;
-        }
-    }
+    public double Y { get; set; }
 
-    private double y;
-
-    public static bool CoordinatesIsValid(double coordinate) => coordinate is >= 0 and <= 1;
+    public static bool CoordinateIsValid(double coordinate) => coordinate is >= 0 and <= 1;
 }

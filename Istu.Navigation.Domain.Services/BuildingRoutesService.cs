@@ -7,14 +7,14 @@ namespace Istu.Navigation.Domain.Services;
 
 public class BuildingRoutesService(
     IBuildingObjectsRepository buildingObjectRepository,
-    IBuildingsRepository buildingsRepository,
+    IBuildingsService buildingsService,
     IFloorsRepository floorsRepository,
     IRouteSearcher routeSearcher): IBuildingRoutesService
 {
     private readonly IBuildingObjectsRepository buildingObjectRepository = buildingObjectRepository;
-    private readonly IBuildingsRepository buildingsRepository = buildingsRepository;
     private readonly IFloorsRepository floorsRepository = floorsRepository;
     private readonly IRouteSearcher routeSearcher = routeSearcher;
+    private readonly IBuildingsService buildingsService = buildingsService;
 
     public async Task<OperationResult<BuildingRoute>> CreateRoute(Guid buildingId, Guid toId, Guid fromId = default)
     {
@@ -50,8 +50,8 @@ public class BuildingRoutesService(
         var getFloorRoutes = GetFloorRoutes(slicedRoute, getFloors.Data);
         if (getFloorRoutes.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getFloorRoutes.ApiError);
-        
-        var getBuilding = await buildingsRepository.GetById(buildingId).ConfigureAwait(false);
+
+        var getBuilding = await buildingsService.GetBuildingById(buildingId).ConfigureAwait(false);
         if(getBuilding.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getBuilding.ApiError);;
 

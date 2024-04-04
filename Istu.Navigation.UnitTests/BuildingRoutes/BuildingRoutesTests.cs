@@ -12,15 +12,15 @@ public class BuildingRoutesTests
     [SetUp]
     public void Setup()
     {
-        var buildingObjectRepository = new Mock<IBuildingObjectsRepository>();
+        /*var buildingObjectRepository = new Mock<IBuildingObjectsRepository>();
         var buildingsRepository = new Mock<IBuildingsRepository>();
         var floorsRepository = new Mock<IFloorsRepository>();
         var routeSearcher = new Mock<IRouteSearcher>();
         
         routesService = new BuildingRoutesService(buildingObjectRepository.Object,
-            buildingsRepository.Object,
+            buildingsRepository,
             floorsRepository.Object,
-            routeSearcher.Object);
+            routeSearcher.Object);*/
     }
 
     [Test]

@@ -2,7 +2,7 @@
 
 namespace Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
-public class BuildingRoutesErrors : ErrorBase
+public class BuildingsErrors : ErrorBase
 {
     protected new string Nid = CommonConstans.RoutesApiNid;
 
@@ -92,12 +92,40 @@ public class BuildingRoutesErrors : ErrorBase
         return new ApiError(404, $"Этаж '{floorNumber}' в здании с идентификатором '{buildingId}' не найден.",
             GetUrn("floor-with-building-id-and-floor-number-not-found"));
     }
+    
+    public static ApiError InvalidCoordinatesError(double x, double y)
+    {
+        return new ApiError(400, 
+            $"Координаты объекта должны быть в диапазоне от 0 до 1. Но у вас координаты ({x}, {y}).",
+            GetUrn("building-objects-with-invalid-coordinates"));
+    }
 
     public static ApiError EmptyListTypesError()
     {
         return new ApiError(400,
             "Невозможно найти объекты с пустым списком типов.",
             GetUrn("building-objects-with-id-and-type-not-found"));
+    }
+    
+    public static ApiError EmptyTitleError()
+    {
+        return new ApiError(400,
+            "Свойство названия не может быть пустым.",
+            GetUrn("title-is-empty"));
+    }
+    
+    public static ApiError NegativeFloorNumbersError()
+    {
+        return new ApiError(400,
+            "Свойство количества этажей не может быть отрицательным.",
+            GetUrn("building-floor-numbers-is-negative"));
+    }
+    
+    public static ApiError BuildingAlreadyExistsError(Guid buildingId)
+    {
+        return new ApiError(400,
+            $"Здание с идентификатором '{buildingId}' уже существует.",
+            GetUrn("building-already-exists"));
     }
     
     public static ApiError TargetObjectIsEqualToSourceError(Guid objectId)

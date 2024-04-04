@@ -1,18 +1,17 @@
 ﻿using System.Linq.Expressions;
-using Istu.Navigation.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 
 namespace Istu.Navigation.Domain.Repositories.Base;
 
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {
-    protected readonly DbContext Context;
+    private readonly DbContext context;
     protected readonly DbSet<TEntity> DbSet;
 
-    public Repository(BuildingsDbContext context)
+    public Repository(DbContext context)
     {
-        Context = context;
-        DbSet = Context.Set<TEntity>();
+        this.context = context;
+        DbSet = this.context.Set<TEntity>();
     }
 
     public async Task<TEntity?> GetByIdAsync(Guid id)
@@ -46,10 +45,21 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         DbSet.Update(entity);
     }
+    public void UpdateRange(IEnumerable<TEntity> entities)
+    {
+        DbSet.UpdateRange(entities);
+    }
 
     public void Remove(TEntity entity)
     {
         DbSet.Remove(entity);
+    }
+    
+    public async Task RemoveByIdAsync(Guid id)
+    {
+        var entity = await DbSet.FindAsync(id);
+        if (entity != null)
+            DbSet.Remove(entity);
     }
 
     public void RemoveRange(IEnumerable<TEntity> entities)
@@ -59,6 +69,6 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     
     public async Task<int> SaveChangesAsync()
     {
-        return await Context.SaveChangesAsync().ConfigureAwait(false);
+        return await context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

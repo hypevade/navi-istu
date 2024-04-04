@@ -31,7 +31,7 @@ public class FloorsRepository : IFloorsRepository
             .FirstOrDefaultAsync(x => x.BuildingId == buildingId && x.FloorNumber == floorNumber).ConfigureAwait(false);
         if (floor is null)
             return OperationResult<Floor>.Failure(
-                BuildingRoutesErrors.FloorWithBuildingAndFloorNumberIdNotFoundError(buildingId, floorNumber));
+                BuildingsErrors.FloorWithBuildingAndFloorNumberIdNotFoundError(buildingId, floorNumber));
         
         var result = await GetFloorByEntity(floor).ConfigureAwait(false);
         return result.IsFailure
@@ -46,7 +46,7 @@ public class FloorsRepository : IFloorsRepository
             .ToListAsync().ConfigureAwait(false);
         if (!floors.Any())
             return OperationResult<List<Floor>>.Failure(
-                BuildingRoutesErrors.FloorsWithBuildingIdNotFoundError(buildingId));
+                BuildingsErrors.FloorsWithBuildingIdNotFoundError(buildingId));
         
         var result = new List<Floor>();
         foreach (var floorEntity in floors)

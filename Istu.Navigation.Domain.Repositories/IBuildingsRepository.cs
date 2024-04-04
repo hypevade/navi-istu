@@ -1,12 +1,21 @@
-﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
-using Istu.Navigation.Infrastructure.Errors;
+﻿using Istu.Navigation.Domain.Models.Entities;
+using Istu.Navigation.Domain.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace Istu.Navigation.Domain.Repositories;
 
-public interface IBuildingsRepository
+public interface IBuildingsRepository : IRepository<BuildingEntity>
 {
-    public Task<OperationResult<List<Building>>> GetAll(int take = 100, int skip = 0);
-    public Task<OperationResult<List<Building>>> GetAllByTitle(string buildingTitle, int take = 100, int skip = 0);
-    public Task<OperationResult<Building>> GetById(Guid buildingId);
-    public Task<OperationResult> CreateBuildings(List<Building> buildings);
+    public Task<IEnumerable<BuildingEntity>> GetAllByTitle(string title);
+}
+
+public class BuildingsRepository : Repository<BuildingEntity> , IBuildingsRepository
+{
+    public BuildingsRepository(DbContext context) : base(context)
+    {}
+
+    public async Task<IEnumerable<BuildingEntity>> GetAllByTitle(string title)
+    {
+        return await DbSet.Where(building => building.Title == title).ToListAsync().ConfigureAwait(false);
+    }
 }

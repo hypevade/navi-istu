@@ -25,7 +25,8 @@ public class Startup
         
         services.AddAutoMapper(typeof(PublicMappingProfile).Assembly);
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
-        
+
+        services.AddScoped<DbContext, BuildingsDbContext>();
         services.AddScoped<IBuildingObjectsRepository, BuildingObjectsRepository>();
         services.AddScoped<IBuildingsRepository, BuildingsRepository>();
         services.AddScoped<IEdgesRepository, EdgesRepository>();
@@ -33,6 +34,7 @@ public class Startup
         services.AddScoped<IImageRepository, ImageRepository>();
         services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
         services.AddScoped<IBuildingObjectsService, BuildingObjectsService>();
+        services.AddScoped<IBuildingsService, BuildingsService>();
         
         services.AddSingleton<IRouteSearcher, RouteSearcher>();
         

@@ -69,7 +69,7 @@ public class RouteSearcherTests
         result.Data.Should().BeNull();
 
         result.ApiError.Urn.Should().BeEquivalentTo(
-            BuildingRoutesErrors.TargetObjectIsEqualToSourceError(objects[0].Id).Urn);
+            BuildingsErrors.TargetObjectIsEqualToSourceError(objects[0].Id).Urn);
     }
     
     [Test]
@@ -117,7 +117,7 @@ public class RouteSearcherTests
         result.IsSuccess.Should().BeFalse();
         result.ApiError.Should().NotBeNull();
         result.ApiError.Urn.Should()
-            .Be(BuildingRoutesErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
+            .Be(BuildingsErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
     }
 
     private static (List<BuildingObject> objects, List<Edge> edges) GetTwoObjectsWithEdge()

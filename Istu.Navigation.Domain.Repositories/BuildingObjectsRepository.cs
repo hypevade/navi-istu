@@ -22,7 +22,7 @@ public class BuildingObjectsRepository : IBuildingObjectsRepository
     public async Task<OperationResult<List<BuildingObject>>> GetAllByTypeInBuilding(Guid buildingId, BuildingObjectType[] types, int skip = 0, int take = 100)
     {
         if (types.Length == 0)
-            return OperationResult<List<BuildingObject>>.Failure(BuildingRoutesErrors.EmptyListTypesError());
+            return OperationResult<List<BuildingObject>>.Failure(BuildingsErrors.EmptyListTypesError());
 
         var objects = await dbContext.Objects.Where(x => x.BuildingId == buildingId && types.Contains(x.Type))
             .Skip(skip)
@@ -31,7 +31,7 @@ public class BuildingObjectsRepository : IBuildingObjectsRepository
             .ConfigureAwait(false);
         if (objects.Count == 0)
             return OperationResult<List<BuildingObject>>.Failure(
-                BuildingRoutesErrors.BuildingObjectsNotFoundError(buildingId, types));
+                BuildingsErrors.BuildingObjectsNotFoundError(buildingId, types));
 
         return OperationResult<List<BuildingObject>>.Success(mapper.Map<List<BuildingObject>>(objects));
     }
@@ -46,7 +46,7 @@ public class BuildingObjectsRepository : IBuildingObjectsRepository
         
         if (objects.Count == 0)
             return OperationResult<List<BuildingObject>>.Failure(
-                BuildingRoutesErrors.BuildingObjectsNotFoundError(buildingId));
+                BuildingsErrors.BuildingObjectsNotFoundError(buildingId));
 
         return OperationResult<List<BuildingObject>>.Success(mapper.Map<List<BuildingObject>>(objects));
     }
@@ -61,7 +61,7 @@ public class BuildingObjectsRepository : IBuildingObjectsRepository
 
         if (objects.Count == 0)
             return OperationResult<List<BuildingObject>>.Failure(
-                BuildingRoutesErrors.BuildingObjectsNotFoundError(buildingId, floor));
+                BuildingsErrors.BuildingObjectsNotFoundError(buildingId, floor));
 
         return OperationResult<List<BuildingObject>>.Success(mapper.Map<List<BuildingObject>>(objects));
     }
@@ -72,7 +72,7 @@ public class BuildingObjectsRepository : IBuildingObjectsRepository
             .ConfigureAwait(false);
         if (objectEntity is null)
             return OperationResult<BuildingObject>.Failure(
-                BuildingRoutesErrors.BuildingObjectNotFoundError(buildingObjectId));
+                BuildingsErrors.BuildingObjectNotFoundError(buildingObjectId));
         return OperationResult<BuildingObject>.Success(mapper.Map<BuildingObject>(objectEntity));
     }
 

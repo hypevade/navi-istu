@@ -46,7 +46,7 @@ public class RouteSearcher : IRouteSearcher
             return OperationResult.Failure(CommonErrors.InternalServerError());
 
         return from.Id == to.Id
-            ? OperationResult.Failure(BuildingRoutesErrors.TargetObjectIsEqualToSourceError(from.Id))
+            ? OperationResult.Failure(BuildingsErrors.TargetObjectIsEqualToSourceError(from.Id))
             : OperationResult.Success();
     }
 
@@ -73,7 +73,7 @@ public class RouteSearcher : IRouteSearcher
 
         if (!predecessorObserver.TryGetPath(to, out var path))
             return OperationResult<IEnumerable<Edge<BuildingObject>>>.Failure(
-                BuildingRoutesErrors.BuildingRouteNotFoundError(from.Id, to.Id));
+                BuildingsErrors.BuildingRouteNotFoundError(from.Id, to.Id));
         
 
         return OperationResult<IEnumerable<Edge<BuildingObject>>>.Success(path);

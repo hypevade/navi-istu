@@ -12,22 +12,8 @@ public class Building
     }
 
     public Guid Id { get; init; }
-
     public string Title { get; set; }
-
-    public int FloorNumbers
-    {
-        get => floorNumbers;
-        init
-        {
-            if (value < 0)
-                throw new ArgumentException($"{nameof(FloorNumbers)} не может быть отрицательным",
-                    nameof(FloorNumbers));
-            floorNumbers = value;
-        }
-    }
-
-    private readonly int floorNumbers;
+    public int FloorNumbers{ get; set; }
 
     public string? Description { get; set; }
 

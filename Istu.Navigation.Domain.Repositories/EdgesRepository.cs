@@ -27,7 +27,7 @@ public class EdgesRepository : IEdgesRepository
             .ConfigureAwait(false);
         if (!edges.Any())
             return OperationResult<List<Edge>>.Failure(
-                BuildingRoutesErrors.EdgesWithBuildingIdNotFoundError(buildingId));
+                BuildingsErrors.EdgesWithBuildingIdNotFoundError(buildingId));
 
         var result = new List<Edge>();
         foreach (var edgeEntity in edges)
@@ -45,7 +45,7 @@ public class EdgesRepository : IEdgesRepository
     {
         var edge = await dbContext.Edges.FirstOrDefaultAsync(x => x.Id == edgeId).ConfigureAwait(false);
         if (edge is null)
-            return OperationResult<Edge>.Failure(BuildingRoutesErrors.EdgeWithIdNotFoundError(edgeId));
+            return OperationResult<Edge>.Failure(BuildingsErrors.EdgeWithIdNotFoundError(edgeId));
         var result = await GetEdgeByEntity(edge).ConfigureAwait(false);
         return result.IsFailure
             ? OperationResult<Edge>.Failure(result.ApiError)
@@ -61,7 +61,7 @@ public class EdgesRepository : IEdgesRepository
 
         if (edges.Count == 0)
             return OperationResult<List<Edge>>.Failure(
-                BuildingRoutesErrors.EdgesWithBuildingIdAndFloorNotFoundError(buildingId, floor));
+                BuildingsErrors.EdgesWithBuildingIdAndFloorNotFoundError(buildingId, floor));
 
         var result = new List<Edge>();
         foreach (var edgeEntity in edges)
@@ -83,7 +83,7 @@ public class EdgesRepository : IEdgesRepository
 
         if (!edges.Any())
             return OperationResult<List<Edge>>.Failure(
-                BuildingRoutesErrors.EdgesWithBuildingObjectIdNotFoundError(buildingObjectId));
+                BuildingsErrors.EdgesWithBuildingObjectIdNotFoundError(buildingObjectId));
 
         var result = new List<Edge>();
         foreach (var edgeEntity in edges)

@@ -1,6 +1,7 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Repositories;
 using Istu.Navigation.Infrastructure.Errors;
+using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
 namespace Istu.Navigation.Domain.Services;
 
@@ -17,12 +18,12 @@ public interface IBuildingObjectsService
 public class BuildingObjectsService : IBuildingObjectsService
 {
     private readonly IBuildingObjectsRepository buildingObjectsRepository;
-    private readonly IBuildingsRepository buildingsRepository;
+    private readonly IBuildingsService buildingsService;
 
-    public BuildingObjectsService(IBuildingObjectsRepository buildingObjectsRepository, IBuildingsRepository buildingsRepository)
+    public BuildingObjectsService(IBuildingObjectsRepository buildingObjectsRepository, IBuildingsService buildingsService)
     {
         this.buildingObjectsRepository = buildingObjectsRepository;
-        this.buildingsRepository = buildingsRepository;
+        this.buildingsService = buildingsService;
     }
 
     public async Task<OperationResult> Create(List<BuildingObject> buildingObjects)
@@ -64,7 +65,15 @@ public class BuildingObjectsService : IBuildingObjectsService
 
     private async Task<OperationResult> CheckCreateRequest(BuildingObject buildingObject)
     {
-        var getBuilding = await buildingsRepository.GetById(buildingObject.BuildingId).ConfigureAwait(false);
+        var checkX = BuildingObject.CoordinateIsValid(buildingObject.X);
+        var checkY = BuildingObject.CoordinateIsValid(buildingObject.Y);
+        if (checkY || checkX)
+            return OperationResult.Failure(BuildingsErrors.InvalidCoordinatesError(buildingObject.X, buildingObject.Y));
+        if (string.IsNullOrWhiteSpace(buildingObject.Title))
+            return OperationResult.Failure(BuildingsErrors.EmptyTitleError());
+
+        var getBuilding = await buildingsService.GetBuildingById(buildingObject.BuildingId).ConfigureAwait(false);
+        
         return getBuilding.IsFailure
             ? OperationResult.Failure(getBuilding.ApiError)
             : OperationResult.Success();
