@@ -47,4 +47,9 @@ public class BuildingsRepository : IBuildingsRepository
             ? OperationResult<Building>.Failure(BuildingRoutesErrors.BuildingWithIdNotFoundError(buildingId))
             : OperationResult<Building>.Success(mapper.Map<Building>(building));
     }
+
+    public Task<OperationResult> CreateBuildings(List<Building> buildings)
+    {
+        throw new NotImplementedException();
+    }
 }

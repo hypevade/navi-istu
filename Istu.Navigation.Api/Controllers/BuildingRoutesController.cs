@@ -5,8 +5,8 @@ using Istu.Navigation.Public.Models.BuildingRoutes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
-[ApiController]
 
+[ApiController]
 [Route("api/buildings/routes")]
 public class BuildingRoutesController: ControllerBase
 {

@@ -8,4 +8,5 @@ public interface IBuildingsRepository
     public Task<OperationResult<List<Building>>> GetAll(int take = 100, int skip = 0);
     public Task<OperationResult<List<Building>>> GetAllByTitle(string buildingTitle, int take = 100, int skip = 0);
     public Task<OperationResult<Building>> GetById(Guid buildingId);
+    public Task<OperationResult> CreateBuildings(List<Building> buildings);
 }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route("api/buildings")]
+[Route("api/buildingObjects")]
 public class BuildingObjectsController : ControllerBase
 {
     private readonly IBuildingObjectsService buildingObjectsService;
@@ -21,7 +21,7 @@ public class BuildingObjectsController : ControllerBase
     }
 
     [HttpPost]
-    [Route("create/object")]
+    [Route("create")]
     public async Task<IActionResult> Create([FromBody] CreateBuildingObjectsRequest request)
     {
         if (request.BuildingObjects.Count == 0)
@@ -56,7 +56,7 @@ public class BuildingObjectsController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{buildingId}/objects")]
+    [Route("{buildingId}/objectsByBuilding")]
     public async Task<ActionResult<List<FullBuildingObjectDto>>> GetAllByBuilding(Guid buildingId, [FromQuery] int skip = 0, [FromQuery] int take = 100)
     {
         var getObjects = await buildingObjectsService.GetAllByBuildingId(buildingId, skip, take).ConfigureAwait(false);
@@ -86,7 +86,7 @@ public class BuildingObjectsController : ControllerBase
     }
 
     [HttpGet]
-    [Route("objects/{objectId}")]
+    [Route("{objectId}")]
     public async Task<ActionResult<FullBuildingObjectDto>> GetById(Guid objectId)
     {
         var getObject = await buildingObjectsService.GetById(objectId).ConfigureAwait(false);
@@ -99,6 +99,4 @@ public class BuildingObjectsController : ControllerBase
         var publicObjects = mapper.Map<List<FullBuildingObjectDto>>(getObject.Data);
         return Ok(publicObjects);
     }
-    
-    
 }
