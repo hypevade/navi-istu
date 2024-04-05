@@ -12,5 +12,8 @@ public class MappingProfile : Profile
         CreateMap<BuildingObjectEntity, BuildingObject>();
         CreateMap<BuildingEntity, Building>();
         CreateMap<Building, BuildingEntity>();
+        
+        CreateMap<Floor, FloorEntity>()
+            .ForMember(x => x.ImageId, x => x.MapFrom(floor => floor.ImageLink.Id));
     }
 }

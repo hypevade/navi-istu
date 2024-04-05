@@ -66,7 +66,20 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         DbSet.RemoveRange(entities);
     }
-    
+
+    public async Task RemoveRangeAsync(IEnumerable<Guid> entityIds)
+    {
+        var entities = new List<TEntity>();
+        foreach (var entityId in entityIds)
+        {
+            var entity = await DbSet.FindAsync(entityId).ConfigureAwait(false);
+            if (entity != null)
+                entities.Add(entity);
+        }
+        
+        DbSet.RemoveRange(entities);
+    }
+
     public async Task<int> SaveChangesAsync()
     {
         return await context.SaveChangesAsync().ConfigureAwait(false);

@@ -93,11 +93,26 @@ public class BuildingsErrors : ErrorBase
             GetUrn("floor-with-building-id-and-floor-number-not-found"));
     }
     
+    public static ApiError ImageWithIdNotFoundError(Guid imageId)
+    {
+        return new ApiError(404, $"Изображение с идентификатором '{imageId}' не найдено.",
+            GetUrn("image-with-id-not-found"));
+    }
+    
+    
+    
     public static ApiError InvalidCoordinatesError(double x, double y)
     {
         return new ApiError(400, 
             $"Координаты объекта должны быть в диапазоне от 0 до 1. Но у вас координаты ({x}, {y}).",
             GetUrn("building-objects-with-invalid-coordinates"));
+    }
+    
+    public static ApiError FloorWithIdAlreadyExistError(Guid buildingId, int floorNumber)
+    {
+        return new ApiError(400, 
+            $"Этаж с идентификатором '{buildingId}' и номером '{floorNumber}' уже существует.",
+            GetUrn("floor-with-id-already-exists"));
     }
 
     public static ApiError EmptyListTypesError()
@@ -127,6 +142,14 @@ public class BuildingsErrors : ErrorBase
             $"Здание с идентификатором '{buildingId}' уже существует.",
             GetUrn("building-already-exists"));
     }
+    
+    public static ApiError BuildingObjectAlreadyExistsError(Guid buildingId)
+    {
+        return new ApiError(400,
+            $"Объект с идентификатором '{buildingId}' уже существует.",
+            GetUrn("building-object-already-exists"));
+    }
+    
     
     public static ApiError TargetObjectIsEqualToSourceError(Guid objectId)
     {

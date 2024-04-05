@@ -6,13 +6,13 @@ using Istu.Navigation.Infrastructure.Errors.Errors;
 namespace Istu.Navigation.Domain.Services;
 
 public class BuildingRoutesService(
-    IBuildingObjectsRepository buildingObjectRepository,
+    IBuildingObjectsService buildingObjectService,
     IBuildingsService buildingsService,
-    IFloorsRepository floorsRepository,
+    IFloorsService floorsService,
     IRouteSearcher routeSearcher): IBuildingRoutesService
 {
-    private readonly IBuildingObjectsRepository buildingObjectRepository = buildingObjectRepository;
-    private readonly IFloorsRepository floorsRepository = floorsRepository;
+    private readonly IBuildingObjectsService buildingObjectService = buildingObjectService;
+    private readonly IFloorsService floorsService = floorsService;
     private readonly IRouteSearcher routeSearcher = routeSearcher;
     private readonly IBuildingsService buildingsService = buildingsService;
 
@@ -20,11 +20,11 @@ public class BuildingRoutesService(
     {
         //TODO: Добавить  поддержку, когда fromID = default
         
-        var getToObject = await buildingObjectRepository.GetById(toId).ConfigureAwait(false);
+        var getToObject = await buildingObjectService.GetById(toId).ConfigureAwait(false);
         if (getToObject.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getToObject.ApiError);
         
-        var getFromObject = await buildingObjectRepository.GetById(fromId).ConfigureAwait(false);
+        var getFromObject = await buildingObjectService.GetById(fromId).ConfigureAwait(false);
         if (getFromObject.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getFromObject.ApiError);
 
@@ -108,7 +108,7 @@ public class BuildingRoutesService(
         var floors = new List<Floor>();
         foreach (var floorNumber in numbersOfFloors)
         {
-            var getFloor = await floorsRepository.GetById(buildingId, floorNumber).ConfigureAwait(false);
+            var getFloor = await floorsService.GetById(buildingId, floorNumber).ConfigureAwait(false);
             if (getFloor.IsFailure)
                 return OperationResult<List<Floor>>.Failure(getFloor.ApiError);
 

@@ -1,10 +1,14 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
-using Istu.Navigation.Infrastructure.Errors;
+using Istu.Navigation.Domain.Models.Entities;
+using Istu.Navigation.Domain.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace Istu.Navigation.Domain.Repositories;
 
-public interface IImageRepository
+public interface IImageRepository : IRepository<ImageLinkEntity>;
+
+public class ImageRepository : Repository<ImageLinkEntity>, IImageRepository
 {
-    public Task<OperationResult<ImageLink>> GetById(Guid imageId); 
-    //public Task<OperationResult<List<ImageLink>>> GetAllByObjectId(Guid objectId);
+    public ImageRepository(DbContext context) : base(context)
+    { }
 }

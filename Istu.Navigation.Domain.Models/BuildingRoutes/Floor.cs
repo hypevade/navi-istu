@@ -21,7 +21,7 @@ public class Floor
 
     public ImageLink ImageLink { get; set; }
 
-    public static FloorEntity ToDto(Floor floor)
+    public static FloorEntity ToEntity(Floor floor)
     {
         return new FloorEntity
         {
@@ -30,5 +30,11 @@ public class Floor
             ImageId = floor.ImageLink.Id,
             IsDeleted = false
         };
+    }
+
+    public static Floor FromEntity(FloorEntity floorEntity, List<BuildingObject> buildingObjects, List<Edge> edges,
+        ImageLink imageLink)
+    {
+        return new Floor(floorEntity.BuildingId, floorEntity.FloorNumber, buildingObjects, edges, imageLink);
     }
 }
