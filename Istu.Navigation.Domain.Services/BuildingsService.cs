@@ -9,13 +9,14 @@ namespace Istu.Navigation.Domain.Services;
 
 public interface IBuildingsService
 {
-    public Task<OperationResult<List<Guid>>> CreateBuildings(List<Building> buildings);
-    public Task<OperationResult<Guid>> CreateBuilding(Building building);
-    public Task<OperationResult> PatchBuilding(Building building);
-    public Task<OperationResult> PatchBuildings(List<Building> buildings);
-    public Task<OperationResult> DeleteBuilding(Guid id);
-    public Task<OperationResult<List<Building>>> GetBuildingsByTitle(string title);
-    public Task<OperationResult<Building>> GetBuildingById(Guid id);
+    public Task<OperationResult<Guid>> Create(Building building);
+    public Task<OperationResult<List<Guid>>> CreateRange(List<Building> buildings);
+    public Task<OperationResult> Patch(Building building);
+    public Task<OperationResult> PatchRange(List<Building> buildings);
+    public Task<OperationResult> Delete(Guid id);
+    public Task<OperationResult<List<Building>>> GetByTitle(string title);
+    public Task<OperationResult<List<Building>>> GetAll(int skip = 0, int take = 100);
+    public Task<OperationResult<Building>> GetById(Guid id);
 }
 
 public class BuildingsService : IBuildingsService
@@ -29,7 +30,7 @@ public class BuildingsService : IBuildingsService
         this.mapper = mapper;
     }
 
-    public async Task<OperationResult<List<Guid>>> CreateBuildings(List<Building> buildings)
+    public async Task<OperationResult<List<Guid>>> CreateRange(List<Building> buildings)
     {
         foreach (var building in buildings)
         {
@@ -45,15 +46,15 @@ public class BuildingsService : IBuildingsService
         return OperationResult<List<Guid>>.Success(addedEntities.Select(x => x.Id).ToList());
     }
 
-    public async Task<OperationResult<Guid>> CreateBuilding(Building building)
+    public async Task<OperationResult<Guid>> Create(Building building)
     {
-        var createOperationResult = await CreateBuildings([building]).ConfigureAwait(false);
+        var createOperationResult = await CreateRange([building]).ConfigureAwait(false);
         return createOperationResult.IsSuccess
             ? OperationResult<Guid>.Success(createOperationResult.Data.First())
             : OperationResult<Guid>.Failure(createOperationResult.ApiError);
     }
 
-    public async Task<OperationResult> PatchBuilding(Building building)
+    public async Task<OperationResult> Patch(Building building)
     {
         var check = await CheckBuilding(building, checkExist: false).ConfigureAwait(false);
         if (check.IsFailure)
@@ -67,7 +68,7 @@ public class BuildingsService : IBuildingsService
         return OperationResult.Success();
     }
 
-    public async Task<OperationResult> PatchBuildings(List<Building> buildings)
+    public async Task<OperationResult> PatchRange(List<Building> buildings)
     {
         foreach (var building in buildings)
         {
@@ -84,7 +85,7 @@ public class BuildingsService : IBuildingsService
         return OperationResult.Success();
     }
 
-    public async Task<OperationResult> DeleteBuilding(Guid id)
+    public async Task<OperationResult> Delete(Guid id)
     {
         await buildingsRepository.RemoveByIdAsync(id).ConfigureAwait(false);
         await buildingsRepository.SaveChangesAsync().ConfigureAwait(false);
@@ -92,7 +93,7 @@ public class BuildingsService : IBuildingsService
         return OperationResult.Success();
     }
 
-    public async Task<OperationResult<List<Building>>> GetBuildingsByTitle(string title)
+    public async Task<OperationResult<List<Building>>> GetByTitle(string title)
     {
         if (string.IsNullOrWhiteSpace(title))
             return OperationResult<List<Building>>.Failure(BuildingsErrors.EmptyTitleError());
@@ -102,7 +103,14 @@ public class BuildingsService : IBuildingsService
         return OperationResult<List<Building>>.Success(result);
     }
 
-    public async Task<OperationResult<Building>> GetBuildingById(Guid id)
+    public async Task<OperationResult<List<Building>>> GetAll(int skip = 0, int take = 100)
+    {
+        var buildings = await buildingsRepository.GetAllAsync(skip, take).ConfigureAwait(false);
+        var result = mapper.Map<List<Building>>(buildings.ToList());
+        return OperationResult<List<Building>>.Success(result);
+    }
+
+    public async Task<OperationResult<Building>> GetById(Guid id)
     {
         var building = await buildingsRepository.GetByIdAsync(id).ConfigureAwait(false);
         if (building is null)

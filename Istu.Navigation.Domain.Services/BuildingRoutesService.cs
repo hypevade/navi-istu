@@ -51,7 +51,7 @@ public class BuildingRoutesService(
         if (getFloorRoutes.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getFloorRoutes.ApiError);
 
-        var getBuilding = await buildingsService.GetBuildingById(buildingId).ConfigureAwait(false);
+        var getBuilding = await buildingsService.GetById(buildingId).ConfigureAwait(false);
         if(getBuilding.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getBuilding.ApiError);;
 

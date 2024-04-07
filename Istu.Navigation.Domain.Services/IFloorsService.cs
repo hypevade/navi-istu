@@ -124,7 +124,7 @@ public class FloorsService : IFloorsService
     {
         if (floor.FloorNumber < 0)
             return OperationResult.Failure(BuildingsErrors.NegativeFloorNumbersError());
-        var tryGetBuilding = await buildingsService.GetBuildingById(floor.BuildingId).ConfigureAwait(false);
+        var tryGetBuilding = await buildingsService.GetById(floor.BuildingId).ConfigureAwait(false);
 
         if (tryGetBuilding.IsFailure)
             return OperationResult.Failure(tryGetBuilding.ApiError);

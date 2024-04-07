@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Public.Models.BuildingRoutes;
+using Istu.Navigation.Public.Models.Buildings;
 
 namespace Istu.Navigation.Public.Models;
 

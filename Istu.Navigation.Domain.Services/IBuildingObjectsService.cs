@@ -127,7 +127,7 @@ public class BuildingObjectsService : IBuildingObjectsService
         if (string.IsNullOrWhiteSpace(buildingObject.Title))
             return OperationResult.Failure(BuildingsErrors.EmptyTitleError());
 
-        var getBuilding = await buildingsService.GetBuildingById(buildingObject.BuildingId).ConfigureAwait(false);
+        var getBuilding = await buildingsService.GetById(buildingObject.BuildingId).ConfigureAwait(false);
         if (getBuilding.IsFailure)
             return OperationResult.Failure(getBuilding.ApiError);
         

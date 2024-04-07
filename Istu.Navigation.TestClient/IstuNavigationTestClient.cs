@@ -1,4 +1,6 @@
-﻿namespace Istu.Navigation.TestClient;
+﻿using Istu.Navigation.TestClient.SubsidiaryClients;
+
+namespace Istu.Navigation.TestClient;
 
 public class IstuNavigationTestClient
 {

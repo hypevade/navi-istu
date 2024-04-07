@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace Istu.Navigation.TestClient;
+namespace Istu.Navigation.TestClient.SubsidiaryClients;
 
 public abstract class BaseClient
 {
@@ -11,7 +11,7 @@ public abstract class BaseClient
     {
         Client = client;
     }
-    
+
     public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest requestData)
     {
         var jsonRequest = JsonSerializer.Serialize(requestData);
@@ -19,7 +19,7 @@ public abstract class BaseClient
 
         var response = await Client.PostAsync(url, content);
         response.EnsureSuccessStatusCode();
-        
+
         var jsonResponse = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<TResponse>(jsonResponse) ?? throw new InvalidOperationException();
     }
@@ -29,7 +29,7 @@ public abstract class BaseClient
         var response = await Client.GetAsync(url);
 
         response.EnsureSuccessStatusCode();
-        
+
         var jsonResponse = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<TResponse>(jsonResponse) ?? throw new InvalidOperationException();
     }
@@ -44,7 +44,7 @@ public abstract class BaseClient
     {
         var jsonRequest = JsonSerializer.Serialize(requestData);
         var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-        
+
         var request = new HttpRequestMessage(new HttpMethod("PATCH"), url) { Content = content };
 
         var response = await Client.SendAsync(request);
@@ -52,5 +52,16 @@ public abstract class BaseClient
 
         var jsonResponse = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<TResponse>(jsonResponse) ?? throw new InvalidOperationException();
+    }
+
+    public async Task PatchAsync<TRequest>(string url, TRequest requestData)
+    {
+        var jsonRequest = JsonSerializer.Serialize(requestData);
+        var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+        var request = new HttpRequestMessage(new HttpMethod("PATCH"), url) { Content = content };
+
+        var response = await Client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Public.Models.BuildingRoutes;
 
-namespace Istu.Navigation.TestClient;
+namespace Istu.Navigation.TestClient.SubsidiaryClients;
 
 public interface IRoutesClient
 {
