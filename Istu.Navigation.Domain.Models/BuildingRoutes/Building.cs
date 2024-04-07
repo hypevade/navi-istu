@@ -4,16 +4,9 @@ namespace Istu.Navigation.Domain.Models.BuildingRoutes;
 
 public class Building
 {
-    public Building(Guid id, string title, int floorNumbers)
-    {
-        Id = id;
-        Title = title;
-        FloorNumbers = floorNumbers;
-    }
-
-    public Guid Id { get; init; }
-    public string Title { get; set; }
-    public int FloorNumbers{ get; set; }
+    public required Guid Id { get; init; }
+    public required string Title { get; set; }
+    public required int FloorNumbers{ get; set; }
 
     public string? Description { get; set; }
 

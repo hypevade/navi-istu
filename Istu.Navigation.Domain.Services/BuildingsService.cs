@@ -9,8 +9,8 @@ namespace Istu.Navigation.Domain.Services;
 
 public interface IBuildingsService
 {
-    public Task<OperationResult> CreateBuildings(List<Building> buildings);
-    public Task<OperationResult> CreateBuilding(Building building);
+    public Task<OperationResult<List<Guid>>> CreateBuildings(List<Building> buildings);
+    public Task<OperationResult<Guid>> CreateBuilding(Building building);
     public Task<OperationResult> PatchBuilding(Building building);
     public Task<OperationResult> PatchBuildings(List<Building> buildings);
     public Task<OperationResult> DeleteBuilding(Guid id);
@@ -29,25 +29,28 @@ public class BuildingsService : IBuildingsService
         this.mapper = mapper;
     }
 
-    public async Task<OperationResult> CreateBuildings(List<Building> buildings)
+    public async Task<OperationResult<List<Guid>>> CreateBuildings(List<Building> buildings)
     {
         foreach (var building in buildings)
         {
             var checkResult = await CheckBuilding(building).ConfigureAwait(false);
             if (checkResult.IsFailure)
-                return checkResult;
+                return OperationResult<List<Guid>>.Failure(checkResult.ApiError);
         }
 
         var createBuildings = mapper.Map<List<BuildingEntity>>(buildings);
-        await buildingsRepository.AddRangeAsync(createBuildings).ConfigureAwait(false);
+        var addedEntities = await buildingsRepository.AddRangeAsync(createBuildings).ConfigureAwait(false);
         await buildingsRepository.SaveChangesAsync().ConfigureAwait(false);
-        
-        return OperationResult.Success();
+
+        return OperationResult<List<Guid>>.Success(addedEntities.Select(x => x.Id).ToList());
     }
 
-    public async Task<OperationResult> CreateBuilding(Building building)
+    public async Task<OperationResult<Guid>> CreateBuilding(Building building)
     {
-        return await CreateBuildings([building]).ConfigureAwait(false);
+        var createOperationResult = await CreateBuildings([building]).ConfigureAwait(false);
+        return createOperationResult.IsSuccess
+            ? OperationResult<Guid>.Success(createOperationResult.Data.First())
+            : OperationResult<Guid>.Failure(createOperationResult.ApiError);
     }
 
     public async Task<OperationResult> PatchBuilding(Building building)

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
+using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Public.Models.BuildingRoutes;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route("api/buildings/routes")]
+[Route(ApiRoutes.BuildingRoutes.BuildingsRoutesApi)]
 public class BuildingRoutesController: ControllerBase
 {
     private readonly IBuildingRoutesService buildingRoutesService;
@@ -20,7 +21,7 @@ public class BuildingRoutesController: ControllerBase
     }
 
     [HttpPost]
-    [Route("create")]
+    [Route(ApiRoutes.BuildingRoutes.CreatePart)]
     public async Task<ActionResult<BuildingRouteResponse>> CreateRoute([FromBody] BuildingRouteRequest request)
     {
         var getInternalRoute = await buildingRoutesService

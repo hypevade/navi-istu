@@ -21,7 +21,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContext<BuildingsDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("BuildingsDatabase")));
+            options.UseNpgsql(Configuration.GetConnectionString("BuildingsDatabaseLocal")));
         
         services.AddSwaggerGen();
         
@@ -43,7 +43,10 @@ public class Startup
         
         services.AddSingleton<IRouteSearcher, RouteSearcher>();
         
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = null;
+        });
     }
 
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
+using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Public.Models;
@@ -9,7 +10,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route("api/buildings")]
+[Route(ApiRoutes.BuildingObjects.BuildingsObjectsApi)]
+
+//TODO: Реализовать поиск с фильтром (объединение нескольких методов в один ) GetAll
+//Добавить методы Update и Delete для объектов и delete для ребер
+//Посмотреть, может стоит всю логику с ребрами вынести в отдельный контроллер
+
 public class BuildingObjectsController : ControllerBase
 {
     private readonly IBuildingObjectsService buildingObjectsService;
@@ -25,7 +31,7 @@ public class BuildingObjectsController : ControllerBase
 
     
     [HttpPost]
-    [Route("objects")]
+    [Route(ApiRoutes.BuildingObjects.CreatePart)]
     public async Task<ActionResult<CreateBuildingObjectResponse>> Create([FromBody] CreateBuildingObjectRequest request)
     {
         var buildingObject = request.ToBuildingObject(Guid.NewGuid());
@@ -42,8 +48,9 @@ public class BuildingObjectsController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{buildingId}/objectsByTypes")]
-    public async Task<ActionResult<List<FullBuildingObjectDto>>> GetAllByTypeInBuilding(Guid buildingId, [FromQuery] PublicObjectType[] types, [FromQuery] int skip = 0, [FromQuery] int take = 100)
+    [Route(ApiRoutes.BuildingObjects.GetAllPart)]
+    public async Task<ActionResult<List<FullBuildingObjectDto>>> GetAll([FromQuery] Guid buildingId,
+        [FromQuery] PublicObjectType[]? types = null, [FromQuery] int floor = 0, [FromQuery] int skip = 0, [FromQuery] int take = 100)
     {
         if(types.Length == 0)
             return Ok(new List<FullBuildingObjectDto>());
@@ -60,39 +67,9 @@ public class BuildingObjectsController : ControllerBase
         var publicObjects = mapper.Map<List<FullBuildingObjectDto>>(getObjects.Data);
         return Ok(publicObjects);
     }
-
-    [HttpGet]
-    [Route("{buildingId}/objects")]
-    public async Task<ActionResult<List<FullBuildingObjectDto>>> GetAllByBuilding(Guid buildingId, [FromQuery] int skip = 0, [FromQuery] int take = 100)
-    {
-        var getObjects = await buildingObjectsService.GetAllByBuildingId(buildingId, skip, take).ConfigureAwait(false);
-        if (getObjects.IsFailure)
-        {
-            var apiError = getObjects.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        var publicObjects = mapper.Map<List<FullBuildingObjectDto>>(getObjects.Data);
-        return Ok(publicObjects);
-    }
     
     [HttpGet]
-    [Route("{buildingId}/objectsByFloor")]
-    public async Task<ActionResult<List<FullBuildingObjectDto>>> GetAllByFloor(Guid buildingId,[FromQuery] int floor, [FromQuery] int skip = 0, [FromQuery] int take = 100)
-    {
-        var getObjects = await buildingObjectsService.GetAllByFloor(buildingId, floor, skip, take).ConfigureAwait(false);
-        if (getObjects.IsFailure)
-        {
-            var apiError = getObjects.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        var publicObjects = mapper.Map<List<FullBuildingObjectDto>>(getObjects.Data);
-        return Ok(publicObjects);
-    }
-
-    [HttpGet]
-    [Route("objects/{objectId}")]
+    [Route(ApiRoutes.BuildingObjects.GetByIdPart)]
     public async Task<ActionResult<FullBuildingObjectDto>> GetById(Guid objectId)
     {
         var getObject = await buildingObjectsService.GetById(objectId).ConfigureAwait(false);
@@ -107,7 +84,7 @@ public class BuildingObjectsController : ControllerBase
     }
     
     [HttpGet]
-    [Route("objects/{objectId}/edges")]
+    [Route(ApiRoutes.BuildingObjects.GetEdgesByIdPart)]
     public async Task<ActionResult<List<EdgeDto>>> GetEdgesById(Guid objectId)
     {
         var getEdgesOperation = await edgesService.GetAllByObject(objectId).ConfigureAwait(false);
@@ -121,7 +98,7 @@ public class BuildingObjectsController : ControllerBase
     }
 
     [HttpPost]
-    [Route("objects/edges")]
+    [Route(ApiRoutes.BuildingObjects.CreateEdgesPart)]
     public async Task<IActionResult> CreateEdges([FromBody] CreateEdgesRequest request)
     {
         var edges = request.Edges.Select(x => (x.FromId, x.ToId)).ToList();

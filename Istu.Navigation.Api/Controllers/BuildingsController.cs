@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
+using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Public.Models;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route("api/buildings")]
+[Route(ApiRoutes.Buildings.BuildingsApi)]
 public class BuildingsController : ControllerBase
 {
     private readonly IMapper mapper;
@@ -19,27 +20,28 @@ public class BuildingsController : ControllerBase
         this.mapper = mapper;
         this.buildingsService = buildingsService;
     }
-    
-    [HttpPost]
-    [Route("")]
-    public async Task<IActionResult> Create([FromBody] CreateBuildingsRequest request)
-    {
-        if (request.Buildings.Count == 0)
-            return Accepted();
-        
-        var buildings = mapper.Map<List<Building>>(request.Buildings);
 
-        var createOperation = await buildingsService.CreateBuildings(buildings).ConfigureAwait(false);
-        if (createOperation.IsFailure)
+    [HttpPost]
+    [Route(ApiRoutes.Buildings.CreatePart)]
+    public async Task<ActionResult<CreateBuildingResponse>> Create([FromBody] CreateBuildingRequest request)
+    {
+        var building = new Building()
         {
-            var apiError = createOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-        return Accepted();
+            Id = Guid.NewGuid(),
+            Title = request.Title,
+            FloorNumbers = request.FloorNumbers,
+            Description = request.Description
+        };
+
+        var createOperation = await buildingsService.CreateBuilding(building).ConfigureAwait(false);
+        if (createOperation.IsFailure)
+            return StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
+        
+        return Ok(new CreateBuildingResponse() { BuildingId = createOperation.Data });
     }
-    
+
     [HttpPatch]
-    [Route("")]
+    [Route(ApiRoutes.Buildings.UpdatePart)]
     public async Task<IActionResult> Update([FromBody] UpdateBuildingsRequest request)
     {
         if (request.Buildings.Count == 0)
@@ -57,7 +59,7 @@ public class BuildingsController : ControllerBase
     }
     
     [HttpDelete]
-    [Route("{buildingId}")]
+    [Route(ApiRoutes.Buildings.DeletePart)]
     public async Task<IActionResult> Delete(Guid buildingId)
     {
         var createOperation = await buildingsService.DeleteBuilding(buildingId).ConfigureAwait(false);
@@ -69,4 +71,21 @@ public class BuildingsController : ControllerBase
         
         return Accepted();
     }
+    
+    //Todo: Своя модель DTO для возврата клиенту  
+    [HttpGet]
+    [Route(ApiRoutes.Buildings.GetPart)]
+    public async Task<ActionResult<BuildingDto>> GetById(Guid buildingId)
+    {
+        var getBuilding = await buildingsService.GetBuildingById(buildingId).ConfigureAwait(false);
+        if (getBuilding.IsFailure)
+        {
+            var apiError = getBuilding.ApiError;
+            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
+        }
+
+        var buildingDto = mapper.Map<BuildingDto>(getBuilding.Data);
+        return buildingDto;
+    }
 }
+
