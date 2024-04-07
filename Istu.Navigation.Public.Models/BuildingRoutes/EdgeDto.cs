@@ -1,15 +1,13 @@
-﻿using Istu.Navigation.Public.Models.BuildingRoutes;
-
-namespace Istu.Navigation.Public.Models;
+﻿namespace Istu.Navigation.Public.Models.BuildingRoutes;
 
 public class EdgeDto
 {
-    public BuildingObjectDto From { get; set; }
-    public BuildingObjectDto To { get; set; }
+    public Guid FromId { get; set; }
+    public Guid ToId { get; set; }
 
-    public EdgeDto(BuildingObjectDto from, BuildingObjectDto to, double weight)
+    public EdgeDto(Guid fromId, Guid toId)
     {
-        From = from;
-        To = to;
+        FromId = fromId;
+        ToId = toId;
     }
 }

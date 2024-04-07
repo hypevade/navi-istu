@@ -9,7 +9,8 @@ namespace Istu.Navigation.Domain.Services;
 
 public interface IBuildingObjectsService
 {
-    public Task<OperationResult> Create(List<BuildingObject> buildingObjects);
+    public Task<OperationResult<List<Guid>>> CreateRange(List<BuildingObject> buildingObjects);
+    public Task<OperationResult<Guid>> CreateRange(BuildingObject buildingObject);
     public Task<OperationResult> Patch(List<BuildingObject> buildingObjects);
     public Task<OperationResult> Delete(List<Guid> buildingObjectsIds);
     public Task<OperationResult<BuildingObject>> GetById(Guid id);
@@ -31,20 +32,28 @@ public class BuildingObjectsService : IBuildingObjectsService
         this.mapper = mapper;
     }
 
-    public async Task<OperationResult> Create(List<BuildingObject> buildingObjects)
+    public async Task<OperationResult<List<Guid>>> CreateRange(List<BuildingObject> buildingObjects)
     {
         foreach (var buildingObject in buildingObjects)
         {
             var check = await CheckBuildingObject(buildingObject).ConfigureAwait(false);
-            if(check.IsFailure)
-                return check;
+            if (check.IsFailure)
+                return OperationResult<List<Guid>>.Failure(check.ApiError);
         }
         
         var buildingObjectsEntity = mapper.Map<List<BuildingObjectEntity>>(buildingObjects);
-        await buildingObjectsRepository.AddRangeAsync(buildingObjectsEntity).ConfigureAwait(false);
+        var buildingObjectsAdded = await buildingObjectsRepository.AddRangeAsync(buildingObjectsEntity).ConfigureAwait(false);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
         
-        return OperationResult.Success();
+        return OperationResult<List<Guid>>.Success(buildingObjectsAdded.Select(x => x.Id).ToList());
+    }
+
+    public async Task<OperationResult<Guid>> CreateRange(BuildingObject buildingObject)
+    {
+        var result = await CreateRange([buildingObject]).ConfigureAwait(false);
+        return result.IsSuccess 
+            ? OperationResult<Guid>.Success(result.Data.First()) 
+            : OperationResult<Guid>.Failure(result.ApiError);
     }
 
     public async Task<OperationResult> Patch(List<BuildingObject> buildingObjects)
@@ -99,6 +108,9 @@ public class BuildingObjectsService : IBuildingObjectsService
     public async Task<OperationResult<List<BuildingObject>>> GetAllByFloor(Guid buildingId, int floor, int skip = 0,
         int take = 100)
     {
+        if (floor < 0)
+            return OperationResult<List<BuildingObject>>.Failure(BuildingsErrors.NegativeFloorNumbersError());
+        
         var buildingObjectEntities = await buildingObjectsRepository
             .GetAllByFloor(buildingId, floor, skip, take).ConfigureAwait(false);
 
@@ -110,7 +122,7 @@ public class BuildingObjectsService : IBuildingObjectsService
     {
         var checkX = BuildingObject.CoordinateIsValid(buildingObject.X);
         var checkY = BuildingObject.CoordinateIsValid(buildingObject.Y);
-        if (checkY || checkX)
+        if (!checkY || !checkX)
             return OperationResult.Failure(BuildingsErrors.InvalidCoordinatesError(buildingObject.X, buildingObject.Y));
         if (string.IsNullOrWhiteSpace(buildingObject.Title))
             return OperationResult.Failure(BuildingsErrors.EmptyTitleError());
@@ -123,9 +135,10 @@ public class BuildingObjectsService : IBuildingObjectsService
             return OperationResult.Success();
         
         var isExist = await buildingObjectsRepository.GetByIdAsync(buildingObject.BuildingId).ConfigureAwait(false) is null;
-        
-        return isExist 
-            ? OperationResult.Failure(BuildingsErrors.BuildingObjectAlreadyExistsError(buildingObject.BuildingId)) 
-            : OperationResult.Success();
+
+        return isExist
+            ? OperationResult.Success()
+            : OperationResult.Failure(BuildingsErrors.BuildingObjectAlreadyExistsError(buildingObject.BuildingId));
+
     }
 }

@@ -9,8 +9,10 @@ namespace Istu.Navigation.Domain.Services;
 public interface IEdgesService
 {
     public Task<OperationResult<List<Edge>>> GetAllByFloor(Guid buildingId, int floorNumber);
+    public Task<OperationResult<List<Edge>>> GetAllByObject(Guid objectId);
     public Task<OperationResult<Edge>> GetById(Guid edgeId);
-    public Task<OperationResult> Create(Guid fromId, Guid toId);
+    public Task<OperationResult<Guid>> Create(Guid fromId, Guid toId);
+    public Task<OperationResult<List<Guid>>> CreateRange(List<(Guid fromId, Guid toId)> edges);
     public Task<OperationResult> Delete(Guid fromId, Guid toId);
     public Task<OperationResult> DeleteRange(List<Guid> edgeIds);
 }
@@ -28,9 +30,23 @@ public class EdgesService : IEdgesService
 
     public async Task<OperationResult<List<Edge>>> GetAllByFloor(Guid buildingId, int floorNumber)
     {
-        var edgesEntities = await edgesRepository.GetAllByFloor(buildingId, floorNumber).ConfigureAwait(false);
+        var edgeEntities = await edgesRepository.GetAllByFloor(buildingId, floorNumber).ConfigureAwait(false);
         var edges = new List<Edge>();
-        foreach (var edgeEntity in edgesEntities)
+        foreach (var edgeEntity in edgeEntities)
+        {
+            var getEdge = await GetById(edgeEntity.Id).ConfigureAwait(false);
+            if (getEdge.IsSuccess)
+                edges.Add(getEdge.Data);
+        }
+
+        return OperationResult<List<Edge>>.Success(edges);
+    }
+
+    public async Task<OperationResult<List<Edge>>> GetAllByObject(Guid objectId)
+    {
+        var edgeEntities = await edgesRepository.GetAllByBuildingObject(objectId).ConfigureAwait(false);
+        var edges = new List<Edge>();
+        foreach (var edgeEntity in edgeEntities)
         {
             var getEdge = await GetById(edgeEntity.Id).ConfigureAwait(false);
             if (getEdge.IsSuccess)
@@ -55,31 +71,32 @@ public class EdgesService : IEdgesService
 
         return OperationResult<Edge>.Success(new Edge(edgeId, getFromObj.Data, getToObj.Data, edge.FloorNumber));
     }
-
-    public async Task<OperationResult> Create(Guid fromId, Guid toId)
+    
+    public async Task<OperationResult<Guid>> Create(Guid fromId, Guid toId)
     {
-        var fromObj = await buildingObjectsService.GetById(fromId).ConfigureAwait(false);
-        if (fromObj.IsFailure)
-            return OperationResult.Failure(fromObj.ApiError);
-
-        var toObj = await buildingObjectsService.GetById(toId).ConfigureAwait(false);
-        if (toObj.IsFailure)
-            return OperationResult.Failure(toObj.ApiError);
-
-        var edgeEntity = new EdgeEntity()
-        {
-            Id = Guid.NewGuid(),
-            FromObject = fromId,
-            ToObject = toId,
-            FloorNumber = fromObj.Data.FloorNumber,
-            BuildingId = fromObj.Data.BuildingId,
-        };
-
-        await edgesRepository.AddAsync(edgeEntity).ConfigureAwait(false);
-        await edgesRepository.SaveChangesAsync().ConfigureAwait(false);
-        return OperationResult.Success();
+        var result = await CreateRange([(fromId, toId)]).ConfigureAwait(false);
+        return result.IsSuccess 
+            ? OperationResult<Guid>.Success(result.Data.First()) 
+            : OperationResult<Guid>.Failure(result.ApiError);
     }
 
+    public async Task<OperationResult<List<Guid>>> CreateRange(List<(Guid fromId, Guid toId)> edges)
+    {
+        var edgeEntities = new List<EdgeEntity>();
+        foreach (var edge in edges)
+        {
+            var getEdgeEntity = await CheckEdgeAndGetEntity(edge.fromId, edge.toId).ConfigureAwait(false);
+            if (getEdgeEntity.IsFailure)
+                return OperationResult<List<Guid>>.Failure(getEdgeEntity.ApiError);
+            
+            edgeEntities.Add(getEdgeEntity.Data);
+        }
+
+        var addedEdges = await edgesRepository.AddRangeAsync(edgeEntities).ConfigureAwait(false);
+        await edgesRepository.SaveChangesAsync().ConfigureAwait(false);
+
+        return OperationResult<List<Guid>>.Success(addedEdges.Select(x => x.Id).ToList());
+    }
 
     public async Task<OperationResult> Delete(Guid fromId, Guid toId)
     {
@@ -96,5 +113,28 @@ public class EdgesService : IEdgesService
         await edgesRepository.RemoveRangeAsync(edgeIds).ConfigureAwait(false);
         await edgesRepository.SaveChangesAsync().ConfigureAwait(false);
         return OperationResult.Success();
+    }
+
+    private async Task<OperationResult<EdgeEntity>> CheckEdgeAndGetEntity(Guid fromId, Guid toId)
+    {
+        var fromObj = await buildingObjectsService.GetById(fromId).ConfigureAwait(false);
+        if (fromObj.IsFailure)
+            return OperationResult<EdgeEntity>.Failure(fromObj.ApiError);
+
+        var toObj = await buildingObjectsService.GetById(toId).ConfigureAwait(false);
+        if (toObj.IsFailure)
+            return OperationResult<EdgeEntity>.Failure(toObj.ApiError);
+        
+        if(fromObj.Data.BuildingId != toObj.Data.BuildingId)
+            return OperationResult<EdgeEntity>.Failure(BuildingsErrors.EdgeFromDifferentBuildingsError(fromId, toId));
+
+        return OperationResult<EdgeEntity>.Success(new EdgeEntity()
+        {
+            Id = Guid.NewGuid(),
+            FromObject = fromId,
+            ToObject = toId,
+            FloorNumber = fromObj.Data.FloorNumber,
+            BuildingId = fromObj.Data.BuildingId,
+        });
     }
 }

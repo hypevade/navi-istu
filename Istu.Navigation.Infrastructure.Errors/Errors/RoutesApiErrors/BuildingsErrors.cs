@@ -99,6 +99,12 @@ public class BuildingsErrors : ErrorBase
             GetUrn("image-with-id-not-found"));
     }
     
+    public static ApiError EdgeFromDifferentBuildingsError(Guid fromId, Guid toId)
+    {
+        return new ApiError(400, 
+            $"Объекты с идентификаторами '{fromId}' и '{toId}' должны быть в одном здании.",
+            GetUrn("building-objects-with-different-building-id"));
+    }
     
     
     public static ApiError InvalidCoordinatesError(double x, double y)

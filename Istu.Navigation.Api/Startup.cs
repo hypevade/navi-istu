@@ -1,4 +1,5 @@
-﻿using Istu.Navigation.Api.Middlewares;
+﻿using System.Reflection;
+using Istu.Navigation.Api.Middlewares;
 using Istu.Navigation.Domain.Models;
 using Istu.Navigation.Domain.Repositories;
 using Istu.Navigation.Domain.Services;
@@ -21,6 +22,7 @@ public class Startup
     {
         services.AddDbContext<BuildingsDbContext>(options =>
             options.UseNpgsql(Configuration.GetConnectionString("BuildingsDatabase")));
+        
         services.AddSwaggerGen();
         
         services.AddAutoMapper(typeof(PublicMappingProfile).Assembly);
@@ -35,6 +37,9 @@ public class Startup
         services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
         services.AddScoped<IBuildingObjectsService, BuildingObjectsService>();
         services.AddScoped<IBuildingsService, BuildingsService>();
+        services.AddScoped<IFloorsService, FloorsService>();
+        services.AddScoped<IEdgesService, EdgesService>();
+        services.AddScoped<IImageService, ImageService>();
         
         services.AddSingleton<IRouteSearcher, RouteSearcher>();
         
@@ -55,6 +60,8 @@ public class Startup
         
         var dbContext = scope.ServiceProvider.GetRequiredService<BuildingsDbContext>();
         dbContext.Database.EnsureCreated();
+        
+        
 
         app.UseRouting();
 

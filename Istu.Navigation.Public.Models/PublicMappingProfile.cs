@@ -10,7 +10,10 @@ public class PublicMappingProfile : Profile
     {
         CreateMap<BuildingObject, BuildingObjectDto>();
         CreateMap<PublicObjectType, BuildingObjectType>();
-        CreateMap<Edge, EdgeDto>();
+        CreateMap<Edge, EdgeDto>()
+            .ForMember(x => x.FromId, x => x.MapFrom(src => src.From.Id))
+            .ForMember(x => x.ToId, x => x.MapFrom(src => src.To.Id));
+        
         CreateMap<FloorRoute, FloorDto>()
             .ForMember(x => x.ImageLink, x => x.MapFrom(src => src.Floor.ImageLink))
             .ForMember(x => x.Edges, x => x.MapFrom(src => src.Floor.Edges))
