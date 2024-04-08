@@ -1,6 +1,7 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
@@ -8,8 +9,7 @@ namespace Istu.Navigation.Domain.Services;
 
 public interface IEdgesService
 {
-    public Task<OperationResult<List<Edge>>> GetAllByFloor(Guid buildingId, int floorNumber);
-    public Task<OperationResult<List<Edge>>> GetAllByObject(Guid objectId);
+    public Task<OperationResult<List<Edge>>> GetAllByFilter(EdgeFilter filter);
     public Task<OperationResult<Edge>> GetById(Guid edgeId);
     public Task<OperationResult<Guid>> Create(Guid fromId, Guid toId);
     public Task<OperationResult<List<Guid>>> CreateRange(List<(Guid fromId, Guid toId)> edges);
@@ -28,9 +28,9 @@ public class EdgesService : IEdgesService
         this.buildingObjectsService = buildingObjectsService;
     }
 
-    public async Task<OperationResult<List<Edge>>> GetAllByFloor(Guid buildingId, int floorNumber)
+    public async Task<OperationResult<List<Edge>>> GetAllByFilter(EdgeFilter filter)
     {
-        var edgeEntities = await edgesRepository.GetAllByFloor(buildingId, floorNumber).ConfigureAwait(false);
+        var edgeEntities = await edgesRepository.GetAllByFilterAsync(filter).ConfigureAwait(false);
         var edges = new List<Edge>();
         foreach (var edgeEntity in edgeEntities)
         {
@@ -41,20 +41,7 @@ public class EdgesService : IEdgesService
 
         return OperationResult<List<Edge>>.Success(edges);
     }
-
-    public async Task<OperationResult<List<Edge>>> GetAllByObject(Guid objectId)
-    {
-        var edgeEntities = await edgesRepository.GetAllByBuildingObject(objectId).ConfigureAwait(false);
-        var edges = new List<Edge>();
-        foreach (var edgeEntity in edgeEntities)
-        {
-            var getEdge = await GetById(edgeEntity.Id).ConfigureAwait(false);
-            if (getEdge.IsSuccess)
-                edges.Add(getEdge.Data);
-        }
-
-        return OperationResult<List<Edge>>.Success(edges);
-    }
+    
 
     //Подумать над тем как можно оптимизировать. 
     public async Task<OperationResult<Edge>> GetById(Guid edgeId)

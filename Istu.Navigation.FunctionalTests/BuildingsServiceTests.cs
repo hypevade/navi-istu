@@ -22,6 +22,14 @@ public class BuildingsServiceTests
     }
 
     [Test]
+    public void METHOD()
+    {
+        Console.WriteLine("Ввведите первое условие: Если человек занимается йогой");
+        Console.WriteLine("Ввведите второе условие (необязательно): ");
+        Console.WriteLine("Он становится гибче");
+    }
+
+    [Test]
     public async Task Create_Should_create_building_when_request_is_valid()
     {
         var testBuilding = new CreateBuildingRequest()
@@ -63,7 +71,7 @@ public class BuildingsServiceTests
         
         await dbContext.Buildings.AddAsync(buildingEntity).ConfigureAwait(false);
         await dbContext.SaveChangesAsync().ConfigureAwait(false);
-        
+
         var buildings = await client.GetAllAsync();
         buildings.Should().HaveCount(1);
         buildings.First().Id.Should().Be(buildingEntity.Id);

@@ -45,6 +45,11 @@ public class BuildingsClient : BaseClient, IBuildingsClient
     public Task<List<BuildingDto>> GetAllAsync(int skip = 0, int take = 100)
     {
         var route = ApiRoutes.Buildings.GetAllRoute();
-        return GetAsync<List<BuildingDto>>(route);
+        var queries = new Dictionary<string, string?>()
+        {
+            {nameof(skip), skip.ToString()},
+            {nameof(take), take.ToString()}
+        };
+        return GetAsync<List<BuildingDto>>(route, queries);
     }
 }

@@ -14,7 +14,6 @@ namespace Istu.Navigation.Api.Controllers;
 
 //TODO: Реализовать поиск с фильтром (объединение нескольких методов в один ) GetAll
 //Добавить методы Update и Delete для объектов и delete для ребер
-//Посмотреть, может стоит всю логику с ребрами вынести в отдельный контроллер
 
 public class BuildingObjectsController : ControllerBase
 {
@@ -81,35 +80,5 @@ public class BuildingObjectsController : ControllerBase
 
         var publicObjects = mapper.Map<List<FullBuildingObjectDto>>(getObject.Data);
         return Ok(publicObjects);
-    }
-    
-    [HttpGet]
-    [Route(ApiRoutes.BuildingObjects.GetEdgesByIdPart)]
-    public async Task<ActionResult<List<EdgeDto>>> GetEdgesById(Guid objectId)
-    {
-        var getEdgesOperation = await edgesService.GetAllByObject(objectId).ConfigureAwait(false);
-        if (getEdgesOperation.IsFailure) 
-        {
-            var apiError = getEdgesOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        return Ok(mapper.Map<List<EdgeDto>>(getEdgesOperation.Data));
-    }
-
-    [HttpPost]
-    [Route(ApiRoutes.BuildingObjects.CreateEdgesPart)]
-    public async Task<IActionResult> CreateEdges([FromBody] CreateEdgesRequest request)
-    {
-        var edges = request.Edges.Select(x => (x.FromId, x.ToId)).ToList();
-        var createEdgeOperation = await edgesService.CreateRange(edges).ConfigureAwait(false);
-
-        if (createEdgeOperation.IsFailure)
-        {
-            var apiError = createEdgeOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        return Ok(new CreateEdgesResponse { EdgeIds = createEdgeOperation.Data });
     }
 }

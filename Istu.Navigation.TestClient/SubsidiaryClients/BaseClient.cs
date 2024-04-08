@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Web;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Istu.Navigation.TestClient.SubsidiaryClients;
 
@@ -12,7 +14,7 @@ public abstract class BaseClient
         Client = client;
     }
 
-    public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest requestData)
+    protected async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest requestData)
     {
         var jsonRequest = JsonSerializer.Serialize(requestData);
         var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
@@ -24,23 +26,25 @@ public abstract class BaseClient
         return JsonSerializer.Deserialize<TResponse>(jsonResponse) ?? throw new InvalidOperationException();
     }
 
-    public async Task<TResponse> GetAsync<TResponse>(string url)
+    protected async Task<TResponse> GetAsync<TResponse>(string url, Dictionary<string, string?>? queries = null)
     {
+        if(queries != null && queries.Any())
+            url = QueryHelpers.AddQueryString(url, queries);
+        
         var response = await Client.GetAsync(url);
 
-        response.EnsureSuccessStatusCode();
-
         var jsonResponse = await response.Content.ReadAsStringAsync();
+        response.EnsureSuccessStatusCode();
         return JsonSerializer.Deserialize<TResponse>(jsonResponse) ?? throw new InvalidOperationException();
     }
 
-    public async Task DeleteAsync(string url)
+    protected async Task DeleteAsync(string url)
     {
         var response = await Client.DeleteAsync(url);
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task<TResponse> PatchAsync<TRequest, TResponse>(string url, TRequest requestData)
+    protected async Task<TResponse> PatchAsync<TRequest, TResponse>(string url, TRequest requestData)
     {
         var jsonRequest = JsonSerializer.Serialize(requestData);
         var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
@@ -54,7 +58,7 @@ public abstract class BaseClient
         return JsonSerializer.Deserialize<TResponse>(jsonResponse) ?? throw new InvalidOperationException();
     }
 
-    public async Task PatchAsync<TRequest>(string url, TRequest requestData)
+    protected async Task PatchAsync<TRequest>(string url, TRequest requestData)
     {
         var jsonRequest = JsonSerializer.Serialize(requestData);
         var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");

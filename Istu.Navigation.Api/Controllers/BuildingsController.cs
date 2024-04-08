@@ -3,6 +3,7 @@ using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Services;
+using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Public.Models.Buildings;
 using Microsoft.AspNetCore.Mvc;
 
@@ -85,20 +86,18 @@ public class BuildingsController : ControllerBase
         return buildingDto;
     }
 
-    //TODO: Поиск по title можно добавить сюда
     [HttpGet]
     [Route(ApiRoutes.Buildings.GetAllPart)]
-    public async Task<ActionResult<List<BuildingDto>>> GetAll(int skip = 0, int take = 100)
+    public async Task<ActionResult<List<BuildingDto>>> GetAllByFilter(BuildingFilter filter)
     {
-        var getBuilding = await buildingsService.GetAll(skip, take).ConfigureAwait(false);
+        var getBuilding = await buildingsService.GetAllByFilter(filter).ConfigureAwait(false);
         if (getBuilding.IsFailure)
         {
             var apiError = getBuilding.ApiError;
             return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
         }
 
-        var dtos = mapper.Map<List<BuildingDto>>(getBuilding.Data);
-        return dtos;
+        return Ok(mapper.Map<List<BuildingDto>>(getBuilding.Data));
     }
 }
 

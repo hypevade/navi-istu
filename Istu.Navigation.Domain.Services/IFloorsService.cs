@@ -2,6 +2,7 @@
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
@@ -69,8 +70,11 @@ public class FloorsService : IFloorsService
             .ConfigureAwait(false);
         if (getBuildingObjects.IsFailure)
             return OperationResult<Floor>.Failure(getBuildingObjects.ApiError);
+
+        var getEdges = await edgesService
+            .GetAllByFilter(new EdgeFilter() { BuildingId = buildingId, FloorNumber = floorNumber })
+            .ConfigureAwait(false);
         
-        var getEdges = await edgesService.GetAllByFloor(buildingId, floorNumber).ConfigureAwait(false);
         if (getEdges.IsFailure)
             return OperationResult<Floor>.Failure(getEdges.ApiError);
         

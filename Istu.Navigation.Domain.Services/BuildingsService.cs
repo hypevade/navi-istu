@@ -2,6 +2,7 @@
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
@@ -14,9 +15,8 @@ public interface IBuildingsService
     public Task<OperationResult> Patch(Building building);
     public Task<OperationResult> PatchRange(List<Building> buildings);
     public Task<OperationResult> Delete(Guid id);
-    public Task<OperationResult<List<Building>>> GetByTitle(string title);
-    public Task<OperationResult<List<Building>>> GetAll(int skip = 0, int take = 100);
     public Task<OperationResult<Building>> GetById(Guid id);
+    public Task<OperationResult<List<Building>>> GetAllByFilter(BuildingFilter filter);
 }
 
 public class BuildingsService : IBuildingsService
@@ -93,19 +93,9 @@ public class BuildingsService : IBuildingsService
         return OperationResult.Success();
     }
 
-    public async Task<OperationResult<List<Building>>> GetByTitle(string title)
+    public async Task<OperationResult<List<Building>>> GetAllByFilter(BuildingFilter filter)
     {
-        if (string.IsNullOrWhiteSpace(title))
-            return OperationResult<List<Building>>.Failure(BuildingsErrors.EmptyTitleError());
-     
-        var buildings = await buildingsRepository.GetAllByTitle(title).ConfigureAwait(false);
-        var result = mapper.Map<List<Building>>(buildings.ToList());
-        return OperationResult<List<Building>>.Success(result);
-    }
-
-    public async Task<OperationResult<List<Building>>> GetAll(int skip = 0, int take = 100)
-    {
-        var buildings = await buildingsRepository.GetAllAsync(skip, take).ConfigureAwait(false);
+        var buildings = await buildingsRepository.GetAllByFilterAsync(filter).ConfigureAwait(false);
         var result = mapper.Map<List<Building>>(buildings.ToList());
         return OperationResult<List<Building>>.Success(result);
     }
