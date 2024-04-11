@@ -3,6 +3,7 @@ using System;
 using Istu.Navigation.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Istu.Navigation.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(BuildingsDbContext))]
-    partial class BuildingsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240411163608_deleteFloors")]
+    partial class deleteFloors
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

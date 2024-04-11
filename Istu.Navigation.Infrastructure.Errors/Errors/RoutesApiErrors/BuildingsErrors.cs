@@ -99,6 +99,13 @@ public class BuildingsErrors : ErrorBase
             GetUrn("image-with-id-not-found"));
     }
     
+    public static ApiError ImageWithFloorIdNotFoundError(Guid buildingId, int floorNumber)
+    {
+        return new ApiError(404,
+            $"Изображения на этаже '{floorNumber}' в здании с идентификатором '{buildingId}' не найдено.",
+            GetUrn("image-with-floor-id-not-found"));
+    }
+    
     public static ApiError EdgeFromDifferentBuildingsError(Guid fromId, Guid toId)
     {
         return new ApiError(400, 

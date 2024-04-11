@@ -20,8 +20,10 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        var connectionString = Configuration.GetConnectionString("BuildingsDatabaseLocal");
         services.AddDbContext<BuildingsDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("BuildingsDatabaseLocal")));
+            options.UseNpgsql(connectionString,
+                x => x.MigrationsAssembly(typeof(BuildingsDbContext).Assembly.GetName().Name)));
         
         services.AddSwaggerGen();
         
@@ -32,14 +34,13 @@ public class Startup
         services.AddScoped<IBuildingObjectsRepository, BuildingObjectsRepository>();
         services.AddScoped<IBuildingsRepository, BuildingsRepository>();
         services.AddScoped<IEdgesRepository, EdgesRepository>();
-        services.AddScoped<IFloorsRepository, FloorsRepository>();
         services.AddScoped<IImageRepository, ImageRepository>();
         services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
         services.AddScoped<IBuildingObjectsService, BuildingObjectsService>();
         services.AddScoped<IBuildingsService, BuildingsService>();
-        services.AddScoped<IFloorsService, FloorsService>();
         services.AddScoped<IEdgesService, EdgesService>();
         services.AddScoped<IImageService, ImageService>();
+        services.AddScoped<IFloorsService, FloorsService>();
         
         services.AddSingleton<IRouteSearcher, RouteSearcher>();
         
@@ -64,8 +65,6 @@ public class Startup
         var dbContext = scope.ServiceProvider.GetRequiredService<BuildingsDbContext>();
         dbContext.Database.EnsureCreated();
         
-        
-
         app.UseRouting();
 
         app.UseAuthorization();

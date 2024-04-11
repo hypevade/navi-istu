@@ -4,21 +4,29 @@ namespace Istu.Navigation.Domain.Models.BuildingRoutes;
 
 public class ImageLink
 {
-    public ImageLink(Guid id, Guid objectId, string link)
+    public ImageLink(Guid id, Guid objectId, string link, string title)
     {
         Id = id;
-        
-        if (string.IsNullOrWhiteSpace(link))
-            throw new ArgumentException($"Параметр {nameof(Link)} не может быть пуст",nameof(Link));
+        ObjectId = objectId;
         Link = link;
+        Title = title;
     }
 
     public Guid Id { get; init; }
+    public Guid ObjectId { get; init; }
+    public string Title { get; init; }
 
     public string Link { get; set; }
 
     //TODO: Может быть надо добавить тип изображенния
 
     public static ImageLinkEntity ToDto(ImageLink imageLink) => new()
-        { Id = imageLink.Id, Link = imageLink.Link, IsDeleted = false };
+    {
+        Id = imageLink.Id,
+        Link = imageLink.Link,
+        ObjectId = imageLink.ObjectId,
+        Title = imageLink.Title,
+        CreatedByAdmin = false,
+        IsDeleted = false
+    };
 }

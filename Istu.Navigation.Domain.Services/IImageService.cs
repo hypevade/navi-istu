@@ -10,6 +10,7 @@ public interface IImageService
 {
     public Task<OperationResult<ImageLink>> GetById(Guid imageId);
     public Task<OperationResult<List<ImageLink>>> GetAllByObjectId(Guid objectId);
+    public Task<OperationResult<ImageLink>> GetByFloorId(Guid buildingId, int floorNumber);
 }
 
 public class ImageService : IImageService
@@ -31,8 +32,19 @@ public class ImageService : IImageService
         return OperationResult<ImageLink>.Success(mapper.Map<ImageLink>(image));
     }
 
-    public Task<OperationResult<List<ImageLink>>> GetAllByObjectId(Guid objectId)
+    public async Task<OperationResult<List<ImageLink>>> GetAllByObjectId(Guid objectId)
     {
         throw new NotImplementedException();
+    }
+    
+    public async Task<OperationResult<ImageLink>> GetByFloorId(Guid buildingId, int floorNumber)
+    {
+        var res = await imageRepository.FindAsync(x => x.ObjectId == buildingId && x.Title == "floor_" + floorNumber);
+        if (res.Count == 0)
+            return OperationResult<ImageLink>.Failure(
+                BuildingsErrors.ImageWithFloorIdNotFoundError(buildingId, floorNumber));
+
+        return OperationResult<ImageLink>.Success(mapper.Map<ImageLink>(res.First()));
+        
     }
 }
