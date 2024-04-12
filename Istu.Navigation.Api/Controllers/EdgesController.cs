@@ -43,7 +43,6 @@ public class EdgesController : ControllerBase
     [Route(ApiRoutes.BuildingEdges.GetAllPart)]
     public async Task<ActionResult<List<EdgeDto>>> GetAllEdges([FromQuery] EdgeFilter filter)
     {
-        var r = HttpContext.Request;
         var getEdgesOperation = await edgesService.GetAllByFilter(filter).ConfigureAwait(false);
         
         if (getEdgesOperation.IsFailure)

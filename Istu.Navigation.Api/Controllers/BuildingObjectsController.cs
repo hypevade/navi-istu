@@ -3,8 +3,9 @@ using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Services;
+using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Public.Models;
-using Istu.Navigation.Public.Models.BuildingRoutes;
+using Istu.Navigation.Public.Models.BuildingObjects;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
@@ -27,6 +28,14 @@ public class BuildingObjectsController : ControllerBase
         this.mapper = mapper;
         this.edgesService = edgesService;
     }
+    
+    [HttpPatch]
+    [Route(ApiRoutes.BuildingObjects.UpdatePart)]
+    
+    public async Task<ActionResult<CreateBuildingObjectResponse>> Update([FromBody] UpdateObjectRequest request)
+    {
+        throw new NotImplementedException();
+    }
 
     
     [HttpPost]
@@ -48,14 +57,9 @@ public class BuildingObjectsController : ControllerBase
 
     [HttpGet]
     [Route(ApiRoutes.BuildingObjects.GetAllPart)]
-    public async Task<ActionResult<List<FullBuildingObjectDto>>> GetAll([FromQuery] Guid buildingId,
-        [FromQuery] PublicObjectType[]? types = null, [FromQuery] int floor = 0, [FromQuery] int skip = 0, [FromQuery] int take = 100)
+    public async Task<ActionResult<List<BuildingObjectDto>>> GetAll([FromQuery] BuildingObjectFilter filter)
     {
-        if(types.Length == 0)
-            return Ok(new List<FullBuildingObjectDto>());
-        
-        var innerTypes = mapper.Map<BuildingObjectType[]>(types);
-        var getObjects = await buildingObjectsService.GetAllByTypeInBuilding(buildingId, innerTypes, skip, take)
+        var getObjects = await buildingObjectsService.GetAllByFilter(filter)
             .ConfigureAwait(false);
         if (getObjects.IsFailure)
         {
@@ -63,13 +67,13 @@ public class BuildingObjectsController : ControllerBase
             return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
         }
 
-        var publicObjects = mapper.Map<List<FullBuildingObjectDto>>(getObjects.Data);
+        var publicObjects = mapper.Map<List<BuildingObjectDto>>(getObjects.Data);
         return Ok(publicObjects);
     }
-    
+
     [HttpGet]
     [Route(ApiRoutes.BuildingObjects.GetByIdPart)]
-    public async Task<ActionResult<FullBuildingObjectDto>> GetById(Guid objectId)
+    public async Task<ActionResult<BuildingObjectDto>> GetById(Guid objectId)
     {
         var getObject = await buildingObjectsService.GetById(objectId).ConfigureAwait(false);
         if (getObject.IsFailure)
@@ -78,7 +82,7 @@ public class BuildingObjectsController : ControllerBase
             return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
         }
 
-        var publicObjects = mapper.Map<List<FullBuildingObjectDto>>(getObject.Data);
+        var publicObjects = mapper.Map<List<BuildingObjectDto>>(getObject.Data);
         return Ok(publicObjects);
     }
 }

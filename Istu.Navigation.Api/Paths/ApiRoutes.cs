@@ -13,17 +13,17 @@ public static class ApiRoutes
         public const string CreatePart = "";
         public const string UpdatePart = "";
         
-        public const string GetPart = "/{buildingId}";
-        public const string DeletePart = "/{buildingId}";
+        public const string GetPart = "{buildingId}";
+        public const string DeletePart = "{buildingId}";
 
         public static string GetWithIdRoute(Guid buildingId)
         {
-            return BuildingsApi + GetPart.Replace("{buildingId}", buildingId.ToString());
+            return BuildingsApi + "/" + GetPart.Replace("{buildingId}", buildingId.ToString());
         }
         
         public static string DeleteRoute(Guid buildingId)
         {
-            return BuildingsApi + DeletePart.Replace("{buildingId}", buildingId.ToString());
+            return BuildingsApi + "/" + DeletePart.Replace("{buildingId}", buildingId.ToString());
         }
         
         public static string UpdateRoute()
@@ -75,12 +75,24 @@ public static class ApiRoutes
     {
         public const string BuildingsObjectsApi = Base + "/buildings/objects";
         public const string CreatePart = "";
+        public const string UpdatePart = "";
+        public const string DeletePart = "{objectId}";
         public const string GetAllPart = "";
-        public const string GetByIdPart = "/{objectId}";
+        public const string GetByIdPart = "{objectId}";
         
         public static string CreateObjectRoute()
         {
             return BuildingsObjectsApi + CreatePart;
+        }
+        
+        public static string UpdateObjectRoute()
+        {
+            return BuildingsObjectsApi + UpdatePart;
+        }
+        
+        public static string DeleteObjectRoute(Guid buildingObjectId)
+        {
+            return BuildingsObjectsApi + "/" + GetByIdPart.Replace("{objectId}", buildingObjectId.ToString());
         }
         
         public static string GetAllRoute()
@@ -90,7 +102,7 @@ public static class ApiRoutes
         
         public static string GetWithIdRoute(Guid buildingObjectId)
         {
-            return BuildingsObjectsApi + GetByIdPart.Replace("{objectId}", buildingObjectId.ToString());
+            return BuildingsObjectsApi + "/" + GetByIdPart.Replace("{objectId}", buildingObjectId.ToString());
         }
     }
 }

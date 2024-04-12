@@ -9,7 +9,7 @@ public class PublicMappingProfile : Profile
 {
     public PublicMappingProfile()
     {
-        CreateMap<BuildingObject, BuildingObjectDto>();
+        CreateMap<BuildingObject, BuildingRoutes.BuildingObjectDto>();
         CreateMap<PublicObjectType, BuildingObjectType>();
         CreateMap<Edge, EdgeDto>()
             .ForMember(x => x.FromId, x => x.MapFrom(src => src.From.Id))
@@ -30,7 +30,7 @@ public class PublicMappingProfile : Profile
             .ForMember(x => x.RouteId, x => x.MapFrom(src => src.RouteId))
             .ForMember(x => x.StartObjectDto, x => x.MapFrom(src => src.StartObject))
             .ForMember(x => x.FinishObjectDto, x => x.MapFrom(src => src.FinishObject));
-        CreateMap<FullBuildingObjectDto, BuildingObject>();
+        CreateMap<BuildingObjectDto, BuildingObject>();
         CreateMap<BuildingDto, Building>();
         CreateMap<Building, BuildingDto>();
         

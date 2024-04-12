@@ -1,6 +1,6 @@
 ﻿namespace Istu.Navigation.Public.Models;
 
-public class FullBuildingObjectDto
+public class BuildingObjectDto
 {
     public required Guid Id { get; set; }
     public required Guid BuildingId { get; set; }

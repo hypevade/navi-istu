@@ -2,6 +2,7 @@
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
@@ -14,9 +15,7 @@ public interface IBuildingObjectsService
     public Task<OperationResult> Patch(List<BuildingObject> buildingObjects);
     public Task<OperationResult> Delete(List<Guid> buildingObjectsIds);
     public Task<OperationResult<BuildingObject>> GetById(Guid id);
-    public Task<OperationResult<List<BuildingObject>>> GetAllByBuildingId(Guid buildingId, int skip = 0, int take = 100); 
-    public Task<OperationResult<List<BuildingObject>>> GetAllByTypeInBuilding(Guid buildingId, BuildingObjectType[] types, int skip = 0, int take = 100);
-    public Task<OperationResult<List<BuildingObject>>> GetAllByFloor(Guid buildingId, int floor, int skip = 0, int take = 100);
+    public Task<OperationResult<List<BuildingObject>>> GetAllByFilter(BuildingObjectFilter filter);
 }
 
 public class BuildingObjectsService : IBuildingObjectsService
@@ -88,33 +87,10 @@ public class BuildingObjectsService : IBuildingObjectsService
         return OperationResult<BuildingObject>.Success(result);
     }
 
-    public async Task<OperationResult<List<BuildingObject>>> GetAllByBuildingId(Guid buildingId, int skip = 0, int take = 100)
+    public async Task<OperationResult<List<BuildingObject>>> GetAllByFilter(BuildingObjectFilter filter)
     {
-        var buildingObjectEntities = await buildingObjectsRepository.GetAllByBuilding(buildingId, skip, take).ConfigureAwait(false);
-        
-        var result = mapper.Map<List<BuildingObject>>(buildingObjectEntities.ToList());
-        return OperationResult<List<BuildingObject>>.Success(result);
-    }
-
-    public async Task<OperationResult<List<BuildingObject>>> GetAllByTypeInBuilding(Guid buildingId, BuildingObjectType[] types, int skip = 0, int take = 100)
-    {
-        var buildingObjectEntities = await buildingObjectsRepository
-            .GetAllByTypeInBuilding(buildingId, types, skip, take).ConfigureAwait(false);
-        
-        var result = mapper.Map<List<BuildingObject>>(buildingObjectEntities.ToList());
-        return OperationResult<List<BuildingObject>>.Success(result);
-    }
-
-    public async Task<OperationResult<List<BuildingObject>>> GetAllByFloor(Guid buildingId, int floor, int skip = 0,
-        int take = 100)
-    {
-        if (floor < 0)
-            return OperationResult<List<BuildingObject>>.Failure(BuildingsErrors.NegativeFloorNumbersError());
-        
-        var buildingObjectEntities = await buildingObjectsRepository
-            .GetAllByFloor(buildingId, floor, skip, take).ConfigureAwait(false);
-
-        var result = mapper.Map<List<BuildingObject>>(buildingObjectEntities.ToList());
+        var buildingObjectEntities = await buildingObjectsRepository.GetAllByFilterAsync(filter).ConfigureAwait(false);
+        var result = mapper.Map<List<BuildingObject>>(buildingObjectEntities);
         return OperationResult<List<BuildingObject>>.Success(result);
     }
 
@@ -139,6 +115,5 @@ public class BuildingObjectsService : IBuildingObjectsService
         return isExist
             ? OperationResult.Success()
             : OperationResult.Failure(BuildingsErrors.BuildingObjectAlreadyExistsError(buildingObject.BuildingId));
-
     }
 }

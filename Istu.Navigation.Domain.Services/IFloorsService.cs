@@ -56,7 +56,7 @@ public class FloorsService : IFloorsService
     public async Task<OperationResult<Floor>> GetById(Guid buildingId, int floorNumber)
     {
         var getBuildingObjects = await buildingObjectsService
-            .GetAllByFloor(buildingId, floorNumber)
+            .GetAllByFilter(new BuildingObjectFilter { BuildingId = buildingId, Floor = floorNumber })
             .ConfigureAwait(false);
         if (getBuildingObjects.IsFailure)
             return OperationResult<Floor>.Failure(getBuildingObjects.ApiError);
