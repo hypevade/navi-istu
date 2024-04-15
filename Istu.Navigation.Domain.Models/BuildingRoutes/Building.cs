@@ -6,11 +6,13 @@ public class Building
 {
     public required Guid Id { get; init; }
     public required string Title { get; set; }
-    public required int FloorNumbers{ get; set; }
+    public int FloorNumbers => Floors.Count;
+
+    public required List<FloorInfo> Floors { get; set; }
 
     public string? Description { get; set; }
 
-    public static BuildingEntity ToDto(Building building) => new()
+    public static BuildingEntity ToEntity(Building building) => new()
     {
         Id = building.Id,
         Title = building.Title,

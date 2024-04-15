@@ -68,11 +68,18 @@ public class FloorsService : IFloorsService
         if (getEdges.IsFailure)
             return OperationResult<Floor>.Failure(getEdges.ApiError);
 
-        var getImageLink = await imageService.GetByFloorId(buildingId, floorNumber).ConfigureAwait(false);
+        var getImageLink = await imageService.GetAllByFilter(new ImageFilter()
+            { ObjectId = buildingId, Title = GetTittleForFloorImage(floorNumber) }).ConfigureAwait(false);
         if (getImageLink.IsFailure)
             return OperationResult<Floor>.Failure(getImageLink.ApiError);
 
-        var floor = new Floor(buildingId, floorNumber, getBuildingObjects.Data, getEdges.Data, getImageLink.Data);
+        var floor = new Floor(buildingId, floorNumber, getBuildingObjects.Data, getEdges.Data, getImageLink.Data.First());
         return OperationResult<Floor>.Success(floor);
+    }
+
+    //Todo: костыль
+    private string GetTittleForFloorImage(int floorNumber)
+    {
+        return "floor_" + floorNumber;
     }
 }

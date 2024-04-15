@@ -13,7 +13,6 @@ namespace Istu.Navigation.Api.Controllers;
 [ApiController]
 [Route(ApiRoutes.BuildingObjects.BuildingsObjectsApi)]
 
-//TODO: Реализовать поиск с фильтром (объединение нескольких методов в один ) GetAll
 //Добавить методы Update и Delete для объектов и delete для ребер
 
 public class BuildingObjectsController : ControllerBase
@@ -84,5 +83,19 @@ public class BuildingObjectsController : ControllerBase
 
         var publicObjects = mapper.Map<List<BuildingObjectDto>>(getObject.Data);
         return Ok(publicObjects);
+    }
+    
+    [HttpDelete]
+    [Route(ApiRoutes.BuildingObjects.DeletePart)]
+    public async Task<ActionResult<BuildingObjectDto>> Delete(Guid objectId)
+    {
+        var getObject = await buildingObjectsService.Delete([objectId]).ConfigureAwait(false);
+        if (getObject.IsFailure)
+        {
+            var apiError = getObject.ApiError;
+            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
+        }
+
+        return Accepted();
     }
 }

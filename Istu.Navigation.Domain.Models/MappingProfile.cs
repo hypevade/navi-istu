@@ -14,5 +14,7 @@ public class MappingProfile : Profile
         CreateMap<BuildingEntity, Building>();
         CreateMap<Building, BuildingEntity>();
         
+        CreateMap<ImageLink, ImageLinkEntity>();
+        CreateMap<ImageLinkEntity, ImageLink>();
     }
 }

@@ -1,15 +1,18 @@
 ﻿using Istu.Navigation.Api.Paths;
+using Istu.Navigation.Domain.Models.BuildingRoutes;
+using Istu.Navigation.Infrastructure.EF.Filters;
+using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Public.Models.Buildings;
 
 namespace Istu.Navigation.TestClient.SubsidiaryClients;
 
 public interface IBuildingsClient
 {
-    Task<BuildingDto> GetBuildingByIdAsync(Guid buildingId);
-    Task DeleteBuildingAsync(Guid buildingId);
-    Task<CreateBuildingResponse> CreateBuildingAsync(CreateBuildingRequest request);
+    Task<OperationResult<BuildingDto>> GetBuildingByIdAsync(Guid buildingId);
+    Task<OperationResult> DeleteBuildingAsync(Guid buildingId);
+    Task<OperationResult<CreateBuildingResponse>> CreateBuildingAsync(CreateBuildingRequest request);
     Task UpdateBuildingAsync(UpdateBuildingRequest request);
-    Task<List<BuildingDto>> GetAllAsync(int skip = 0, int take = 100);
+    Task<OperationResult<List<BuildingDto>>> GetAllByFilterAsync(BuildingFilter filter);
 }
 
 public class BuildingsClient : BaseClient, IBuildingsClient
@@ -18,22 +21,22 @@ public class BuildingsClient : BaseClient, IBuildingsClient
     {
     }
 
-    public async Task<BuildingDto> GetBuildingByIdAsync(Guid buildingId)
+    public async Task<OperationResult<BuildingDto>> GetBuildingByIdAsync(Guid buildingId)
     {
         var route = ApiRoutes.Buildings.GetWithIdRoute(buildingId);
-        return await GetAsync<BuildingDto>(route).ConfigureAwait(false);
+        return await GetAsync1<BuildingDto>(route).ConfigureAwait(false);
     }
 
-    public Task DeleteBuildingAsync(Guid buildingId)
+    public Task<OperationResult> DeleteBuildingAsync(Guid buildingId)
     {
         var route = ApiRoutes.Buildings.DeleteRoute(buildingId);
-        return DeleteAsync(route);
+        return DeleteAsync1(route);
     }
 
-    public Task<CreateBuildingResponse> CreateBuildingAsync(CreateBuildingRequest request)
+    public Task<OperationResult<CreateBuildingResponse>> CreateBuildingAsync(CreateBuildingRequest request)
     {
         var route = ApiRoutes.Buildings.CreateRoute();
-        return PostAsync<CreateBuildingRequest, CreateBuildingResponse>(route, request);
+        return PostAsync1<CreateBuildingRequest, CreateBuildingResponse>(route, request);
     }
 
     public Task UpdateBuildingAsync(UpdateBuildingRequest request)
@@ -42,14 +45,20 @@ public class BuildingsClient : BaseClient, IBuildingsClient
         return PatchAsync(route, request);
     }
 
-    public Task<List<BuildingDto>> GetAllAsync(int skip = 0, int take = 100)
+    public Task<OperationResult<List<BuildingDto>>> GetAllByFilterAsync(BuildingFilter filter)
     {
         var route = ApiRoutes.Buildings.GetAllRoute();
-        var queries = new Dictionary<string, string?>()
-        {
-            {nameof(skip), skip.ToString()},
-            {nameof(take), take.ToString()}
-        };
-        return GetAsync<List<BuildingDto>>(route, queries);
+        var queries = new Dictionary<string, string?>();
+
+        if (filter.BuildingId != null)
+            queries.Add(nameof(filter.BuildingId), filter.BuildingId.ToString());
+        if (filter.Title != null)
+            queries.Add(nameof(filter.Title), filter.Title);
+        if (filter.FloorNumber != null)
+            queries.Add(nameof(filter.FloorNumber), filter.FloorNumber.ToString());
+
+        queries.Add(nameof(filter.Skip), filter.Skip.ToString());
+        queries.Add(nameof(filter.Take), filter.Take.ToString());
+        return GetAsync1<List<BuildingDto>>(route, queries);
     }
 }

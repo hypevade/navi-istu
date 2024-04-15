@@ -30,22 +30,24 @@ public class BuildingsController : ControllerBase
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
-            FloorNumbers = request.FloorNumbers,
-            Description = request.Description
+            Description = request.Description,
+            Floors = request.Floors.Select(x => new FloorInfo(x.FloorNumber, x.ImageLink)).ToList()
         };
-
         var createOperation = await buildingsService.Create(building).ConfigureAwait(false);
+
         if (createOperation.IsFailure)
             return StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
 
-        return Ok(new CreateBuildingResponse() { BuildingId = createOperation.Data });
+        return Ok(new CreateBuildingResponse { BuildingId = createOperation.Data });
     }
 
+    //Todo: add patch method
     [HttpPatch]
     [Route(ApiRoutes.Buildings.UpdatePart)]
     public async Task<IActionResult> Update([FromBody] UpdateBuildingRequest request)
     {
-        var building = mapper.Map<Building>(request.Building);
+        return Ok();
+        /*var building = mapper.Map<Building>(request.Building);
 
         var patchBuildings = await buildingsService.Patch(building).ConfigureAwait(false);
         if (patchBuildings.IsFailure)
@@ -54,7 +56,7 @@ public class BuildingsController : ControllerBase
             return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
         }
 
-        return Accepted();
+        return Accepted();*/
     }
 
     [HttpDelete]
@@ -88,7 +90,7 @@ public class BuildingsController : ControllerBase
 
     [HttpGet]
     [Route(ApiRoutes.Buildings.GetAllPart)]
-    public async Task<ActionResult<List<BuildingDto>>> GetAllByFilter(BuildingFilter filter)
+    public async Task<ActionResult<List<BuildingDto>>> GetAllByFilter([FromQuery] BuildingFilter filter)
     {
         var getBuilding = await buildingsService.GetAllByFilter(filter).ConfigureAwait(false);
         if (getBuilding.IsFailure)

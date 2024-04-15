@@ -7,7 +7,7 @@ public class CreateBuildingRequest
     [Required]
     public required string Title { get; set; }
     [Required]
-    public int FloorNumbers { get; set; }
+    public required List<CreateFloorDto> Floors { get; set; }
     
     public string? Address { get; set; }
     public string? Description { get; set; }
