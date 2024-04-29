@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Istu.Navigation.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(BuildingsDbContext))]
-    [Migration("20240312121325_Initial_Migration")]
-    partial class Initial_Migration
+    [Migration("20240429121714_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,11 +35,14 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<int>("FloorNumbers")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -121,22 +124,22 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
 
             modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.FloorEntity", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("BuildingId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("FloorNumber")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ImageId")
-                        .HasColumnType("uuid");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.HasKey("BuildingId", "FloorNumber");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ImageId")
-                        .IsUnique();
+                    b.HasIndex("BuildingId");
 
                     b.ToTable("Floors");
                 });
@@ -147,6 +150,9 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("CreatedByAdmin")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -156,6 +162,10 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
 
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -182,15 +192,9 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
 
             modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.FloorEntity", b =>
                 {
-                    b.HasOne("Istu.Navigation.Domain.Models.Entities.BuildingObjectEntity", null)
+                    b.HasOne("Istu.Navigation.Domain.Models.Entities.BuildingEntity", null)
                         .WithMany()
                         .HasForeignKey("BuildingId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Istu.Navigation.Domain.Models.Entities.ImageLinkEntity", null)
-                        .WithOne()
-                        .HasForeignKey("Istu.Navigation.Domain.Models.Entities.FloorEntity", "ImageId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

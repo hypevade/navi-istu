@@ -7,7 +7,7 @@ public class BuildingRouteResponse
     public required string BuildingName { get; set; }
     public required Guid BuildingId { get; set; }
     
-    public required List<FloorDto> Floors { get; set; }
+    public required List<FloorRouteDto> Floors { get; set; }
     
     //Запасаные, возможно не будут использоваться
     public BuildingObjectDto? StartObjectDto { get; set; }

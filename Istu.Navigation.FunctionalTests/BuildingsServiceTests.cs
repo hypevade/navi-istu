@@ -33,12 +33,13 @@ public class BuildingsServiceTests
     [Test]
     public async Task Should_create_building_when_request_is_valid()
     {
-        var floors = TestDataGenerator.GetTestFloors([1,2,3,4]);
         var testBuilding = new CreateBuildingRequest
         {
             Title = "TestBuilding",
             Description = "TestDescription",
-            Floors = floors
+            Latitude = 0,
+            Longitude = 0,
+            Address = "TestAddress"
         };
 
         var createBuildingResponse = await client.CreateBuildingAsync(testBuilding);
@@ -47,12 +48,13 @@ public class BuildingsServiceTests
         
         var getBuildingOperation = await client.GetBuildingByIdAsync(buildingId);
         getBuildingOperation.IsSuccess.Should().BeTrue();
-        var building = getBuildingOperation.Data;
         
+        var building = getBuildingOperation.Data;
         building.Id.Should().Be(buildingId);
         building.Title.Should().Be(testBuilding.Title);
-        building.Floors.Should().BeEquivalentTo(floors);
         building.Description.Should().Be(testBuilding.Description);
+        building.Latitude.Should().Be(testBuilding.Latitude);
+        building.Longitude.Should().Be(testBuilding.Longitude);
     }
     
     [Test]
@@ -159,7 +161,17 @@ public class BuildingsServiceTests
         getAllBuildingsOperation.Data.Should().HaveCount(2);
     }
 
-    [TestCaseSource(nameof(TestCasesWithWrongFloorNumbers))]
+    [Test]
+    public async Task GetBuildingById_Should_return_404_when_building_does_not_exist()
+    {
+        var buildingId = Guid.NewGuid();
+        var getBuildingOperation = await client.GetBuildingByIdAsync(buildingId).ConfigureAwait(false);
+        
+        getBuildingOperation.IsSuccess.Should().BeFalse();
+        getBuildingOperation.ApiError.Urn.Should().BeEquivalentTo(BuildingsApiErrors.BuildingWithIdNotFoundError(buildingId).Urn);
+    }
+
+    /*[TestCaseSource(nameof(TestCasesWithWrongFloorNumbers))]
     public async Task Should_return_bad_request_when_floor_numbers_is_invalid(int[] floorNumbers)
     {
         var floors = TestDataGenerator.GetTestFloors(floorNumbers);
@@ -177,19 +189,10 @@ public class BuildingsServiceTests
         var error = operationResult.ApiError;
         var expectedError = BuildingsApiErrors.WrongFloorNumberError(1, 1);
         error.Urn.Should().BeEquivalentTo(expectedError.Urn);
-    }
+    }*/
 
-    [Test]
-    public async Task GetBuildingById_Should_return_404_when_building_does_not_exist()
-    {
-        var buildingId = Guid.NewGuid();
-        var getBuildingOperation = await client.GetBuildingByIdAsync(buildingId).ConfigureAwait(false);
-        
-        getBuildingOperation.IsSuccess.Should().BeFalse();
-        getBuildingOperation.ApiError.Urn.Should().BeEquivalentTo(BuildingsApiErrors.BuildingWithIdNotFoundError(buildingId).Urn);
-    }
 
-    public static IEnumerable<int[]> TestCasesWithWrongFloorNumbers
+    /*public static IEnumerable<int[]> TestCasesWithWrongFloorNumbers
     {
         get
         {
@@ -199,7 +202,5 @@ public class BuildingsServiceTests
             yield return new[] { 1, 3};
             yield return new[] { 1, -1 };
         }
-    }
-
-    
+    }*/
 }

@@ -14,18 +14,7 @@ public abstract class BaseClient
         Client = client;
     }
 
-    protected async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest requestData)
-    {
-        var jsonRequest = JsonSerializer.Serialize(requestData);
-        var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-
-        var response = await Client.PostAsync(url, content);
-        response.EnsureSuccessStatusCode();
-
-        var jsonResponse = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<TResponse>(jsonResponse) ?? throw new InvalidOperationException();
-    }
-    protected async Task<OperationResult<TResponse>> PostAsync1<TRequest, TResponse>(string url, TRequest requestData)
+    protected async Task<OperationResult<TResponse>> PostAsync<TRequest, TResponse>(string url, TRequest requestData)
     {
         var jsonRequest = JsonSerializer.Serialize(requestData);
         var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
@@ -34,19 +23,7 @@ public abstract class BaseClient
         return await GetResponse<TResponse>(response).ConfigureAwait(false);
     }
 
-    protected async Task<TResponse> GetAsync<TResponse>(string url, Dictionary<string, string?>? queries = null)
-    {
-        if(queries != null && queries.Any())
-            url = QueryHelpers.AddQueryString(url, queries);
-        
-        var response = await Client.GetAsync(url);
-
-        var jsonResponse = await response.Content.ReadAsStringAsync();
-        response.EnsureSuccessStatusCode();
-        return JsonSerializer.Deserialize<TResponse>(jsonResponse) ?? throw new InvalidOperationException();
-    }
-    
-    protected async Task<OperationResult<TResponse>> GetAsync1<TResponse>(string url, Dictionary<string, string?>? queries = null)
+    protected async Task<OperationResult<TResponse>> GetAsync<TResponse>(string url, Dictionary<string, string?>? queries = null)
     {
         if (queries != null && queries.Any())
             url = QueryHelpers.AddQueryString(url, queries);
@@ -73,12 +50,7 @@ public abstract class BaseClient
         return OperationResult<TResponse>.Failure(apiError);
     }
 
-    protected async Task DeleteAsync(string url)
-    {
-        var response = await Client.DeleteAsync(url);
-        response.EnsureSuccessStatusCode();
-    }
-    protected async Task<OperationResult> DeleteAsync1(string url)
+    protected async Task<OperationResult> DeleteAsync(string url)
     {
         var response = await Client.DeleteAsync(url);
         if (response.IsSuccessStatusCode)

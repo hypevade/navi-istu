@@ -3,7 +3,7 @@
 public class BuildingEntity : BaseEntity
 {
     public required string Title { get; set; }
-    public required int FloorNumbers { get; set; }
-    
+    public required double Latitude { get; set; }
+    public required double Longitude { get; set; }
     public string? Description { get; set; }
 }

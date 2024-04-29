@@ -8,6 +8,7 @@ namespace Istu.Navigation.Domain.Repositories;
 public interface IBuildingsRepository : IRepository<BuildingEntity>
 {
     public Task<List<BuildingEntity>> GetAllByFilterAsync(BuildingFilter filter);
+    public Task<bool> ExistWithTitle(string title);
 }
 
 public class BuildingsRepository : Repository<BuildingEntity> , IBuildingsRepository
@@ -28,14 +29,14 @@ public class BuildingsRepository : Repository<BuildingEntity> , IBuildingsReposi
         {
             query = query.Where(e=> e.Title == filter.Title);
         }
-
-        if (filter.FloorNumber.HasValue)
-        {
-            query = query.Where(e => e.FloorNumbers == filter.FloorNumber.Value);
-        }
         
         query = query.Skip(filter.Skip).Take(filter.Take);
 
         return query.ToListAsync();
+    }
+
+    public Task<bool> ExistWithTitle(string title)
+    {
+        return DbSet.AnyAsync(e => string.Equals(e.Title.ToLower(), title.ToLower(), StringComparison.OrdinalIgnoreCase));
     }
 }

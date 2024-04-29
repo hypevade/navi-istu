@@ -14,15 +14,22 @@ public class PublicMappingProfile : Profile
         CreateMap<Edge, EdgeDto>()
             .ForMember(x => x.FromId, x => x.MapFrom(src => src.From.Id))
             .ForMember(x => x.ToId, x => x.MapFrom(src => src.To.Id));
-        
-        CreateMap<FloorRoute, FloorDto>()
+        //TODO: Написать маппинг для маршрутов
+        /*CreateMap<FloorRoute, FloorRouteDto>()
             .ForMember(x => x.ImageLink, x => x.MapFrom(src => src.Floor.ImageLink))
             .ForMember(x => x.Edges, x => x.MapFrom(src => src.Floor.Edges))
             .ForMember(x => x.Objects, x => x.MapFrom(src => src.Floor.Objects))
             .ForMember(x => x.Route, x => x.MapFrom(src => src.Route))
             .ForMember(x => x.Number, x => x.MapFrom(src => src.Floor.FloorNumber))
-            .ForMember(x => x.BuildingId, x => x.MapFrom(src => src.Floor.BuildingId));
+            .ForMember(x => x.BuildingId, x => x.MapFrom(src => src.Floor.BuildingId));*/
         CreateMap<FloorInfo, FloorInfoDto>();
+        CreateMap<Floor, FloorDto>();
+        CreateMap<Edge, EdgeDto>()
+            .ForMember(x => x.FromId,
+                x => x.MapFrom(src => src.From.Id))
+            .ForMember(x => x.ToId,
+                x => x.MapFrom(src => src.To.Id));
+        
         CreateMap<BuildingRoute, BuildingRouteResponse>()
             .ForMember(x => x.BuildingId, x => x.MapFrom(src => src.Building.Id))
             .ForMember(x => x.BuildingName, x => x.MapFrom(src => src.Building.Title))

@@ -4,7 +4,7 @@ namespace Istu.Navigation.Domain.Models.BuildingRoutes;
 
 public class Floor
 {
-    public Floor( Guid buildingId, int floorNumber, List<BuildingObject> objects, List<Edge> edges, ImageLink imageLink)
+    public Floor( Guid buildingId, int floorNumber, List<BuildingObject> objects, List<Edge> edges, string imageLink)
     {
         BuildingId = buildingId;
         FloorNumber = floorNumber;
@@ -19,5 +19,5 @@ public class Floor
     public List<BuildingObject> Objects { get; set; }
     public List<Edge> Edges { get; set; }
 
-    public ImageLink ImageLink { get; set; }
+    public string ImageLink { get; set; }
 }

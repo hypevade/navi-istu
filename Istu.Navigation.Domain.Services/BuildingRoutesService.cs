@@ -8,7 +8,7 @@ public class BuildingRoutesService(
     IBuildingObjectsService objectService,
     IBuildingsService service,
     IRouteSearcher searcher,
-    IFloorsService floorsService) : IBuildingRoutesService
+    IFloorsBuilder floorsBuilder) : IBuildingRoutesService
 {
     public async Task<OperationResult<BuildingRoute>> CreateRoute(Guid buildingId, Guid toId, Guid fromId = default)
     {
@@ -26,7 +26,7 @@ public class BuildingRoutesService(
         var fromObject = getFromObject.Data;
 
         var (start, end) = GetFloorsNumbers(fromObject, toObject);
-        var getFloors = await floorsService.GetAllByBuilding(buildingId, start, end).ConfigureAwait(false);
+        var getFloors = await floorsBuilder.GetFloorsByBuilding(buildingId, start, end).ConfigureAwait(false);
         if (getFloors.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getFloors.ApiError);
 

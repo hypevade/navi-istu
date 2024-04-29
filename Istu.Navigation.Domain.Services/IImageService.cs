@@ -14,7 +14,6 @@ public interface IImageService
     public Task<OperationResult<List<ImageLink>>> GetAllByObjectId(Guid objectId);
     public Task<OperationResult<Guid>> Create(ImageLink image);
     public Task<OperationResult<List<Guid>>> CreateRange(List<ImageLink> image);
-    public Task<OperationResult<Guid>> CreateFloorImage(Guid buildingId, int floorNumber, string link);
     public Task<OperationResult> Delete(Guid imageId);
 }
 
@@ -62,6 +61,8 @@ public class ImageService : IImageService
 
     public async Task<OperationResult<Guid>> Create(ImageLink image)
     {
+        if(string.IsNullOrEmpty(image.Link.Trim()))
+            return OperationResult<Guid>.Failure(ImagesApiErrors.ImageWithEmptyLinkError());
         var imageEntity = mapper.Map<ImageLinkEntity>(image);
         var linkEntity = await imageRepository.AddAsync(imageEntity).ConfigureAwait(false);
         await imageRepository.SaveChangesAsync().ConfigureAwait(false);
@@ -76,13 +77,6 @@ public class ImageService : IImageService
         
         var linkIds = linkEntities.Select(x => x.Id).ToList();
         return OperationResult<List<Guid>>.Success(linkIds);
-    }
-
-    public Task<OperationResult<Guid>> CreateFloorImage(Guid buildingId, int floorNumber, string link)
-    {
-        var imageTitle = "floor_" + floorNumber;
-        var imageLink = new ImageLink(Guid.NewGuid(), buildingId, link, imageTitle);
-        return Create(imageLink);
     }
 
     public async Task<OperationResult> Delete(Guid imageId)

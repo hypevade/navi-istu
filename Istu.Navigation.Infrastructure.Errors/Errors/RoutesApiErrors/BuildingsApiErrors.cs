@@ -16,7 +16,7 @@ public static class BuildingsApiErrors
             GetUrn("floors-with-building-id-not-found"));
     }
     
-    public static ApiError FloorWithBuildingAndFloorNumberIdNotFoundError(Guid buildingId, int floorNumber)
+    public static ApiError FloorWithBuildingAndFloorNumberNotFoundError(Guid buildingId, int floorNumber)
     {
         return new ApiError(404, $"Этаж '{floorNumber}' в здании с идентификатором '{buildingId}' не найден.",
             GetUrn("floor-with-building-id-and-floor-number-not-found"));
@@ -43,11 +43,25 @@ public static class BuildingsApiErrors
             GetUrn("building-already-exists"));
     }
     
+    public static ApiError BuildingAlreadyExistsError(string title)
+    {
+        return new ApiError(400,
+            $"Здание с названием '{title}' уже существует.",
+            GetUrn("building-already-exists"));
+    }
+    
     public static ApiError FloorContainsNoObjectsError(Guid buildingId, int floor)
     {
         return new ApiError(400,
             $"Этаж {floor} в здании с идентификатором {buildingId} не содержит объектов. Возможно вам стоит добавить их.",
             GetUrn("floor-contains-no-objects"));
+    }
+    
+    public static ApiError FloorWithBuildingAndFloorNumberAlreadyExistsError(Guid buildingId, int floor)
+    {
+        return new ApiError(400,
+            $"Этаж {floor} в здании с идентификатором {buildingId} уже существует.",
+            GetUrn("floor-with-building-id-and-floor-number-already-exists"));
     }
     
     public static ApiError WrongFloorNumberError(int floor, int expectedFloor)
@@ -61,5 +75,17 @@ public static class BuildingsApiErrors
     {
         return new ApiError(404, $"Зданий с названием '{title}' не найдено.",
             GetUrn("buildings-with-title-not-found"));
+    }
+    
+    public static ApiError MinFloorGreaterThanMaxFloorError(int minFloor, int maxFloor)
+    {
+        return new ApiError(404, $"Минимальный этаж {minFloor} больше максимального {maxFloor}.",
+            GetUrn("min-floor-greater-than-max-floor"));
+    }
+    
+    public static ApiError FloorNumberLessThanMinFloorError(int floorNumber)
+    {
+        return new ApiError(404, $"Этаж {floorNumber} меньше 1.",
+            GetUrn("floor-number-less-than-min-floor"));
     }
 }

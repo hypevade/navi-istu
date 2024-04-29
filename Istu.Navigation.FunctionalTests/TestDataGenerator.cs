@@ -8,7 +8,7 @@ public static class TestDataGenerator
 {
     public static async Task<List<Guid>> CreateRandomBuildings(IBuildingsClient client, int count)
     {
-        var requests = GetCreateRequests(count);
+        var requests = GetCreateBuildingRequests(count);
         var buildingIds = new List<Guid>();
         foreach (var request in requests)
         {
@@ -19,9 +19,18 @@ public static class TestDataGenerator
         return buildingIds;
     }
 
-    public static List<CreateBuildingRequest> GetCreateRequests(int count)
+    public static CreateFloorRequest GetCreateFloorRequest(string? link = null, int? floorNumber = null)
     {
-        var floors = GetTestFloors(new List<int> { 1, 2, 3, 4 });
+        link ??= "TestLink";
+        return new CreateFloorRequest
+        {
+            ImageLink = link,
+            FloorNumber = floorNumber
+        };
+    }
+
+    public static List<CreateBuildingRequest> GetCreateBuildingRequests(int count)
+    {
         var requests = new List<CreateBuildingRequest>();
         for (var i = 0; i < count; i++)
         {
@@ -29,16 +38,13 @@ public static class TestDataGenerator
             {
                 Title = $"TestBuilding_{i}",
                 Description = $"TestDescription_{i}",
-                Floors = floors
+                Latitude = 0 + i,
+                Longitude = 0 + i,
+                Address = $"TestAddress_{i}"
             };
             requests.Add(request);
         }
 
         return requests;
-    }
-
-    public static List<CreateFloorDto> GetTestFloors(IEnumerable<int> floorNumbers)
-    {
-        return floorNumbers.Select(x => new CreateFloorDto { FloorNumber = x, ImageLink = "TestLink_" + x }).ToList();
     }
 }

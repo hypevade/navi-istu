@@ -8,6 +8,10 @@ public class Building
     public required string Title { get; set; }
     public int FloorNumbers => Floors.Count;
 
+    public required double Latitude { get; set; }
+
+    public required double Longitude { get; set; }
+
     public required List<FloorInfo> Floors { get; set; }
 
     public string? Description { get; set; }
@@ -16,8 +20,8 @@ public class Building
     {
         Id = building.Id,
         Title = building.Title,
-        FloorNumbers = building.FloorNumbers,
         Description = building.Description,
-        IsDeleted = false
+        Latitude = building.Latitude,
+        Longitude = building.Longitude,
     };
 }

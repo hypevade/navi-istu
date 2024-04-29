@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Istu.Navigation.Infrastructure.EF.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial_Migration : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,8 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    FloorNumbers = table.Column<int>(type: "integer", nullable: false),
+                    Latitude = table.Column<double>(type: "double precision", nullable: false),
+                    Longitude = table.Column<double>(type: "double precision", nullable: false),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -31,13 +32,35 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ObjectId = table.Column<Guid>(type: "uuid", nullable: false),
                     Link = table.Column<string>(type: "text", nullable: false),
+                    ObjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    CreatedByAdmin = table.Column<bool>(type: "boolean", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ImageLinks", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Floors",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    BuildingId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FloorNumber = table.Column<int>(type: "integer", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Floors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Floors_Buildings_BuildingId",
+                        column: x => x.BuildingId,
+                        principalTable: "Buildings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,42 +110,15 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Floors",
-                columns: table => new
-                {
-                    BuildingId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FloorNumber = table.Column<int>(type: "integer", nullable: false),
-                    ImageId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Floors", x => new { x.BuildingId, x.FloorNumber });
-                    table.ForeignKey(
-                        name: "FK_Floors_ImageLinks_ImageId",
-                        column: x => x.ImageId,
-                        principalTable: "ImageLinks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Floors_Objects_BuildingId",
-                        column: x => x.BuildingId,
-                        principalTable: "Objects",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Edges_ToObject",
                 table: "Edges",
                 column: "ToObject");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Floors_ImageId",
+                name: "IX_Floors_BuildingId",
                 table: "Floors",
-                column: "ImageId",
-                unique: true);
+                column: "BuildingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Objects_BuildingId",

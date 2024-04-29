@@ -26,7 +26,5 @@ public class ImageLink
         Link = imageLink.Link,
         ObjectId = imageLink.ObjectId,
         Title = imageLink.Title,
-        CreatedByAdmin = false,
-        IsDeleted = false
     };
 }

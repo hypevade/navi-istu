@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Istu.Navigation.Api.Middlewares;
+﻿using Istu.Navigation.Api.Middlewares;
 using Istu.Navigation.Domain.Models;
 using Istu.Navigation.Domain.Repositories;
 using Istu.Navigation.Domain.Services;
@@ -35,13 +34,15 @@ public class Startup
         services.AddScoped<IBuildingsRepository, BuildingsRepository>();
         services.AddScoped<IEdgesRepository, EdgesRepository>();
         services.AddScoped<IImageRepository, ImageRepository>();
+        services.AddScoped<IFloorsRepository, FloorsRepository>();
         services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
         services.AddScoped<IBuildingObjectsService, BuildingObjectsService>();
         services.AddScoped<IBuildingsService, BuildingsService>();
         services.AddScoped<IEdgesService, EdgesService>();
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IFloorsService, FloorsService>();
-        
+        services.AddScoped<IFloorsBuilder, FloorsBuilder>();
+
         services.AddSingleton<IRouteSearcher, RouteSearcher>();
         
         services.AddControllers().AddJsonOptions(options =>

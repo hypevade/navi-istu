@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Istu.Navigation.Domain.Models.BuildingRoutes;
+﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories;
 using Istu.Navigation.Infrastructure.EF.Filters;
@@ -11,9 +10,8 @@ namespace Istu.Navigation.Domain.Services;
 
 public interface IBuildingsService
 {
-    public Task<OperationResult<Guid>> Create(Building building);
-    public Task<OperationResult> Patch(Building building);
-    public Task<OperationResult> PatchRange(List<Building> buildings);
+    public Task<OperationResult<Guid>> Create(string title, double latitude, double longitude,  string? description = null);
+    public Task<OperationResult> Patch(Guid id, string? title = null, double? latitude = null, double? longitude = null, string? description = null);
     public Task<OperationResult> Delete(Guid id);
     public Task<OperationResult<Building>> GetById(Guid id);
     public Task<OperationResult<List<Building>>> GetAllByFilter(BuildingFilter filter);
@@ -23,58 +21,57 @@ public interface IBuildingsService
 public class BuildingsService : IBuildingsService
 {
     private readonly IBuildingsRepository buildingsRepository;
-    private readonly IImageService imageService;
-    private readonly IMapper mapper;
+    private readonly IFloorsService floorsService;
 
-    public BuildingsService(IBuildingsRepository buildingsRepository, IMapper mapper, IImageService imageService)
+    public BuildingsService(IBuildingsRepository buildingsRepository, IFloorsService floorsService)
     {
         this.buildingsRepository = buildingsRepository;
-        this.mapper = mapper;
-        this.imageService = imageService;
+        this.floorsService = floorsService;
     }
 
-    public async Task<OperationResult<Guid>> Create(Building building)
+    public async Task<OperationResult<Guid>> Create(string title, double latitude, double longitude,  string? description = null)
     {
-        var checkResult = await CheckBuilding(building).ConfigureAwait(false);
+        var checkResult = await CheckTitle(title).ConfigureAwait(false);
         if (checkResult.IsFailure)
             return OperationResult<Guid>.Failure(checkResult.ApiError);
 
-        var createFloorsOperation = await CreateFloors(building.Id, building.Floors).ConfigureAwait(false);
-        if (createFloorsOperation.IsFailure)
-            return OperationResult<Guid>.Failure(createFloorsOperation.ApiError);
-
-        var buildingEntity = mapper.Map<BuildingEntity>(building);
+        var buildingEntity = new BuildingEntity()
+        {
+            Id = Guid.NewGuid(),
+            Title = title,
+            Description = description,
+            Latitude = latitude,
+            Longitude = longitude
+        }; 
+            
         buildingEntity = await buildingsRepository.AddAsync(buildingEntity).ConfigureAwait(false);
         await buildingsRepository.SaveChangesAsync().ConfigureAwait(false);
         return OperationResult<Guid>.Success(buildingEntity.Id);
     }
 
-    public async Task<OperationResult> Patch(Building building)
+    public async Task<OperationResult> Patch(Guid id, string? title = null, double? latitude = null, double? longitude = null, string? description = null)
     {
-        var check = await CheckBuilding(building, checkExist: false).ConfigureAwait(false);
-        if (check.IsFailure)
-            return check;
-        
-        var buildingEntity = mapper.Map<BuildingEntity>(building);
-        
-        buildingsRepository.Update(buildingEntity);
-        await buildingsRepository.SaveChangesAsync().ConfigureAwait(false);
-        
-        return OperationResult.Success();
-    }
-
-    public async Task<OperationResult> PatchRange(List<Building> buildings)
-    {
-        foreach (var building in buildings)
+        if (title != null)
         {
-            var check = await CheckBuilding(building, checkExist: false).ConfigureAwait(false);
+            var check = await CheckTitle(title, checkExist: true).ConfigureAwait(false);
             if (check.IsFailure)
                 return check;
         }
-
-        var buildingEntities = mapper.Map<List<BuildingEntity>>(buildings);
+        var buildingEntity = await buildingsRepository.GetByIdAsync(id).ConfigureAwait(false);
+        if (buildingEntity is null)
+            return OperationResult.Failure(BuildingsApiErrors.BuildingWithIdNotFoundError(id));
         
-        buildingsRepository.UpdateRange(buildingEntities);
+        
+        if (title != null)
+            buildingEntity.Title = title;
+        if (latitude.HasValue)
+            buildingEntity.Latitude = latitude.Value;
+        if (longitude.HasValue)
+            buildingEntity.Longitude = longitude.Value;
+        if (description != null)
+            buildingEntity.Description = description;
+        
+        buildingsRepository.Update(buildingEntity);
         await buildingsRepository.SaveChangesAsync().ConfigureAwait(false);
         
         return OperationResult.Success();
@@ -119,101 +116,34 @@ public class BuildingsService : IBuildingsService
 
         return await GetBuildingByEntity(buildingEntity).ConfigureAwait(false);
     }
-
-    private async Task<OperationResult<List<FloorInfo>>> GetFloors(BuildingEntity building)
+    
+    private async Task<OperationResult> CheckTitle(string title,  bool checkExist = true)
     {
-        var tasks = new List<Task<OperationResult<FloorInfo>>>();
-
-        for (var i = 1; i <= building.FloorNumbers; i++)
-        {
-            tasks.Add(GetFloorInfo(building, i));
-        }
-        
-        var results = await Task.WhenAll(tasks);
-        
-        foreach (var result in results)
-        {
-            if (result.IsFailure) return OperationResult<List<FloorInfo>>.Failure(result.ApiError);
-        }
-        
-        return OperationResult<List<FloorInfo>>.Success(results.Select(r => r.Data).ToList());
-    }
-
-    private async Task<OperationResult<FloorInfo>> GetFloorInfo(BuildingEntity building, int floorNumber)
-    {
-        var title = GetTittleForFloorImage(floorNumber);
-        var filter = new ImageFilter
-        {
-            ObjectId = building.Id,
-            Title = title
-        };
-
-        var floorImg = await imageService.GetAllByFilter(filter).ConfigureAwait(false);
-
-        if (floorImg.IsFailure)
-            return OperationResult<FloorInfo>.Failure(floorImg.ApiError);
-
-        if (floorImg.Data.Count == 0)
-            return OperationResult<FloorInfo>.Failure(BuildingsApiErrors.ImageWithFloorIdNotFoundError(building.Id, floorNumber));
-
-        return OperationResult<FloorInfo>.Success(new FloorInfo(floorNumber, floorImg.Data.First().Link));
-    }
-
-    private async Task<OperationResult> CreateFloors(Guid buildingId, List<FloorInfo> floorInfos)
-    {
-        var links = floorInfos.Select(x =>
-            new ImageLink(Guid.NewGuid(), buildingId, x.ImageLink, GetTittleForFloorImage(x.FloorNumber))).ToList();
-        var createOperation = await imageService.CreateRange(links).ConfigureAwait(false);
-        
-        return createOperation.IsSuccess 
-            ? OperationResult.Success() 
-            : OperationResult.Failure(createOperation.ApiError);
-    }
-
-    private async Task<OperationResult> CheckBuilding(Building building, bool checkExist = true)
-    {
-        if (string.IsNullOrWhiteSpace(building.Title))
+        if (string.IsNullOrWhiteSpace(title))
             return OperationResult.Failure(CommonErrors.EmptyTitleError());
-        
-        if(building.Floors.Count == 0)
-            return OperationResult.Failure(BuildingsApiErrors.NoFloorsError());
-
-        var floors = building.Floors.OrderBy(x => x.FloorNumber).ToList();
-        
-        for (var i = 0; i < floors.Count; i++)
-        {
-            var expectedNumber = i + 1;
-            if(floors[i].FloorNumber != expectedNumber)
-                return OperationResult.Failure(BuildingsApiErrors.WrongFloorNumberError(floors[i].FloorNumber, expectedNumber));
-        }
-        
-        if (!checkExist)
-            return OperationResult.Success();
-
-        var isExist = await buildingsRepository.GetByIdAsync(building.Id).ConfigureAwait(false) != null;
-        return isExist
-            ? OperationResult.Failure(BuildingsApiErrors.BuildingAlreadyExistsError(building.Id))
-            : OperationResult.Success();
+        var existWithTitle = await buildingsRepository.ExistWithTitle(title).ConfigureAwait(false);
+        if (existWithTitle)
+            return OperationResult.Failure(BuildingsApiErrors.BuildingAlreadyExistsError(title));
+        return OperationResult.Success();
     }
 
     private async Task<OperationResult<Building>> GetBuildingByEntity(BuildingEntity buildingEntity)
     {
-        var floors = await GetFloors(buildingEntity).ConfigureAwait(false);
+        var floors = await floorsService.GetFloorInfosByBuilding(buildingEntity.Id).ConfigureAwait(false);
         if (floors.IsFailure)
-            return OperationResult<Building>.Failure(floors.ApiError);
+        {
+            return OperationResult<Building>.Failure(CommonErrors.InternalServerError());
+        }
 
         var building = new Building
         {
             Id = buildingEntity.Id,
             Title = buildingEntity.Title,
             Floors = floors.Data,
-            Description = buildingEntity.Description
+            Description = buildingEntity.Description,
+            Latitude = buildingEntity.Latitude,
+            Longitude = buildingEntity.Longitude,
         };
         return OperationResult<Building>.Success(building);
-    }
-
-    private string GetTittleForFloorImage(int floorNumber)
-    {
-        return "floor_" + floorNumber;
     }
 }

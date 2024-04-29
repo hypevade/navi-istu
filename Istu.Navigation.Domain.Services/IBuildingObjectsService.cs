@@ -23,14 +23,15 @@ public interface IBuildingObjectsService
 public class BuildingObjectsService : IBuildingObjectsService
 {
     private readonly IBuildingObjectsRepository buildingObjectsRepository;
-    private readonly IBuildingsService buildingsService;
+    private readonly IBuildingsRepository buildingsRepository;
     private readonly IMapper mapper;
 
-    public BuildingObjectsService(IBuildingObjectsRepository buildingObjectsRepository, IBuildingsService buildingsService, IMapper mapper)
+    public BuildingObjectsService(IBuildingObjectsRepository buildingObjectsRepository, IMapper mapper,
+        IBuildingsRepository buildingsRepository)
     {
         this.buildingObjectsRepository = buildingObjectsRepository;
-        this.buildingsService = buildingsService;
         this.mapper = mapper;
+        this.buildingsRepository = buildingsRepository;
     }
 
     public async Task<OperationResult<List<Guid>>> CreateRange(List<BuildingObject> buildingObjects)
@@ -41,19 +42,20 @@ public class BuildingObjectsService : IBuildingObjectsService
             if (check.IsFailure)
                 return OperationResult<List<Guid>>.Failure(check.ApiError);
         }
-        
+
         var buildingObjectsEntity = mapper.Map<List<BuildingObjectEntity>>(buildingObjects);
-        var buildingObjectsAdded = await buildingObjectsRepository.AddRangeAsync(buildingObjectsEntity).ConfigureAwait(false);
+        var buildingObjectsAdded =
+            await buildingObjectsRepository.AddRangeAsync(buildingObjectsEntity).ConfigureAwait(false);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
-        
+
         return OperationResult<List<Guid>>.Success(buildingObjectsAdded.Select(x => x.Id).ToList());
     }
 
     public async Task<OperationResult<Guid>> CreateRange(BuildingObject buildingObject)
     {
         var result = await CreateRange([buildingObject]).ConfigureAwait(false);
-        return result.IsSuccess 
-            ? OperationResult<Guid>.Success(result.Data.First()) 
+        return result.IsSuccess
+            ? OperationResult<Guid>.Success(result.Data.First())
             : OperationResult<Guid>.Failure(result.ApiError);
     }
 
@@ -62,14 +64,14 @@ public class BuildingObjectsService : IBuildingObjectsService
         foreach (var buildingObject in buildingObjects)
         {
             var check = await CheckBuildingObject(buildingObject, checkExist: false).ConfigureAwait(false);
-            if(check.IsFailure)
+            if (check.IsFailure)
                 return check;
         }
-        
-        var buildingObjectsEntity = mapper.Map<List<BuildingObjectEntity>>(buildingObjects); 
+
+        var buildingObjectsEntity = mapper.Map<List<BuildingObjectEntity>>(buildingObjects);
         buildingObjectsRepository.UpdateRange(buildingObjectsEntity);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
-        
+
         return OperationResult.Success();
     }
 
@@ -101,21 +103,24 @@ public class BuildingObjectsService : IBuildingObjectsService
         var checkX = BuildingObject.CoordinateIsValid(buildingObject.X);
         var checkY = BuildingObject.CoordinateIsValid(buildingObject.Y);
         if (!checkY || !checkX)
-            return OperationResult.Failure(BuildingObjectsApiErrors.InvalidCoordinatesError(buildingObject.X, buildingObject.Y));
+            return OperationResult.Failure(
+                BuildingObjectsApiErrors.InvalidCoordinatesError(buildingObject.X, buildingObject.Y));
         if (string.IsNullOrWhiteSpace(buildingObject.Title))
             return OperationResult.Failure(CommonErrors.EmptyTitleError());
 
-        var getBuilding = await buildingsService.CheckExist(buildingObject.BuildingId).ConfigureAwait(false);
-        if (getBuilding.IsFailure)
-            return OperationResult.Failure(getBuilding.ApiError);
-        
-        if(!checkExist)
+        var getBuilding = await buildingsRepository.GetByIdAsync(buildingObject.BuildingId).ConfigureAwait(false);
+        if (getBuilding is null)
+            return OperationResult.Failure(BuildingsApiErrors.BuildingWithIdNotFoundError(buildingObject.BuildingId));
+
+        if (!checkExist)
             return OperationResult.Success();
-        
-        var isExist = await buildingObjectsRepository.GetByIdAsync(buildingObject.BuildingId).ConfigureAwait(false) is null;
+
+        var isExist =
+            await buildingObjectsRepository.GetByIdAsync(buildingObject.BuildingId).ConfigureAwait(false) is null;
 
         return isExist
             ? OperationResult.Success()
-            : OperationResult.Failure(BuildingObjectsApiErrors.BuildingObjectAlreadyExistsError(buildingObject.BuildingId));
+            : OperationResult.Failure(
+                BuildingObjectsApiErrors.BuildingObjectAlreadyExistsError(buildingObject.BuildingId));
     }
 }

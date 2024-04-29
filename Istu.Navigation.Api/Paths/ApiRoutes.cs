@@ -9,36 +9,57 @@ public static class ApiRoutes
     public static class Buildings
     {
         public const string BuildingsApi = Base + "/buildings";
-        public const string GetAllPart = "";
-        public const string CreatePart = "";
-        public const string UpdatePart = "";
+        public const string GetAllBuildingsPart = "";
+        public const string CreateBuildingPart = "";
+        public const string UpdateBuildingPart = "";
+        public const string GetBuildingPart = "{buildingId}";
+        public const string DeleteBuildingPart = "{buildingId}";
         
-        public const string GetPart = "{buildingId}";
-        public const string DeletePart = "{buildingId}";
+        public const string CreateFloorPart = "{buildingId}/floors";
+        public const string GetFloorPart = "{buildingId}/floors/{floorNumber}";
+        public const string DeleteFloorPart = "{buildingId}/floors/{floorNumber}";
+        
 
-        public static string GetWithIdRoute(Guid buildingId)
+        public static string GetBuildingWithIdRoute(Guid buildingId)
         {
-            return BuildingsApi + "/" + GetPart.Replace("{buildingId}", buildingId.ToString());
+            return BuildingsApi + "/" + GetBuildingPart.Replace("{buildingId}", buildingId.ToString());
         }
         
-        public static string DeleteRoute(Guid buildingId)
+        public static string DeleteBuildingRoute(Guid buildingId)
         {
-            return BuildingsApi + "/" + DeletePart.Replace("{buildingId}", buildingId.ToString());
+            return BuildingsApi + "/" + DeleteBuildingPart.Replace("{buildingId}", buildingId.ToString());
         }
         
-        public static string UpdateRoute()
+        public static string UpdateBuildingRoute()
         {
-            return BuildingsApi + UpdatePart;
+            return BuildingsApi + UpdateBuildingPart;
         }
         
-        public static string GetAllRoute()
+        public static string GetAllBuildingsRoute()
         {
-            return BuildingsApi + GetAllPart;
+            return BuildingsApi + GetAllBuildingsPart;
         }
         
-        public static string CreateRoute()
+        public static string CreateBuildingRoute()
         {
-            return BuildingsApi + CreatePart;
+            return BuildingsApi + CreateBuildingPart;
+        }
+        
+        public static string CreateFloorRoute(Guid buildingId)
+        {
+            return BuildingsApi + "/" + CreateFloorPart.Replace("{buildingId}", buildingId.ToString());
+        }
+
+        public static string DeleteFloorRoute(Guid buildingId, int floorNumber)
+        {
+            return BuildingsApi + "/" + DeleteFloorPart.Replace("{buildingId}", buildingId.ToString())
+                .Replace("{floorNumber}", floorNumber.ToString());
+        }
+        
+        public static string GetFloorRoute(Guid buildingId, int floorNumber)
+        {
+            return BuildingsApi + "/" + GetFloorPart.Replace("{buildingId}", buildingId.ToString())
+                .Replace("{floorNumber}", floorNumber.ToString());
         }
     }
 

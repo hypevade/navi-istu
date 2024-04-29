@@ -32,11 +32,14 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<int>("FloorNumbers")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -116,6 +119,28 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                     b.ToTable("Edges");
                 });
 
+            modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.FloorEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BuildingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("FloorNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuildingId");
+
+                    b.ToTable("Floors");
+                });
+
             modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.ImageLinkEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -158,6 +183,15 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                     b.HasOne("Istu.Navigation.Domain.Models.Entities.BuildingObjectEntity", null)
                         .WithMany()
                         .HasForeignKey("ToObject")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.FloorEntity", b =>
+                {
+                    b.HasOne("Istu.Navigation.Domain.Models.Entities.BuildingEntity", null)
+                        .WithMany()
+                        .HasForeignKey("BuildingId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
