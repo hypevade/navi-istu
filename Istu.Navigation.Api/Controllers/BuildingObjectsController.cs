@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Paths;
-using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Public.Models;
@@ -81,7 +80,7 @@ public class BuildingObjectsController : ControllerBase
             return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
         }
 
-        var publicObjects = mapper.Map<List<BuildingObjectDto>>(getObject.Data);
+        var publicObjects = mapper.Map<BuildingObjectDto>(getObject.Data);
         return Ok(publicObjects);
     }
     

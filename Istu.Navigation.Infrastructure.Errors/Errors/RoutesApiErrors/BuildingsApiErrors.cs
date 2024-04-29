@@ -56,5 +56,10 @@ public static class BuildingsApiErrors
             $"Передан этаж с неверным номером {floor}. Ожидаемый этаж {expectedFloor}.",
             GetUrn("wrong-floor-number"));
     }
-
+    
+    public static ApiError BuildingsWithTitleNotFoundError(string title)
+    {
+        return new ApiError(404, $"Зданий с названием '{title}' не найдено.",
+            GetUrn("buildings-with-title-not-found"));
+    }
 }

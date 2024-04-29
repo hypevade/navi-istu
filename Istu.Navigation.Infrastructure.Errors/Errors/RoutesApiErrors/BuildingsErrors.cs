@@ -11,27 +11,6 @@ public class BuildingsErrors : ErrorBase
         return new ApiError(404, $"Объект с идентификатором '{buildingObjectId}' не найден.",
             GetUrn("building-object-not-found"));
     }
-    
-    public static ApiError BuildingObjectsNotFoundError(Guid buildingId, BuildingObjectType[] types)
-    {
-        return new ApiError(404,
-            $"Объектов типа '{string.Join(", ", types)}' в здании с идентификатором '{buildingId}' не найдено.",
-            GetUrn("building-objects-with-id-and-type-not-found"));
-    }
-    
-    public static ApiError BuildingObjectsNotFoundError(Guid buildingId)
-    {
-        return new ApiError(404,
-            $"Объектов в здании с идентификатором '{buildingId}' не найдено.",
-            GetUrn("building-objects-with-id-not-found"));
-    }
-    
-    public static ApiError BuildingObjectsNotFoundError(Guid buildingId, int floor)
-    {
-        return new ApiError(404,
-            $"Объектов в здании с идентификатором '{buildingId}' на этаже '{floor}' не найдено.",
-            GetUrn("building-objects-with-id-and-floor-not-found"));
-    }
 
     public static ApiError BuildingEdgeNotFoundError(Guid fromObjectId, Guid toObjectId)
     {
@@ -51,11 +30,6 @@ public class BuildingsErrors : ErrorBase
             GetUrn("buildings-with-title-not-found"));
     }
     
-    public static ApiError BuildingWithIdNotFoundError(Guid buildingId)
-    {
-        return new ApiError(404, $"Здание с идентификатором '{buildingId}' не найдено.",
-            GetUrn("building-with-id-not-found"));
-    }
 
     public static ApiError EdgesWithBuildingIdNotFoundError(Guid buildingId)
     {
@@ -113,13 +87,6 @@ public class BuildingsErrors : ErrorBase
             GetUrn("building-objects-with-different-building-id"));
     }
     
-    
-    public static ApiError InvalidCoordinatesError(double x, double y)
-    {
-        return new ApiError(400, 
-            $"Координаты объекта должны быть в диапазоне от 0 до 1. Но у вас координаты ({x}, {y}).",
-            GetUrn("building-objects-with-invalid-coordinates"));
-    }
 
     public static ApiError EmptyListTypesError()
     {
@@ -128,27 +95,12 @@ public class BuildingsErrors : ErrorBase
             GetUrn("building-objects-with-id-and-type-not-found"));
     }
     
-    public static ApiError EmptyTitleError()
-    {
-        return new ApiError(400,
-            "Свойство названия не может быть пустым.",
-            GetUrn("title-is-empty"));
-    }
-    
     public static ApiError BuildingAlreadyExistsError(Guid buildingId)
     {
         return new ApiError(400,
             $"Здание с идентификатором '{buildingId}' уже существует.",
             GetUrn("building-already-exists"));
     }
-    
-    public static ApiError BuildingObjectAlreadyExistsError(Guid buildingId)
-    {
-        return new ApiError(400,
-            $"Объект с идентификатором '{buildingId}' уже существует.",
-            GetUrn("building-object-already-exists"));
-    }
-    
     
     public static ApiError TargetObjectIsEqualToSourceError(Guid objectId)
     {

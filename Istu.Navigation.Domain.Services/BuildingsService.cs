@@ -17,6 +17,7 @@ public interface IBuildingsService
     public Task<OperationResult> Delete(Guid id);
     public Task<OperationResult<Building>> GetById(Guid id);
     public Task<OperationResult<List<Building>>> GetAllByFilter(BuildingFilter filter);
+    public Task<OperationResult> CheckExist(Guid buildingId);
 }
 
 public class BuildingsService : IBuildingsService
@@ -100,6 +101,14 @@ public class BuildingsService : IBuildingsService
         }
 
         return OperationResult<List<Building>>.Success(buildingResults.Select(r => r.Data).ToList());
+    }
+    
+    public async Task<OperationResult> CheckExist(Guid buildingId)
+    {
+        var buildingEntity = await buildingsRepository.GetByIdAsync(buildingId).ConfigureAwait(false);
+        return buildingEntity is null
+            ? OperationResult.Failure(BuildingsApiErrors.BuildingWithIdNotFoundError(buildingId))
+            : OperationResult.Success();
     }
 
     public async Task<OperationResult<Building>> GetById(Guid id)

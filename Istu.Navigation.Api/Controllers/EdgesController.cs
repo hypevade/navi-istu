@@ -3,7 +3,6 @@ using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Infrastructure.EF.Filters;
-using Istu.Navigation.Public.Models;
 using Istu.Navigation.Public.Models.BuildingRoutes;
 using Istu.Navigation.Public.Models.Edges;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,7 @@ public class EdgesController : ControllerBase
     
     [HttpPost]
     [Route(ApiRoutes.BuildingEdges.CreatePart)]
-    public async Task<IActionResult> CreateEdges([FromBody] CreateEdgesRequest request)
+    public async Task<ActionResult<CreateEdgesResponse>> CreateEdges([FromBody] CreateEdgesRequest request)
     {
         var edges = request.Edges.Select(x => (x.FromId, x.ToId)).ToList();
         var createEdgeOperation = await edgesService.CreateRange(edges).ConfigureAwait(false);

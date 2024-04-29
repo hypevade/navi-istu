@@ -1,5 +1,4 @@
 ﻿using Istu.Navigation.Api.Paths;
-using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Public.Models.Buildings;

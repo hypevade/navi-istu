@@ -20,10 +20,10 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        var connectionString = Configuration.GetConnectionString("BuildingsDatabaseLocal");
+        var connectionString = Configuration.GetConnectionString("BuildingsDatabaseTest");
         services.AddDbContext<BuildingsDbContext>(options =>
             options.UseNpgsql(connectionString,
-                x => x.MigrationsAssembly(typeof(BuildingsDbContext).Assembly.GetName().Name)));
+                x => x.MigrationsAssembly(typeof(BuildingsDbContext).Assembly.GetName().Name)), ServiceLifetime.Scoped);
         
         services.AddSwaggerGen();
         

@@ -25,14 +25,11 @@ public class ImageRepository(DbContext context) : Repository<ImageLinkEntity>(co
         if (filter.ObjectId.HasValue)
             query = query.Where(e => e.ObjectId == filter.ObjectId.Value);
         
-
         if (filter.Title != null)
             query = query.Where(e => e.Title == filter.Title);
         
-
         if (filter.ImageId.HasValue)
             query = query.Where(e => e.Id == filter.ImageId.Value);
-        
         
         if (filter.Link != null)
             query = query.Where(e => e.Link == filter.Link);

@@ -1,9 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Net;
+using AutoMapper;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
+using Istu.Navigation.Infrastructure.Errors.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
 namespace Istu.Navigation.Domain.Services;
@@ -99,11 +101,11 @@ public class BuildingObjectsService : IBuildingObjectsService
         var checkX = BuildingObject.CoordinateIsValid(buildingObject.X);
         var checkY = BuildingObject.CoordinateIsValid(buildingObject.Y);
         if (!checkY || !checkX)
-            return OperationResult.Failure(BuildingsErrors.InvalidCoordinatesError(buildingObject.X, buildingObject.Y));
+            return OperationResult.Failure(BuildingObjectsApiErrors.InvalidCoordinatesError(buildingObject.X, buildingObject.Y));
         if (string.IsNullOrWhiteSpace(buildingObject.Title))
-            return OperationResult.Failure(BuildingsErrors.EmptyTitleError());
+            return OperationResult.Failure(CommonErrors.EmptyTitleError());
 
-        var getBuilding = await buildingsService.GetById(buildingObject.BuildingId).ConfigureAwait(false);
+        var getBuilding = await buildingsService.CheckExist(buildingObject.BuildingId).ConfigureAwait(false);
         if (getBuilding.IsFailure)
             return OperationResult.Failure(getBuilding.ApiError);
         
@@ -114,6 +116,6 @@ public class BuildingObjectsService : IBuildingObjectsService
 
         return isExist
             ? OperationResult.Success()
-            : OperationResult.Failure(BuildingsErrors.BuildingObjectAlreadyExistsError(buildingObject.BuildingId));
+            : OperationResult.Failure(BuildingObjectsApiErrors.BuildingObjectAlreadyExistsError(buildingObject.BuildingId));
     }
 }

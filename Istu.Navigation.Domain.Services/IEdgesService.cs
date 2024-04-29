@@ -120,7 +120,7 @@ public class EdgesService : IEdgesService
             Id = Guid.NewGuid(),
             FromObject = fromId,
             ToObject = toId,
-            FloorNumber = fromObj.Data.FloorNumber,
+            FloorNumber = fromObj.Data.Floor,
             BuildingId = fromObj.Data.BuildingId,
         });
     }

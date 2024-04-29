@@ -145,7 +145,7 @@ public class RouteSearcherTests
         {
             var point = points[index];
             objects.Add(new BuildingObject(id: Guid.NewGuid(), buildingId: buildingId, title: $"Object {index}",
-                floorNumber: 1, type: BuildingObjectType.Node, x: point.X, y: point.Y));
+                floor: 1, type: BuildingObjectType.Node, x: point.X, y: point.Y));
         }
 
         return objects;

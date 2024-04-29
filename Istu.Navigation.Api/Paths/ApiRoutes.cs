@@ -80,7 +80,7 @@ public static class ApiRoutes
         public const string GetAllPart = "";
         public const string GetByIdPart = "{objectId}";
         
-        public static string CreateObjectRoute()
+        public static string CreateRoute()
         {
             return BuildingsObjectsApi + CreatePart;
         }

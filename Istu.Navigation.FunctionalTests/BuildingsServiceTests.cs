@@ -2,7 +2,6 @@ using FluentAssertions;
 using Istu.Navigation.Infrastructure.EF;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
-using Istu.Navigation.Public.Models;
 using Istu.Navigation.Public.Models.Buildings;
 using Istu.Navigation.TestClient;
 using Istu.Navigation.TestClient.SubsidiaryClients;
@@ -34,7 +33,7 @@ public class BuildingsServiceTests
     [Test]
     public async Task Should_create_building_when_request_is_valid()
     {
-        var floors = GetTestFloors([1,2,3,4]);
+        var floors = TestDataGenerator.GetTestFloors([1,2,3,4]);
         var testBuilding = new CreateBuildingRequest
         {
             Title = "TestBuilding",
@@ -59,7 +58,7 @@ public class BuildingsServiceTests
     [Test]
     public async Task Should_delete_building_when_request_is_valid()
     {
-        var buildingIds = await CreateRandomBuildings(1).ConfigureAwait(false);
+        var buildingIds = await TestDataGenerator.CreateRandomBuildings(client, 1).ConfigureAwait(false);
         var buildingId = buildingIds.First();
         
         var getBuildingOperation = await client.GetBuildingByIdAsync(buildingId);
@@ -76,7 +75,7 @@ public class BuildingsServiceTests
     [Test]
     public async Task Should_return_one_building_when_filter_by_id()
     {
-        var buildingIds = await CreateRandomBuildings(10).ConfigureAwait(false);
+        var buildingIds = await TestDataGenerator.CreateRandomBuildings(client, 10).ConfigureAwait(false);
 
         var getTestBuilding = await client.GetBuildingByIdAsync(buildingIds.First()).ConfigureAwait(false);
         getTestBuilding.IsSuccess.Should().BeTrue();
@@ -101,7 +100,7 @@ public class BuildingsServiceTests
     [Test]
     public async Task Should_return_one_building_when_filter_by_title()
     {
-        var buildingIds = await CreateRandomBuildings(10).ConfigureAwait(false);
+        var buildingIds = await TestDataGenerator.CreateRandomBuildings(client,10).ConfigureAwait(false);
 
         var getTestBuilding = await client.GetBuildingByIdAsync(buildingIds.First()).ConfigureAwait(false);
         getTestBuilding.IsSuccess.Should().BeTrue();
@@ -127,7 +126,7 @@ public class BuildingsServiceTests
     [Test]
     public async Task Should_return_correct_count_of_buildings_when_take()
     {
-        await CreateRandomBuildings(10).ConfigureAwait(false);
+        await TestDataGenerator.CreateRandomBuildings(client, 10).ConfigureAwait(false);
 
         var filter = new BuildingFilter() { Take = 5 };
         
@@ -139,7 +138,7 @@ public class BuildingsServiceTests
     [Test]
     public async Task Should_return_correct_count_of_buildings_when_skip()
     {
-        await CreateRandomBuildings(10).ConfigureAwait(false);
+        await TestDataGenerator.CreateRandomBuildings(client,10).ConfigureAwait(false);
 
         var filter = new BuildingFilter() { Skip = 5 };
         
@@ -151,7 +150,7 @@ public class BuildingsServiceTests
     [Test]
     public async Task Should_return_correct_count_of_buildings_when_take_and_skip()
     {
-        await CreateRandomBuildings(10).ConfigureAwait(false);
+        await TestDataGenerator.CreateRandomBuildings(client,10).ConfigureAwait(false);
 
         var filter = new BuildingFilter() { Skip = 5, Take = 2};
         
@@ -163,7 +162,7 @@ public class BuildingsServiceTests
     [TestCaseSource(nameof(TestCasesWithWrongFloorNumbers))]
     public async Task Should_return_bad_request_when_floor_numbers_is_invalid(int[] floorNumbers)
     {
-        var floors = GetTestFloors(floorNumbers);
+        var floors = TestDataGenerator.GetTestFloors(floorNumbers);
         var testBuilding = new CreateBuildingRequest
         {
             Title = "TestBuilding",
@@ -202,39 +201,5 @@ public class BuildingsServiceTests
         }
     }
 
-    private async Task<List<Guid>> CreateRandomBuildings(int count)
-    {
-        var requests = GetCreateRequests(count);
-        var buildingIds = new List<Guid>();
-        foreach (var request in requests)
-        {
-            var buildingId = await client.CreateBuildingAsync(request).ConfigureAwait(false);
-            buildingIds.Add(buildingId.Data.BuildingId);
-        }
-
-        return buildingIds;
-    }
-
-    private List<CreateBuildingRequest> GetCreateRequests(int count)
-    {
-        var floors = GetTestFloors(new List<int> { 1, 2, 3, 4 });
-        var requests = new List<CreateBuildingRequest>();
-        for (var i = 0; i < count; i++)
-        {
-            var request = new CreateBuildingRequest
-            {
-                Title = $"TestBuilding_{i}",
-                Description = $"TestDescription_{i}",
-                Floors = floors
-            };
-            requests.Add(request);
-        }
-
-        return requests;
-    }
-
-    private List<CreateFloorDto> GetTestFloors(IEnumerable<int> floorNumbers)
-    {
-        return floorNumbers.Select(x => new CreateFloorDto { FloorNumber = x, ImageLink = "TestLink_" + x }).ToList();
-    }
+    
 }

@@ -25,8 +25,8 @@ public class BuildingObjectsRepository : Repository<BuildingObjectEntity>, IBuil
         if (filter.BuildingId.HasValue)
             query = query.Where(e => e.Id == filter.BuildingId.Value);
 
-        if (filter.Id.HasValue)
-            query = query.Where(e => e.Id == filter.Id.Value);
+        if (filter.BuildingObjectId.HasValue)
+            query = query.Where(e => e.Id == filter.BuildingObjectId.Value);
 
         if (!string.IsNullOrWhiteSpace(filter.Title))
             query = query.Where(e => e.Title == filter.Title);

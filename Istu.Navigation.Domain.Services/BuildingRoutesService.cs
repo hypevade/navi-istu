@@ -64,8 +64,8 @@ public class BuildingRoutesService(
 
         foreach (var obj in totalPath)
         {
-            var floorNumber = obj.FloorNumber;
-            if (result.ContainsKey(obj.FloorNumber))
+            var floorNumber = obj.Floor;
+            if (result.ContainsKey(obj.Floor))
                 result[floorNumber].Add(obj);
             else
                 result.Add(floorNumber, [obj]);
@@ -92,8 +92,8 @@ public class BuildingRoutesService(
 
     private (int start, int end) GetFloorsNumbers(BuildingObject fromBuildingObject, BuildingObject toBuildingObject)
     {
-        var start = Math.Min(fromBuildingObject.FloorNumber, toBuildingObject.FloorNumber);
-        var end = Math.Max(fromBuildingObject.FloorNumber, toBuildingObject.FloorNumber);
+        var start = Math.Min(fromBuildingObject.Floor, toBuildingObject.Floor);
+        var end = Math.Max(fromBuildingObject.Floor, toBuildingObject.Floor);
         return (start, end);
     }
 }
