@@ -37,6 +37,6 @@ public class BuildingsRepository : Repository<BuildingEntity> , IBuildingsReposi
 
     public Task<bool> ExistWithTitle(string title)
     {
-        return DbSet.AnyAsync(e => string.Equals(e.Title.ToLower(), title.ToLower(), StringComparison.OrdinalIgnoreCase));
+        return DbSet.AnyAsync(e => e.Title.ToLower() == title.ToLower());
     }
 }

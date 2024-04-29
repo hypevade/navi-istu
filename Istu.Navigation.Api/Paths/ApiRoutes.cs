@@ -18,6 +18,7 @@ public static class ApiRoutes
         public const string CreateFloorPart = "{buildingId}/floors";
         public const string GetFloorPart = "{buildingId}/floors/{floorNumber}";
         public const string DeleteFloorPart = "{buildingId}/floors/{floorNumber}";
+        public const string GetFloorsPart = "{buildingId}/floors";
         
 
         public static string GetBuildingWithIdRoute(Guid buildingId)

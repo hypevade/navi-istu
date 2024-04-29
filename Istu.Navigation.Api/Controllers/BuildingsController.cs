@@ -35,42 +35,32 @@ public class BuildingsController : ControllerBase
         var createOperation = await buildingsService
             .Create(request.Title, request.Latitude, request.Longitude, request.Description).ConfigureAwait(false);
 
-        if (createOperation.IsFailure)
-            return StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
-
-        return Ok(new CreateBuildingResponse { BuildingId = createOperation.Data });
+        return createOperation.IsFailure
+            ? Ok(new CreateBuildingResponse { BuildingId = createOperation.Data })
+            : StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
     }
     
-    //Todo: add patch method
     [HttpPatch]
     [Route(ApiRoutes.Buildings.UpdateBuildingPart)]
     public async Task<IActionResult> Update([FromBody] UpdateBuildingRequest request)
     {
-        return Ok();
-        /*var building = mapper.Map<Building>(request.Building);
-
-        var patchBuildings = await buildingsService.Patch(building).ConfigureAwait(false);
-        if (patchBuildings.IsFailure)
-        {
-            var apiError = patchBuildings.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        return Accepted();*/
+        var update = await buildingsService
+            .Patch(request.Id, request.UpdatedTitle, request.UpdatedLatitude, request.UpdatedLongitude,
+                request.UpdatedDescription)
+            .ConfigureAwait(false);
+        return update.IsSuccess
+            ? Accepted()
+            : StatusCode(update.ApiError.StatusCode, update.ApiError.ToErrorDto());
     }
 
     [HttpDelete]
     [Route(ApiRoutes.Buildings.DeleteBuildingPart)]
     public async Task<IActionResult> Delete(Guid buildingId)
     {
-        var createOperation = await buildingsService.Delete(buildingId).ConfigureAwait(false);
-        if (createOperation.IsFailure)
-        {
-            var apiError = createOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        return Accepted();
+        var delete = await buildingsService.Delete(buildingId).ConfigureAwait(false);
+        return delete.IsSuccess 
+            ? Accepted() 
+            : StatusCode(delete.ApiError.StatusCode, delete.ApiError.ToErrorDto());
     }
 
     [HttpGet]
@@ -78,14 +68,9 @@ public class BuildingsController : ControllerBase
     public async Task<ActionResult<BuildingDto>> GetById(Guid buildingId)
     {
         var getBuilding = await buildingsService.GetById(buildingId).ConfigureAwait(false);
-        if (getBuilding.IsFailure)
-        {
-            var apiError = getBuilding.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        var buildingDto = mapper.Map<BuildingDto>(getBuilding.Data);
-        return buildingDto;
+        return getBuilding.IsSuccess
+            ? Ok(mapper.Map<BuildingDto>(getBuilding.Data))
+            : StatusCode(getBuilding.ApiError.StatusCode, getBuilding.ApiError.ToErrorDto());
     }
 
     [HttpGet]
@@ -93,46 +78,52 @@ public class BuildingsController : ControllerBase
     public async Task<ActionResult<List<BuildingDto>>> GetAllByFilter([FromQuery] BuildingFilter filter)
     {
         var getBuilding = await buildingsService.GetAllByFilter(filter).ConfigureAwait(false);
-        if (getBuilding.IsFailure)
-        {
-            var apiError = getBuilding.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        return Ok(mapper.Map<List<BuildingDto>>(getBuilding.Data));
+        return getBuilding.IsSuccess
+            ? Ok(mapper.Map<List<BuildingDto>>(getBuilding.Data))
+            : StatusCode(getBuilding.ApiError.StatusCode, getBuilding.ApiError.ToErrorDto());
     }
 
     [HttpPost]
-    [Route("{buildingId}/floors")]
+    [Route(ApiRoutes.Buildings.CreateFloorPart)]
     public async Task<ActionResult<CreateFloorResponse>> CreateFloor(Guid buildingId,
         [FromBody] CreateFloorRequest request)
     {
         var createOperation = await floorsService.CreateFloor(buildingId, request.ImageLink, request.FloorNumber)
             .ConfigureAwait(false);
-        if (createOperation.IsFailure)
-            return StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
-        return Ok(new CreateFloorResponse { FloorId = createOperation.Data });
+        return createOperation.IsSuccess
+            ? Ok(new CreateFloorResponse { FloorId = createOperation.Data })
+            : StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
     }
-    
+
     [HttpGet]
-    [Route("{buildingId}/floors/{floorNumber}")]
+    [Route(ApiRoutes.Buildings.GetFloorPart)]
     public async Task<ActionResult<FloorDto>> GetFloor(Guid buildingId, int floorNumber)
     {
         var floor = await floorsBuilder.GetFloor(buildingId, floorNumber)
             .ConfigureAwait(false);
-        if (floor.IsFailure)
-            return StatusCode(floor.ApiError.StatusCode, floor.ApiError.ToErrorDto());
-        return Ok(mapper.Map<FloorDto>(floor.Data));
+        return floor.IsSuccess
+            ? Ok(mapper.Map<FloorDto>(floor.Data))
+            : StatusCode(floor.ApiError.StatusCode, floor.ApiError.ToErrorDto());
     }
 
     [HttpDelete]
-    [Route("{buildingId}/floors/{floorNumber}")]
+    [Route(ApiRoutes.Buildings.DeleteFloorPart)]
     public async Task<IActionResult> DeleteFloor(Guid buildingId, int floorNumber)
     {
-        var createOperation = await floorsService.DeleteFloor(buildingId, floorNumber).ConfigureAwait(false);
-        return createOperation.IsSuccess
+        var deleteFloor = await floorsService.DeleteFloor(buildingId, floorNumber).ConfigureAwait(false);
+        return deleteFloor.IsSuccess
             ? Accepted()
-            : StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
+            : StatusCode(deleteFloor.ApiError.StatusCode, deleteFloor.ApiError.ToErrorDto());
+    }
+
+    [HttpGet]
+    [Route(ApiRoutes.Buildings.DeleteFloorPart)]
+    public async Task<ActionResult<List<FloorDto>>> GetFloorsByBuilding(Guid buildingId)
+    {
+        var floors = await floorsService.GetFloorInfosByBuilding(buildingId).ConfigureAwait(false);
+        return floors.IsSuccess
+            ? Ok(mapper.Map<List<FloorDto>>(floors.Data))
+            : StatusCode(floors.ApiError.StatusCode, floors.ApiError.ToErrorDto());
     }
 }
 

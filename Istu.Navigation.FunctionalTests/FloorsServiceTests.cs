@@ -106,6 +106,19 @@ public class FloorsServiceTests
         floor.IsSuccess.Should().BeTrue();
         await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, createFloorRequest.ImageLink, 1);
     }
+    
+    [TestCase(0)]
+    [TestCase(-1)]
+    [TestCase(int.MinValue)]
+    public async Task CreateFloor_Should_return_400_when_floor_number_less_than_one(int floorNumber)
+    {
+        var createFloorRequest = TestDataGenerator.GetCreateFloorRequest(floorNumber: floorNumber);
+
+        var floor = await client.AddFloorAsync(buildingDto.Id, createFloorRequest).ConfigureAwait(false);
+        floor.IsSuccess.Should().BeFalse();
+        floor.ApiError.StatusCode.Should().Be(400);
+        floor.ApiError.Should().BeEquivalentTo(BuildingsApiErrors.FloorNumberLessThanMinFloorError(floorNumber));
+    }
 
     [Test]
     public async Task CreateFloor_Should_create_floors_two_requests_without_floor_number()

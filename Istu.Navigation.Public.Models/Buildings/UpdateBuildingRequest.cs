@@ -11,7 +11,6 @@ public class UpdateBuildingRequest
     public string? UpdatedDescription { get; set; }
     public string? UpdatedAddress { get; set; }
     
-    public int? UpdatedFloorNumbers { get; set; }
     public double? UpdatedLatitude { get; set; }
     public double? UpdatedLongitude { get; set; }
 }

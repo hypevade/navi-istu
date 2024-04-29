@@ -85,7 +85,7 @@ public static class BuildingsApiErrors
     
     public static ApiError FloorNumberLessThanMinFloorError(int floorNumber)
     {
-        return new ApiError(404, $"Этаж {floorNumber} меньше 1.",
+        return new ApiError(400, $"Этаж {floorNumber} меньше 1.",
             GetUrn("floor-number-less-than-min-floor"));
     }
 }
