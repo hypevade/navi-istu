@@ -35,7 +35,7 @@ public class BuildingsController : ControllerBase
         var createOperation = await buildingsService
             .Create(request.Title, request.Latitude, request.Longitude, request.Description).ConfigureAwait(false);
 
-        return createOperation.IsFailure
+        return createOperation.IsSuccess
             ? Ok(new CreateBuildingResponse { BuildingId = createOperation.Data })
             : StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
     }

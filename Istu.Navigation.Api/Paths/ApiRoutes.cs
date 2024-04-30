@@ -91,6 +91,7 @@ public static class ApiRoutes
         {
             return BuildingsRoutesApi + GetAllPart;
         }
+        
     }
 
     public static class BuildingObjects

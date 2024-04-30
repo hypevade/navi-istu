@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Infrastructure.EF;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
@@ -50,7 +49,7 @@ public class BuildingObjectsServiceTests
         {
             (x, y)
         };
-        var objects = GenerateBuildingObjects(points);
+        var objects = TestDataGenerator.GenerateBuildingObjects(points, testBuilding.Id);
 
         var createResponse = objects.First();
         var createOperation = await client.CreateBuildingObjectAsync(createResponse).ConfigureAwait(false);
@@ -65,7 +64,7 @@ public class BuildingObjectsServiceTests
     [Test]
     public async Task Should_create_building_object_when_request_is_valid()
     {
-        var requests = GenerateBuildingObjects(1);
+        var requests = TestDataGenerator.GenerateBuildingObjects(1, testBuilding.Id);
         var createResponse = requests.First();
         var createOperation = await client.CreateBuildingObjectAsync(createResponse).ConfigureAwait(false);
         createOperation.IsSuccess.Should().BeTrue();
@@ -82,7 +81,7 @@ public class BuildingObjectsServiceTests
     [Test]
     public async Task Should_return_building_object_by_filter_with_object_id()
     {
-        var requests = GenerateBuildingObjects(10);
+        var requests = TestDataGenerator.GenerateBuildingObjects(10, testBuilding.Id);
         var ids = await CreateBuildingObjects(requests).ConfigureAwait(false);
 
         ids.Should().NotBeEmpty();
@@ -104,7 +103,7 @@ public class BuildingObjectsServiceTests
     [Test]
     public async Task Should_return_building_object_by_filter_with_title()
     {
-        var requests = GenerateBuildingObjects(10);
+        var requests = TestDataGenerator.GenerateBuildingObjects(10, testBuilding.Id);
         var ids = await CreateBuildingObjects(requests).ConfigureAwait(false);
 
         ids.Should().NotBeEmpty();
@@ -128,7 +127,7 @@ public class BuildingObjectsServiceTests
     public async Task Should_return_building_objects_by_filter_with_floor()
     {
         var numberOfBuildingObjects = 10;
-        var requests = GenerateBuildingObjects(numberOfBuildingObjects);
+        var requests = TestDataGenerator.GenerateBuildingObjects(numberOfBuildingObjects, testBuilding.Id);
         var ids = await CreateBuildingObjects(requests).ConfigureAwait(false);
 
         var filterById = new BuildingObjectFilter
@@ -162,33 +161,5 @@ public class BuildingObjectsServiceTests
         }
 
         return ids;
-    }
-
-    private List<CreateBuildingObjectRequest> GenerateBuildingObjects(int count)
-    {
-        var random = new Random();
-        var points = new List<(double X, double Y)>();
-        for (var i = 0; i < count; i++)
-        {
-            points.Add((random.NextDouble(), random.NextDouble()));
-        }
-
-        return GenerateBuildingObjects(points);
-    }
-
-    private List<CreateBuildingObjectRequest> GenerateBuildingObjects(List<(double X, double Y)> points)
-    {
-        var buildingId = testBuilding.Id;
-
-        return points.Select((point, i) => new CreateBuildingObjectRequest()
-            {
-                Title = $"Object {i}",
-                BuildingId = buildingId,
-                Floor = 1,
-                Type = BuildingObjectType.Node,
-                X = point.X,
-                Y = point.Y
-            })
-            .ToList();
     }
 }

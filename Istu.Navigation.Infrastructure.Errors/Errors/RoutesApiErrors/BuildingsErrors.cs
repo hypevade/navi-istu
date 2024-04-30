@@ -6,12 +6,6 @@ public class BuildingsErrors : ErrorBase
 {
     protected new string Nid = CommonConstans.RoutesApiNid;
 
-    public static ApiError BuildingObjectNotFoundError(Guid buildingObjectId)
-    {
-        return new ApiError(404, $"Объект с идентификатором '{buildingObjectId}' не найден.",
-            GetUrn("building-object-not-found"));
-    }
-
     public static ApiError BuildingEdgeNotFoundError(Guid fromObjectId, Guid toObjectId)
     {
         return new ApiError(404, $"Ребро между объектами с идентификаторами '{fromObjectId}' и '{toObjectId}' не найдено.",
@@ -78,13 +72,6 @@ public class BuildingsErrors : ErrorBase
         return new ApiError(404,
             $"Изображения на этаже '{floorNumber}' в здании с идентификатором '{buildingId}' не найдено.",
             GetUrn("image-with-floor-id-not-found"));
-    }
-    
-    public static ApiError EdgeFromDifferentBuildingsError(Guid fromId, Guid toId)
-    {
-        return new ApiError(400, 
-            $"Объекты с идентификаторами '{fromId}' и '{toId}' должны быть в одном здании.",
-            GetUrn("building-objects-with-different-building-id"));
     }
     
 

@@ -86,7 +86,7 @@ public class BuildingObjectsService : IBuildingObjectsService
     {
         var buildingObject = await buildingObjectsRepository.GetByIdAsync(id).ConfigureAwait(false);
         if (buildingObject is null)
-            return OperationResult<BuildingObject>.Failure(BuildingsErrors.BuildingObjectNotFoundError(id));
+            return OperationResult<BuildingObject>.Failure(BuildingObjectsApiErrors.BuildingObjectNotFoundError(id));
         var result = mapper.Map<BuildingObject>(buildingObject);
         return OperationResult<BuildingObject>.Success(result);
     }

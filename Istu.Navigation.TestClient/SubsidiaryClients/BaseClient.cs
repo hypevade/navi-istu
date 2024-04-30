@@ -50,8 +50,10 @@ public abstract class BaseClient
         return OperationResult<TResponse>.Failure(apiError);
     }
 
-    protected async Task<OperationResult> DeleteAsync(string url)
+    protected async Task<OperationResult> DeleteAsync(string url, Dictionary<string, string?>? queries = null)
     {
+        if (queries != null && queries.Any())
+            url = QueryHelpers.AddQueryString(url, queries);
         var response = await Client.DeleteAsync(url);
         if (response.IsSuccessStatusCode)
             return OperationResult.Success();

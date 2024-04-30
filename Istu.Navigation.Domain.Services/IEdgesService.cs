@@ -70,19 +70,32 @@ public class EdgesService : IEdgesService
     public async Task<OperationResult<List<Guid>>> CreateRange(List<(Guid fromId, Guid toId)> edges)
     {
         var edgeEntities = new List<EdgeEntity>();
+        var existingEdges = new List<Guid>();
         foreach (var edge in edges)
         {
             var getEdgeEntity = await CheckEdgeAndGetEntity(edge.fromId, edge.toId).ConfigureAwait(false);
-            if (getEdgeEntity.IsFailure)
-                return OperationResult<List<Guid>>.Failure(getEdgeEntity.ApiError);
             
+            var existEdges = await edgesRepository
+                .GetAllByFilterAsync(new EdgeFilter { FromBuildingObjectId = edge.fromId, ToBuildingObjectId = edge.toId }).ConfigureAwait(false);
+            var existEdge = existEdges.FirstOrDefault();
+            if (existEdge is not null)
+            {
+                existingEdges.Add(existEdge.Id);
+                continue;
+            }
+
+            if (getEdgeEntity.IsFailure)
+            {
+                return OperationResult<List<Guid>>.Failure(getEdgeEntity.ApiError);
+            }
+
             edgeEntities.Add(getEdgeEntity.Data);
         }
 
         var addedEdges = await edgesRepository.AddRangeAsync(edgeEntities).ConfigureAwait(false);
         await edgesRepository.SaveChangesAsync().ConfigureAwait(false);
 
-        return OperationResult<List<Guid>>.Success(addedEdges.Select(x => x.Id).ToList());
+        return OperationResult<List<Guid>>.Success(addedEdges.Select(x => x.Id).Concat(existingEdges).ToList());
     }
 
     public async Task<OperationResult> Delete(Guid fromId, Guid toId)
@@ -104,6 +117,10 @@ public class EdgesService : IEdgesService
 
     private async Task<OperationResult<EdgeEntity>> CheckEdgeAndGetEntity(Guid fromId, Guid toId)
     {
+        if (fromId == toId)
+            return OperationResult<EdgeEntity>.Failure(EdgesApiErrors.EdgeFromToSameError(fromId, toId));
+        
+        
         var fromObj = await buildingObjectsService.GetById(fromId).ConfigureAwait(false);
         if (fromObj.IsFailure)
             return OperationResult<EdgeEntity>.Failure(fromObj.ApiError);
@@ -113,7 +130,7 @@ public class EdgesService : IEdgesService
             return OperationResult<EdgeEntity>.Failure(toObj.ApiError);
         
         if(fromObj.Data.BuildingId != toObj.Data.BuildingId)
-            return OperationResult<EdgeEntity>.Failure(BuildingsErrors.EdgeFromDifferentBuildingsError(fromId, toId));
+            return OperationResult<EdgeEntity>.Failure(EdgesApiErrors.EdgeFromDifferentBuildingsError(fromId, toId));
 
         return OperationResult<EdgeEntity>.Success(new EdgeEntity()
         {

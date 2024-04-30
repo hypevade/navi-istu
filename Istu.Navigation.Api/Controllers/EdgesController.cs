@@ -52,4 +52,15 @@ public class EdgesController : ControllerBase
 
         return Ok(mapper.Map<List<EdgeDto>>(getEdgesOperation.Data));
     }
+
+    [HttpDelete]
+    [Route(ApiRoutes.BuildingEdges.DeletePart)]
+    public async Task<IActionResult> DeleteEdges([FromQuery] List<Guid> edgesIds)
+    {
+        var deleteRangeOperation = await edgesService.DeleteRange(edgesIds).ConfigureAwait(false);
+
+        return deleteRangeOperation.IsSuccess
+            ? Accepted()
+            : StatusCode(deleteRangeOperation.ApiError.StatusCode, deleteRangeOperation.ApiError.ToErrorDto());
+    }
 }
