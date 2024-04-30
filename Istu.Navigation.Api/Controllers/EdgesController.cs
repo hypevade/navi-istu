@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route(ApiRoutes.BuildingEdges.BuildingsRoutesApi)]
+[Route(ApiRoutes.BuildingEdges.EdgesApi)]
 public class EdgesController : ControllerBase
 {
     private readonly IEdgesService edgesService;
@@ -55,9 +55,9 @@ public class EdgesController : ControllerBase
 
     [HttpDelete]
     [Route(ApiRoutes.BuildingEdges.DeletePart)]
-    public async Task<IActionResult> DeleteEdges([FromQuery] List<Guid> edgesIds)
+    public async Task<IActionResult> DeleteEdge(Guid edgeId)
     {
-        var deleteRangeOperation = await edgesService.DeleteRange(edgesIds).ConfigureAwait(false);
+        var deleteRangeOperation = await edgesService.Delete(edgeId).ConfigureAwait(false);
 
         return deleteRangeOperation.IsSuccess
             ? Accepted()

@@ -10,6 +10,7 @@ public interface IEdgesClient
 {
     Task<OperationResult<List<EdgeDto>>> GetAllEdgesByFilter(EdgeFilter filter);
     Task<OperationResult<CreateEdgesResponse>> CreateEdges(CreateEdgesRequest request);
+    Task<OperationResult> DeleteEdge(Guid edgeId);
     
     //TODO: Delete
 }
@@ -53,19 +54,10 @@ public class EdgesClient : BaseClient, IEdgesClient
         var result = PostAsync<CreateEdgesRequest, CreateEdgesResponse>(url, request);
         return result;
     }
-    
-    
-    /*public Task<OperationResult> DeleteEdges(List<Guid> edgesIds)
-    {
-        var url = ApiRoutes.BuildingEdges.CreateRoute();
-        var queries = new Dictionary<string, string?>();
 
-        foreach (var VARIABLE in edgesIds)
-        {
-            if (filter.Types != null)
-                queries.Add(nameof(filter.Types), string.Join(',', filter.Types));
-        }
-        var result = DeleteAsync<CreateEdgesRequest>(url);
-        return result;
-    }*/
+    public Task<OperationResult> DeleteEdge(Guid edgeId)
+    {
+        var url = ApiRoutes.BuildingEdges.GetDeleteRoute(edgeId);
+        return DeleteAsync(url);
+    }
 }

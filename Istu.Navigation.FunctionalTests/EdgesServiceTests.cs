@@ -221,8 +221,8 @@ public class EdgesServiceTests
         edges.Data.First().Should().BeEquivalentTo(request.Edges.First());
     }
 
-    /*[Test]
-    public async Task CreateEdge_Should_create_edge_with_correct_request1()
+    [Test]
+    public async Task DeleteEdge_Should_successful_delete_when_exist()
     {
         var request = new CreateEdgesRequest()
         {
@@ -233,11 +233,18 @@ public class EdgesServiceTests
         create.Data.EdgeIds.Should().HaveCount(1);
         await ShouldCreateEdge(testBuildingObject1, testBuildingObject2, create.Data.EdgeIds.First())
             .ConfigureAwait(false);
-        var delete = await client.
-    }*/
+        var delete = await client.DeleteEdge(create.Data.EdgeIds.First()).ConfigureAwait(false);
+        delete.IsSuccess.Should().BeTrue();
+        dbContext.Edges.FirstOrDefault(x => x.Id == create.Data.EdgeIds.First()).Should().BeNull();
+    }
     
+    [Test]
+    public async Task DeleteEdge_Should_return_success_when_not_exist()
+    {
+        var delete = await client.DeleteEdge(Guid.NewGuid()).ConfigureAwait(false);
+        delete.IsSuccess.Should().BeTrue();
+    }
     
-
     private async Task ShouldCreateEdge(BuildingObjectDto from, BuildingObjectDto to, Guid edgeId)
     {
         var edgeEntity = await dbContext.Edges.FirstOrDefaultAsync(x => x.Id == edgeId)

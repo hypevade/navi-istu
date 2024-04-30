@@ -77,21 +77,24 @@ public static class ApiRoutes
     
     public static class BuildingEdges
     {
-        public const string BuildingsRoutesApi = Base + "/buildings/edges";
+        public const string EdgesApi = Base + "/buildings/edges";
         public const string CreatePart = "";
-        public const string DeletePart = "";
+        public const string DeletePart = "{edgeId}";
         public const string GetAllPart = "";
         
         public static string CreateRoute()
         {
-            return BuildingsRoutesApi + CreatePart;
+            return EdgesApi + CreatePart;
         }
         
         public static string GetAllRoute()
         {
-            return BuildingsRoutesApi + GetAllPart;
+            return EdgesApi + GetAllPart;
         }
-        
+        public static string GetDeleteRoute(Guid edgeId)
+        {
+            return EdgesApi + "/" + DeletePart.Replace("{edgeId}", edgeId.ToString());
+        }
     }
 
     public static class BuildingObjects

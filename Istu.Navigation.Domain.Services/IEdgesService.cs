@@ -14,6 +14,7 @@ public interface IEdgesService
     public Task<OperationResult<Guid>> Create(Guid fromId, Guid toId);
     public Task<OperationResult<List<Guid>>> CreateRange(List<(Guid fromId, Guid toId)> edges);
     public Task<OperationResult> Delete(Guid fromId, Guid toId);
+    public Task<OperationResult> Delete(Guid edgeId);
     public Task<OperationResult> DeleteRange(List<Guid> edgeIds);
 }
 
@@ -104,8 +105,17 @@ public class EdgesService : IEdgesService
                 x.FromObject == fromId && x.ToObject == toId || x.FromObject == toId && x.ToObject == fromId)
             .ConfigureAwait(false);
 
-        edgesRepository.RemoveRange(edges);
+        if (edges.Count == 0)
+            return OperationResult.Success();
+        
+        await edgesRepository.RemoveRangeAsync(edges.Select(x=>x.Id)).ConfigureAwait(false);
+        await edgesRepository.SaveChangesAsync().ConfigureAwait(false);
         return OperationResult.Success();
+    }
+
+    public Task<OperationResult> Delete(Guid edgeId)
+    {
+        return DeleteRange([edgeId]);
     }
 
     public async Task<OperationResult> DeleteRange(List<Guid> edgeIds)

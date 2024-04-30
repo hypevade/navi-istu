@@ -37,17 +37,18 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         return entity;
     }
 
-    public async Task<List<TEntity>> AddRangeAsync(List<TEntity> entities)
+    public async Task<List<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities)
     {
-        await DbSet.AddRangeAsync(entities).ConfigureAwait(false);
-        return entities;
+        var enumerable = entities.ToList();
+        await DbSet.AddRangeAsync(enumerable).ConfigureAwait(false);
+        return enumerable.ToList();
     }
 
     public void Update(TEntity entity)
     {
         DbSet.Update(entity);
     }
-    public void UpdateRange(List<TEntity> entities)
+    public void UpdateRange(IEnumerable<TEntity> entities)
     {
         DbSet.UpdateRange(entities);
     }
@@ -64,12 +65,12 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
             DbSet.Remove(entity);
     }
 
-    public void RemoveRange(List<TEntity> entities)
+    public void RemoveRange(IEnumerable<TEntity> entities)
     {
         DbSet.RemoveRange(entities);
     }
 
-    public async Task RemoveRangeAsync(List<Guid> entityIds)
+    public async Task RemoveRangeAsync(IEnumerable<Guid> entityIds)
     {
         var entities = new List<TEntity>();
         foreach (var entityId in entityIds)
