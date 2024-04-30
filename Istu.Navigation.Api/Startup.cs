@@ -19,7 +19,7 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        var connectionString = Configuration.GetConnectionString("BuildingsDatabaseTest");
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__TestDataBase");
         services.AddDbContext<BuildingsDbContext>(options =>
             options.UseNpgsql(connectionString,
                 x => x.MigrationsAssembly(typeof(BuildingsDbContext).Assembly.GetName().Name)));
