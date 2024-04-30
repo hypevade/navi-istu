@@ -22,7 +22,18 @@ public class Startup
         var connectionString = Configuration.GetConnectionString("BuildingsDatabaseTest");
         services.AddDbContext<BuildingsDbContext>(options =>
             options.UseNpgsql(connectionString,
-                x => x.MigrationsAssembly(typeof(BuildingsDbContext).Assembly.GetName().Name)), ServiceLifetime.Scoped);
+                x => x.MigrationsAssembly(typeof(BuildingsDbContext).Assembly.GetName().Name)));
+        
+        services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy", builder =>
+            {
+                builder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
         
         services.AddSwaggerGen();
         
@@ -69,6 +80,7 @@ public class Startup
         app.UseRouting();
 
         app.UseAuthorization();
+        app.UseCors("CorsPolicy");
         
         app.UseMiddleware<ErrorHandlingMiddleware>();
         
