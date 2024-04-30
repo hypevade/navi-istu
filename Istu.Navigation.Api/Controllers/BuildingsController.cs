@@ -117,7 +117,7 @@ public class BuildingsController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ApiRoutes.Buildings.DeleteFloorPart)]
+    [Route(ApiRoutes.Buildings.GetFloorsPart)]
     public async Task<ActionResult<List<FloorDto>>> GetFloorsByBuilding(Guid buildingId)
     {
         var floors = await floorsService.GetFloorInfosByBuilding(buildingId).ConfigureAwait(false);
