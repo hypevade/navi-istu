@@ -20,9 +20,9 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__TestDataBase");
-        services.AddDbContext<BuildingsDbContext>(options =>
+        services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString,
-                x => x.MigrationsAssembly(typeof(BuildingsDbContext).Assembly.GetName().Name)));
+                x => x.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name)));
         
         services.AddCors(options =>
         {
@@ -40,7 +40,7 @@ public class Startup
         services.AddAutoMapper(typeof(PublicMappingProfile).Assembly);
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-        services.AddScoped<DbContext, BuildingsDbContext>();
+        services.AddScoped<DbContext, AppDbContext>();
         services.AddScoped<IBuildingObjectsRepository, BuildingObjectsRepository>();
         services.AddScoped<IBuildingsRepository, BuildingsRepository>();
         services.AddScoped<IEdgesRepository, EdgesRepository>();
@@ -74,7 +74,7 @@ public class Startup
 
         using var scope = app.ApplicationServices.CreateScope();
         
-        var dbContext = scope.ServiceProvider.GetRequiredService<BuildingsDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         dbContext.Database.EnsureCreated();
         
         app.UseRouting();

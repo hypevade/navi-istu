@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Istu.Navigation.TestClient"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Istu.Navigation.FunctionalTests", "Istu.Navigation.FunctionalTests\Istu.Navigation.FunctionalTests.csproj", "{7E276593-4A9C-4FD3-A42D-A63F4CEA1606}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Istu.Navigation.Infrastructure.Common", "Istu.Navigation.Infrastructure.Common\Istu.Navigation.Infrastructure.Common.csproj", "{F8C410E6-916A-499F-8E59-21FC5909610C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{7E276593-4A9C-4FD3-A42D-A63F4CEA1606}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E276593-4A9C-4FD3-A42D-A63F4CEA1606}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E276593-4A9C-4FD3-A42D-A63F4CEA1606}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8C410E6-916A-499F-8E59-21FC5909610C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8C410E6-916A-499F-8E59-21FC5909610C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8C410E6-916A-499F-8E59-21FC5909610C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8C410E6-916A-499F-8E59-21FC5909610C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{81E0E3F5-5A0A-4FBE-91A2-9806231D2BB3} = {3D5D4546-FDB2-49AA-BF68-93A31507BBC6}
@@ -86,5 +92,6 @@ Global
 		{86474341-91B4-4649-AE8C-DDF96024FE4B} = {0411DBE9-AF02-4BDA-B018-F6B024149B17}
 		{F499BAA7-33FD-4C60-8A88-DE3E376E6F1D} = {89F25847-046C-47F8-9ED0-BB8D914FF39A}
 		{7E276593-4A9C-4FD3-A42D-A63F4CEA1606} = {89F25847-046C-47F8-9ED0-BB8D914FF39A}
+		{F8C410E6-916A-499F-8E59-21FC5909610C} = {0411DBE9-AF02-4BDA-B018-F6B024149B17}
 	EndGlobalSection
 EndGlobal

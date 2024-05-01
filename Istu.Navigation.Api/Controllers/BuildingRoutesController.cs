@@ -36,8 +36,6 @@ public class BuildingRoutesController: ControllerBase
         return Ok(publicRoute);
     }
     
-    
-
     /*[HttpGet]
     [Route("{routeId:guid}")]
     public async Task<ActionResult<BuildingRouteResponse>> GetRouteById(Guid routeId)

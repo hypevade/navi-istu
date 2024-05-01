@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
+using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Public.Models.BuildingRoutes;
 using Istu.Navigation.Public.Models.Buildings;
+using Istu.Navigation.Public.Models.Users;
 
 namespace Istu.Navigation.Public.Models;
 
@@ -50,6 +52,9 @@ public class PublicMappingProfile : Profile
             .ForMember(x => x.X, x => x.MapFrom(src => src.X))
             .ForMember(x => x.Y, x => x.MapFrom(src => src.Y))
             .ForMember(x => x.Description, x => x.MapFrom(src => src.Description));
+        
     */
+        CreateMap<User, UserDto>();
+        
     }
 }

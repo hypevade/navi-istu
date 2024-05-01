@@ -11,7 +11,7 @@ namespace Istu.Navigation.FunctionalTests;
 public class FloorsServiceTests
 {
     private IBuildingsClient client = null!;
-    private BuildingsDbContext dbContext = null!;
+    private AppDbContext dbContext = null!;
     private BuildingDto buildingDto = null!;
 
     [OneTimeSetUp]

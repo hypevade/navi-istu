@@ -15,7 +15,7 @@ public class EdgesServiceTests
 {
     private IEdgesClient client = null!;
     private IstuNavigationTestClient commonClient = null!;
-    private BuildingsDbContext dbContext = null!;
+    private AppDbContext dbContext = null!;
     private BuildingDto testBuilding = null!;
     private BuildingObjectDto testBuildingObject1 = null!;
     private BuildingObjectDto testBuildingObject2 = null!;

@@ -9,11 +9,13 @@
     <ItemGroup>
       <ProjectReference Include="..\Istu.Navigation.Domain.Models\Istu.Navigation.Domain.Models.csproj" />
       <ProjectReference Include="..\Istu.Navigation.Domain.Repositories\Istu.Navigation.Domain.Repositories.csproj" />
+      <ProjectReference Include="..\Istu.Navigation.Infrastructure.Common\Istu.Navigation.Infrastructure.Common.csproj" />
       <ProjectReference Include="..\Istu.Navigation.Infrastructure.Errors\Istu.Navigation.Infrastructure.Errors.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="13.0.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
       <PackageReference Include="QuikGraph.Serialization" Version="2.5.0" />
     </ItemGroup>
 

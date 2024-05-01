@@ -1,9 +1,10 @@
 ﻿using Istu.Navigation.Domain.Models.Entities;
+using Istu.Navigation.Domain.Models.Entities.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Istu.Navigation.Infrastructure.EF;
 
-public class BuildingsDbContext : DbContext
+public class AppDbContext : DbContext
 {
     public DbSet<BuildingEntity> Buildings { get; set; }
 
@@ -14,13 +15,15 @@ public class BuildingsDbContext : DbContext
     public DbSet<ImageLinkEntity> ImageLinks { get; set; }
 
     public DbSet<FloorEntity> Floors { get; set; }
+    
+    public DbSet<UserEntity> Users { get; set; }
 
 #pragma warning disable CS8618 // Required by Entity Framework
-    public BuildingsDbContext(DbContextOptions<BuildingsDbContext> options) : base(options)
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
-    public BuildingsDbContext()
+    public AppDbContext()
     {
     }
 
@@ -31,6 +34,17 @@ public class BuildingsDbContext : DbContext
         ConfigureEdges(modelBuilder);
         ConfigureImageLinks(modelBuilder);
         ConfigureFloors(modelBuilder);
+    }
+    
+    private void ConfigureUsers(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserEntity>(a =>
+        {
+            a.Property(x => x.Email).IsRequired();
+            a.Property(x => x.FirstName).IsRequired();
+            a.Property(x => x.LastName).IsRequired();
+            a.Property(x => x.Role).IsRequired();
+        });
     }
 
     private void ConfigureImageLinks(ModelBuilder modelBuilder)

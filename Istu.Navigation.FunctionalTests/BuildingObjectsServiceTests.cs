@@ -12,7 +12,7 @@ namespace Istu.Navigation.FunctionalTests;
 public class BuildingObjectsServiceTests
 {
     private IBuildingObjectsClient client = null!;
-    private BuildingsDbContext dbContext = null!;
+    private AppDbContext dbContext = null!;
     private BuildingDto testBuilding = null!;
 
     [OneTimeSetUp]

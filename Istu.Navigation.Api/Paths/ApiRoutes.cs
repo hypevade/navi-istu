@@ -131,4 +131,11 @@ public static class ApiRoutes
             return BuildingsObjectsApi + "/" + GetByIdPart.Replace("{objectId}", buildingObjectId.ToString());
         }
     }
+
+    public static class Users
+    {
+        public const string UsersApi = Base + "/users";
+        public const string LoginPart = "login";
+        public const string RegisterPart = "register";
+    }
 }

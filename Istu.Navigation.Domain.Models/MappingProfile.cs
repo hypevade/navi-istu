@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Models.Entities;
+using Istu.Navigation.Domain.Models.Entities.User;
+using Istu.Navigation.Domain.Models.Users;
 
 namespace Istu.Navigation.Domain.Models;
 
@@ -16,5 +18,7 @@ public class MappingProfile : Profile
         
         CreateMap<ImageLink, ImageLinkEntity>();
         CreateMap<ImageLinkEntity, ImageLink>();
+        CreateMap<User, UserEntity>();
+        CreateMap<UserEntity, User>();
     }
 }

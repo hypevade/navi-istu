@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Istu.Navigation.Infrastructure.EF.Migrations
 {
-    [DbContext(typeof(BuildingsDbContext))]
+    [DbContext(typeof(AppDbContext))]
     partial class BuildingsDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -167,6 +167,45 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ImageLinks");
+                });
+
+            modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.User.UserEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HashPassword")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("IstuId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("IstuToken")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.BuildingObjectEntity", b =>
