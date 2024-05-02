@@ -40,7 +40,7 @@ public class Startup
         services.AddAutoMapper(typeof(PublicMappingProfile).Assembly);
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-        services.AddScoped<DbContext, AppDbContext>();
+        services.AddTransient<DbContext, AppDbContext>();
         services.AddScoped<IBuildingObjectsRepository, BuildingObjectsRepository>();
         services.AddScoped<IBuildingsRepository, BuildingsRepository>();
         services.AddScoped<IEdgesRepository, EdgesRepository>();

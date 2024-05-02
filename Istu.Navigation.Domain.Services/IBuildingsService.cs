@@ -91,13 +91,14 @@ public class BuildingsService : IBuildingsService
     public async Task<OperationResult<List<Building>>> GetAllByFilter(BuildingFilter filter)
     {
         var buildingEntities = await buildingsRepository.GetAllByFilterAsync(filter).ConfigureAwait(false);
-    
-        var buildingTasks = buildingEntities.Select(async entity => await GetBuildingByEntity(entity).ConfigureAwait(false)).ToList();
-        var buildingResults = await Task.WhenAll(buildingTasks);
 
-        if (buildingResults.Any(r => r.IsFailure))
+        var buildingResults = new List<OperationResult<Building>>();
+        foreach (var buildingEntity in buildingEntities)
         {
-            return OperationResult<List<Building>>.Failure(buildingResults.First(r => r.IsFailure).ApiError);
+            var buildingResult = await GetBuildingByEntity(buildingEntity).ConfigureAwait(false);
+            if(buildingResult.IsFailure)
+                return OperationResult<List<Building>>.Failure(buildingResult.ApiError);
+            buildingResults.Add(buildingResult);
         }
 
         return OperationResult<List<Building>>.Success(buildingResults.Select(r => r.Data).ToList());
