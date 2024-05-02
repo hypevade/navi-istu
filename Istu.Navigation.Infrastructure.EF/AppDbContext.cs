@@ -86,7 +86,7 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(x => x.BuildingId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private void ConfigureEdges(ModelBuilder modelBuilder)
@@ -98,14 +98,14 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(x => x.ToObject)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<EdgeEntity>()
             .HasOne<BuildingObjectEntity>()
             .WithMany()
             .HasForeignKey(x => x.ToObject)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private void ConfigureFloors(ModelBuilder modelBuilder)
@@ -117,6 +117,6 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(x => x.BuildingId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

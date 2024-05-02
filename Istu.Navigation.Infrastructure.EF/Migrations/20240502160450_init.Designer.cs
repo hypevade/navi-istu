@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Istu.Navigation.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240501181358_add_users")]
-    partial class add_users
+    [Migration("20240502160450_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,11 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
@@ -203,6 +208,9 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
                     b.Property<int>("Role")
                         .HasColumnType("integer");
 
@@ -216,7 +224,7 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                     b.HasOne("Istu.Navigation.Domain.Models.Entities.BuildingEntity", null)
                         .WithMany()
                         .HasForeignKey("BuildingId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -225,7 +233,7 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                     b.HasOne("Istu.Navigation.Domain.Models.Entities.BuildingObjectEntity", null)
                         .WithMany()
                         .HasForeignKey("ToObject")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -234,7 +242,7 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                     b.HasOne("Istu.Navigation.Domain.Models.Entities.BuildingEntity", null)
                         .WithMany()
                         .HasForeignKey("BuildingId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618
