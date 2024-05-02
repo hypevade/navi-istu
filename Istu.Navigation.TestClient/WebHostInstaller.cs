@@ -24,15 +24,6 @@ public class WebHostInstaller
                 {
                     options.UseInMemoryDatabase("BuildingsDatabase");
                 });
-                var tokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("testPrivateKey")),
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
-
-                services.AddSingleton(tokenValidationParameters);
             });
         });
         var client = IstuNavigationTestClient.Create(webHost.CreateClient());
