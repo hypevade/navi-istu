@@ -11,6 +11,7 @@ public class Building
     public required double Latitude { get; set; }
 
     public required double Longitude { get; set; }
+    public required string Address { get; set; }
 
     public required List<FloorInfo> Floors { get; set; }
 
@@ -23,5 +24,6 @@ public class Building
         Description = building.Description,
         Latitude = building.Latitude,
         Longitude = building.Longitude,
+        Address = building.Address,
     };
 }

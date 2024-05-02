@@ -33,7 +33,7 @@ public class BuildingsController : ControllerBase
     public async Task<ActionResult<CreateBuildingResponse>> Create([FromBody] CreateBuildingRequest request)
     {
         var createOperation = await buildingsService
-            .Create(request.Title, request.Latitude, request.Longitude, request.Description).ConfigureAwait(false);
+            .Create(request.Title, request.Latitude, request.Longitude, request.Address,request.Description).ConfigureAwait(false);
 
         return createOperation.IsSuccess
             ? Ok(new CreateBuildingResponse { BuildingId = createOperation.Data })
@@ -45,7 +45,7 @@ public class BuildingsController : ControllerBase
     public async Task<IActionResult> Update([FromBody] UpdateBuildingRequest request)
     {
         var update = await buildingsService
-            .Patch(request.Id, request.UpdatedTitle, request.UpdatedLatitude, request.UpdatedLongitude,
+            .Patch(request.Id, request.UpdatedTitle, request.UpdatedLatitude, request.UpdatedLongitude, request.UpdatedAddress,
                 request.UpdatedDescription)
             .ConfigureAwait(false);
         return update.IsSuccess

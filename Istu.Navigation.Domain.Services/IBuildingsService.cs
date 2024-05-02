@@ -10,8 +10,8 @@ namespace Istu.Navigation.Domain.Services;
 
 public interface IBuildingsService
 {
-    public Task<OperationResult<Guid>> Create(string title, double latitude, double longitude,  string? description = null);
-    public Task<OperationResult> Patch(Guid id, string? title = null, double? latitude = null, double? longitude = null, string? description = null);
+    public Task<OperationResult<Guid>> Create(string title, double latitude, double longitude, string address, string? description = null);
+    public Task<OperationResult> Patch(Guid id, string? title = null, double? latitude = null, double? longitude = null, string? address = null, string? description = null);
     public Task<OperationResult> Delete(Guid id);
     public Task<OperationResult<Building>> GetById(Guid id);
     public Task<OperationResult<List<Building>>> GetAllByFilter(BuildingFilter filter);
@@ -29,7 +29,7 @@ public class BuildingsService : IBuildingsService
         this.floorsService = floorsService;
     }
 
-    public async Task<OperationResult<Guid>> Create(string title, double latitude, double longitude,  string? description = null)
+    public async Task<OperationResult<Guid>> Create(string title, double latitude, double longitude, string address, string? description = null)
     {
         var checkResult = await CheckTitle(title).ConfigureAwait(false);
         if (checkResult.IsFailure)
@@ -41,7 +41,8 @@ public class BuildingsService : IBuildingsService
             Title = title,
             Description = description,
             Latitude = latitude,
-            Longitude = longitude
+            Longitude = longitude,
+            Address = address
         }; 
             
         buildingEntity = await buildingsRepository.AddAsync(buildingEntity).ConfigureAwait(false);
@@ -49,11 +50,11 @@ public class BuildingsService : IBuildingsService
         return OperationResult<Guid>.Success(buildingEntity.Id);
     }
 
-    public async Task<OperationResult> Patch(Guid id, string? title = null, double? latitude = null, double? longitude = null, string? description = null)
+    public async Task<OperationResult> Patch(Guid id, string? title = null, double? latitude = null, double? longitude = null, string? address = null,string? description = null)
     {
         if (title != null)
         {
-            var check = await CheckTitle(title, checkExist: true).ConfigureAwait(false);
+            var check = await CheckTitle(title).ConfigureAwait(false);
             if (check.IsFailure)
                 return check;
         }
@@ -70,6 +71,8 @@ public class BuildingsService : IBuildingsService
             buildingEntity.Longitude = longitude.Value;
         if (description != null)
             buildingEntity.Description = description;
+        if (address != null)
+            buildingEntity.Address = address;
         
         buildingsRepository.Update(buildingEntity);
         await buildingsRepository.SaveChangesAsync().ConfigureAwait(false);
@@ -117,7 +120,7 @@ public class BuildingsService : IBuildingsService
         return await GetBuildingByEntity(buildingEntity).ConfigureAwait(false);
     }
     
-    private async Task<OperationResult> CheckTitle(string title,  bool checkExist = true)
+    private async Task<OperationResult> CheckTitle(string title)
     {
         if (string.IsNullOrWhiteSpace(title))
             return OperationResult.Failure(CommonErrors.EmptyTitleError());
@@ -143,6 +146,7 @@ public class BuildingsService : IBuildingsService
             Description = buildingEntity.Description,
             Latitude = buildingEntity.Latitude,
             Longitude = buildingEntity.Longitude,
+            Address = buildingEntity.Address
         };
         return OperationResult<Building>.Success(building);
     }

@@ -63,6 +63,9 @@ public class AppDbContext : DbContext
         {
             a.Property(x => x.Title).HasMaxLength(100).IsRequired();
             a.Property(x => x.Description).HasMaxLength(1000);
+            a.Property(x => x.Latitude).IsRequired();
+            a.Property(x => x.Longitude).IsRequired();
+            a.Property(x => x.Address).HasMaxLength(100).IsRequired();
         });
     }
 
