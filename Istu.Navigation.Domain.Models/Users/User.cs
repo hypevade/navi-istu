@@ -4,7 +4,7 @@ namespace Istu.Navigation.Domain.Models.Users;
 
 public class User
 {
-    public User(Guid id, string email, string hashPassword, string firstName, string lastName, UserRole role)
+    public User(Guid id, string email, string hashPassword, string firstName, string lastName, UserRole role, string? refreshToken = null, string? accessToken = null)
     {
         Id = id;
         Email = email;
@@ -12,6 +12,8 @@ public class User
         FirstName = firstName;
         LastName = lastName;
         Role = role;
+        RefreshToken = refreshToken;
+        AccessToken = accessToken;
     }
 
     public Guid Id { get; set; }
@@ -19,6 +21,9 @@ public class User
     public string HashPassword { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
+
+    public string? RefreshToken { get; set; }
+    public string? AccessToken { get; set; }
     public UserRole Role { get; set; }
 
     public static UserEntity ToEntity(User user) => new()
@@ -28,6 +33,7 @@ public class User
         HashPassword = user.HashPassword,
         FirstName = user.FirstName,
         LastName = user.LastName,
-        Role = user.Role
+        Role = user.Role,
+        RefreshToken = user.RefreshToken
     };
 }

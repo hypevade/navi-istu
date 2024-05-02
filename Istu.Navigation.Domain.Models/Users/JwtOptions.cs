@@ -2,6 +2,7 @@
 
 public class JwtOptions
 {
-    public string SecretKey { get; set; } = string.Empty;
-    public int ExpirationHours { get; set; }
+    public int AccessTokenExpirationHours { get; set; }
+    
+    public int RefreshTokenExpirationDays { get; set; }
 }

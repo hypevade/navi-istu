@@ -137,5 +137,6 @@ public static class ApiRoutes
         public const string UsersApi = Base + "/users";
         public const string LoginPart = "login";
         public const string RegisterPart = "register";
+        public const string RefreshPart = "refresh";
     }
 }

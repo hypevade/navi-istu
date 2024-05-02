@@ -47,4 +47,17 @@ public class UsersController(IUsersService usersService, IMapper mapper) : Contr
 
         return Ok(loginUser.Data);
     }
+    
+    [HttpPost]
+    [Route(ApiRoutes.Users.RefreshPart)]
+    public async Task<ActionResult<RefreshTokenResult>> RefreshToken()
+    {
+        var refreshToken =
+            await usersService.RefreshToken(Request.Headers["RefreshToken"].ToString())
+                .ConfigureAwait(false);
+
+        return refreshToken.IsSuccess
+            ? Ok(new RefreshTokenResult { AccessToken = refreshToken.Data.accessToken, RefreshToken = refreshToken.Data.refreshToken })
+            : StatusCode(refreshToken.ApiError.StatusCode, refreshToken.ApiError.ToErrorDto());
+    }
 }

@@ -10,12 +10,8 @@ public interface IFloorsRepository : IRepository<FloorEntity>
     public Task<FloorEntity?> GetByBuildingIdAsync(Guid buildingId, int floorNumber);
 }
 
-public class FloorsRepository : Repository<FloorEntity>, IFloorsRepository
+public class FloorsRepository(DbContext context) : Repository<FloorEntity>(context), IFloorsRepository
 {
-    public FloorsRepository(DbContext context) : base(context)
-    {
-    }
-
     public Task<List<FloorEntity>> GetAllByBuildingIdAsync(Guid buildingId, int minFloor = 1, int maxFloor = int.MaxValue)
     {
         return DbSet.Where(e => e.BuildingId == buildingId && e.FloorNumber >= minFloor && e.FloorNumber <= maxFloor).ToListAsync();

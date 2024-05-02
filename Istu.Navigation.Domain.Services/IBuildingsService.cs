@@ -62,7 +62,6 @@ public class BuildingsService : IBuildingsService
         if (buildingEntity is null)
             return OperationResult.Failure(BuildingsApiErrors.BuildingWithIdNotFoundError(id));
         
-        
         if (title != null)
             buildingEntity.Title = title;
         if (latitude.HasValue)
