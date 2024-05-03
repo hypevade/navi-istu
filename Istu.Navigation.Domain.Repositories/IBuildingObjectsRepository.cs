@@ -23,7 +23,7 @@ public class BuildingObjectsRepository : Repository<BuildingObjectEntity>, IBuil
         var query = DbSet.AsQueryable();
 
         if (filter.BuildingId.HasValue)
-            query = query.Where(e => e.Id == filter.BuildingId.Value);
+            query = query.Where(e => e.BuildingId == filter.BuildingId.Value);
 
         if (filter.BuildingObjectId.HasValue)
             query = query.Where(e => e.Id == filter.BuildingObjectId.Value);

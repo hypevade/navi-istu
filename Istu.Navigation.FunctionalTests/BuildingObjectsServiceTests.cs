@@ -59,8 +59,6 @@ public class BuildingObjectsServiceTests
         error.Should().BeEquivalentTo(expectedError);
     }
 
-
-
     [Test]
     public async Task Should_create_building_object_when_request_is_valid()
     {
@@ -132,7 +130,8 @@ public class BuildingObjectsServiceTests
 
         var filterById = new BuildingObjectFilter
         {
-            Floor = 1
+            Floor = 1,
+            BuildingId = testBuilding.Id
         };
         var getOperation = await client.GetAllByFilterAsync(filterById).ConfigureAwait(false);
         getOperation.IsSuccess.Should().BeTrue();
