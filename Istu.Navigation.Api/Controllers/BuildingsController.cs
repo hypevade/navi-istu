@@ -120,7 +120,7 @@ public class BuildingsController : ControllerBase
     [Route(ApiRoutes.Buildings.GetFloorsPart)]
     public async Task<ActionResult<List<FloorDto>>> GetFloorsByBuilding(Guid buildingId)
     {
-        var floors = await floorsService.GetFloorInfosByBuilding(buildingId).ConfigureAwait(false);
+        var floors = await floorsBuilder.GetFloorsByBuilding(buildingId).ConfigureAwait(false);
         return floors.IsSuccess
             ? Ok(mapper.Map<List<FloorDto>>(floors.Data))
             : StatusCode(floors.ApiError.StatusCode, floors.ApiError.ToErrorDto());
