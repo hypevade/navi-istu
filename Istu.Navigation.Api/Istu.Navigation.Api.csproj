@@ -28,6 +28,11 @@
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+      <None Remove="map-srp-izh.routerdb" />
+      <None Remove="srp-izh.osm.pbf" />
+      <Content Include="srp-izh.osm.pbf">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>

@@ -31,13 +31,14 @@ public class Startup
     private IConfiguration Configuration { get; }
     public void ConfigureExternalSearcher(IServiceCollection services)
     {
+        var filename = Configuration.GetSection("Map").GetSection("FileName").Value ?? string.Empty;
+        var mapPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
+
         var routerDb = new RouterDb();
-        var pathToMap = Configuration.GetSection("Map").GetSection("Path").Value ?? string.Empty;
-        using (var stream = new FileInfo(pathToMap).OpenRead())
+        using (var stream = new FileInfo(mapPath).OpenRead())
         {
-            //TODO: Если будем добавлять не только пешеходные маршруты, следует добавить Vehicle.Car и Vehicle.Bike
-            routerDb.LoadOsmData(stream, Vehicle.Pedestrian);
-        }
+            routerDb.LoadOsmData(stream, Vehicle.Pedestrian, Vehicle.Bicycle);
+        };
         services.Configure<MapOptions>(Configuration.GetSection("Map"));
 
         services.AddSingleton(routerDb);
