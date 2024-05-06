@@ -1,5 +1,6 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Models.Entities;
+using Istu.Navigation.Domain.Models.ExternalRoutes;
 using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
@@ -14,6 +15,7 @@ public interface IBuildingsService
     public Task<OperationResult> Patch(Guid id, string? title = null, double? latitude = null, double? longitude = null, string? address = null, string? description = null);
     public Task<OperationResult> Delete(Guid id);
     public Task<OperationResult<Building>> GetById(Guid id);
+    public Task<OperationResult<ExternalPoint>> GetBuildingCoordinates(Guid id);
     public Task<OperationResult<List<Building>>> GetAllByFilter(BuildingFilter filter);
     public Task<OperationResult> CheckExist(Guid buildingId);
 }
@@ -85,6 +87,16 @@ public class BuildingsService : IBuildingsService
         await buildingsRepository.SaveChangesAsync().ConfigureAwait(false);
         
         return OperationResult.Success();
+    }
+
+    public async Task<OperationResult<ExternalPoint>> GetBuildingCoordinates(Guid id)
+    {
+        var buildingEntity = await buildingsRepository.GetByIdAsync(id).ConfigureAwait(false);
+        if (buildingEntity is null)
+            return OperationResult<ExternalPoint>.Failure(BuildingsApiErrors.BuildingWithIdNotFoundError(id));
+        var resultPoint = new ExternalPoint(buildingEntity.Latitude, buildingEntity.Longitude);
+        
+        return OperationResult<ExternalPoint>.Success(resultPoint);
     }
 
     public async Task<OperationResult<List<Building>>> GetAllByFilter(BuildingFilter filter)

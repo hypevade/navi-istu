@@ -1,8 +1,7 @@
 namespace Istu.Navigation.Domain.Models.ExternalRoutes;
 
-public class ExternalPoint(double latitude, double longitude, string? name = null)
+public class ExternalPoint(double latitude, double longitude)
 {
-    public required double Latitude { get; set; } = latitude;
-    public required double Longitude { get; set; } = longitude;
-    public string? Name { get; set; } = name;
+    public double Latitude { get; set; } = latitude;
+    public double Longitude { get; set; } = longitude;
 }

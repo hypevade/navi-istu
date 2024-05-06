@@ -1,17 +1,20 @@
 ﻿using System.Text;
 using Istu.Navigation.Api.Middlewares;
 using Istu.Navigation.Domain.Models;
+using Istu.Navigation.Domain.Models.ExternalRoutes;
 using Istu.Navigation.Domain.Models.Users;
-using Istu.Navigation.Domain.Repositories;
 using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Domain.Repositories.Users;
-using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.BuildingRoutes;
 using Istu.Navigation.Domain.Services.Buildings;
+using Istu.Navigation.Domain.Services.ExternalRoutes;
 using Istu.Navigation.Domain.Services.Users;
 using Istu.Navigation.Infrastructure.Common;
 using Istu.Navigation.Infrastructure.EF;
 using Istu.Navigation.Public.Models;
+using Itinero;
+using Itinero.IO.Osm;
+using Itinero.Osm.Vehicles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -26,6 +29,21 @@ public class Startup
     }
 
     private IConfiguration Configuration { get; }
+    public void ConfigureExternalSearcher(IServiceCollection services)
+    {
+        var routerDb = new RouterDb();
+        var pathToMap = Configuration.GetSection("Map").GetSection("Path").Value ?? string.Empty;
+        using (var stream = new FileInfo(pathToMap).OpenRead())
+        {
+            //TODO: Если будем добавлять не только пешеходные маршруты, следует добавить Vehicle.Car и Vehicle.Bike
+            routerDb.LoadOsmData(stream, Vehicle.Pedestrian);
+        }
+        services.Configure<MapOptions>(Configuration.GetSection("Map"));
+
+        services.AddSingleton(routerDb);
+        services.AddScoped<Router>();
+        services.AddScoped<IExternalRoutesSearcher, ExternalRoutesSearcher>();
+    }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -41,6 +59,8 @@ public class Startup
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
+        
+        ConfigureExternalSearcher(services);
 
         services.AddSingleton(tokenValidationParameters);
 

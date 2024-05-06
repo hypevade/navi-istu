@@ -86,9 +86,10 @@ public class BuildingObjectsServiceTests
         requests.Should().NotBeEmpty();
         var buildingObjectRequest = requests.First();
         var testObjId = ids.First();
-        var filterById = new BuildingObjectFilter()
+        var filterById = new BuildingObjectFilter
         {
-            BuildingId = testObjId
+            BuildingObjectId = testObjId,
+            BuildingId = testBuilding.Id
         };
         var getOperation = await client.GetAllByFilterAsync(filterById).ConfigureAwait(false);
         getOperation.IsSuccess.Should().BeTrue();

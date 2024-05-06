@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics;
+using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Services;
@@ -78,7 +79,10 @@ public class BuildingsController : ControllerBase
     [Route(ApiRoutes.Buildings.GetAllBuildingsPart)]
     public async Task<ActionResult<List<BuildingDto>>> GetAllByFilter([FromQuery] BuildingFilter filter)
     {
+        var timer = Stopwatch.StartNew();
         var getBuilding = await buildingsService.GetAllByFilter(filter).ConfigureAwait(false);
+        timer.Stop();
+        Console.WriteLine(timer.Elapsed.Milliseconds);
         return getBuilding.IsSuccess
             ? Ok(mapper.Map<List<BuildingDto>>(getBuilding.Data))
             : StatusCode(getBuilding.ApiError.StatusCode, getBuilding.ApiError.ToErrorDto());

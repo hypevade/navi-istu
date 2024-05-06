@@ -53,6 +53,9 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Title")
+                        .IsUnique();
+
                     b.ToTable("Buildings");
                 });
 
@@ -121,6 +124,8 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
 
                     b.HasIndex("ToObject");
 
+                    b.HasIndex("BuildingId", "ToObject", "FromObject");
+
                     b.ToTable("Edges");
                 });
 
@@ -170,6 +175,8 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ObjectId");
 
                     b.ToTable("ImageLinks");
                 });

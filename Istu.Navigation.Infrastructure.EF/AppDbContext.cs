@@ -45,6 +45,7 @@ public class AppDbContext : DbContext
             a.Property(x => x.LastName).IsRequired();
             a.Property(x => x.Role).IsRequired();
         });
+        modelBuilder.Entity<UserEntity>().HasIndex(x => x.Email).IsUnique();
     }
 
     private void ConfigureImageLinks(ModelBuilder modelBuilder)
@@ -55,6 +56,7 @@ public class AppDbContext : DbContext
             a.Property(x => x.ObjectId).IsRequired();
             a.Property(x => x.CreatedByAdmin).IsRequired();
         });
+        modelBuilder.Entity<ImageLinkEntity>().HasIndex(x => new { x.ObjectId });
     }
 
     private void ConfigureBuildings(ModelBuilder modelBuilder)
@@ -67,6 +69,7 @@ public class AppDbContext : DbContext
             a.Property(x => x.Longitude).IsRequired();
             a.Property(x => x.Address).HasMaxLength(100).IsRequired();
         });
+        modelBuilder.Entity<BuildingEntity>().HasIndex(x => x.Title).IsUnique();
     }
 
     private void ConfigureBuildingObjects(ModelBuilder modelBuilder)
@@ -87,6 +90,8 @@ public class AppDbContext : DbContext
             .HasForeignKey(x => x.BuildingId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<BuildingObjectEntity>().HasIndex(x => new { x.BuildingId });
     }
 
     private void ConfigureEdges(ModelBuilder modelBuilder)
@@ -106,6 +111,7 @@ public class AppDbContext : DbContext
             .HasForeignKey(x => x.ToObject)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<EdgeEntity>().HasIndex(x => new { x.BuildingId, x.ToObject, x.FromObject });
     }
 
     private void ConfigureFloors(ModelBuilder modelBuilder)
@@ -118,5 +124,6 @@ public class AppDbContext : DbContext
             .HasForeignKey(x => x.BuildingId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<FloorEntity>().HasIndex(x => new { x.BuildingId });
     }
 }

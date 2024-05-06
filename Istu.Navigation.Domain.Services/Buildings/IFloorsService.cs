@@ -9,7 +9,7 @@ namespace Istu.Navigation.Domain.Services.Buildings;
 
 public interface IFloorsService
 {
-    public Task<OperationResult<FloorInfo>> GetFloorInfo(Guid buildingId, int floorNumber);
+    //public Task<OperationResult<FloorInfo>> GetFloorInfo(Guid buildingId, int floorNumber);
     public Task<OperationResult<Guid>> CreateFloor(Guid buildingId, string imageLink, int? floorNumber = null);
     public Task<OperationResult> DeleteFloor(Guid buildingId, int floorNumber);
     public Task<OperationResult<List<FloorInfo>>> GetFloorInfosByBuilding(Guid buildingId);
@@ -48,7 +48,7 @@ public class FloorsService : IFloorsService
         var floorInfos = new List<FloorInfo>();
         foreach (var floorEntity in floors)
         {
-            var getFloorInfo = await GetFloorInfo(buildingId, floorEntity.FloorNumber).ConfigureAwait(false);
+            var getFloorInfo = await GetFloorInfoByEntity(floorEntity).ConfigureAwait(false);
             if (getFloorInfo.IsFailure)
                 return OperationResult<List<FloorInfo>>.Failure(getFloorInfo.ApiError);
             floorInfos.Add(getFloorInfo.Data);
@@ -83,6 +83,7 @@ public class FloorsService : IFloorsService
 
         await floorsRepository.AddAsync(floorEntity).ConfigureAwait(false);
         await floorsRepository.SaveChangesAsync().ConfigureAwait(false);
+        
         var link = new ImageLink(Guid.NewGuid(), floorEntity.Id, imageLink, $"floor_{floorNumber}");
         var createLink = await imageService.Create(link).ConfigureAwait(false);
         if (createLink.IsFailure)
@@ -92,15 +93,6 @@ public class FloorsService : IFloorsService
                 : OperationResult<Guid>.Failure(CommonErrors.InternalServerError());
         }
         return OperationResult<Guid>.Success(floorEntity.Id);
-    }
-
-    public async Task<OperationResult<FloorInfo>> GetFloorInfo(Guid buildingId, int floorNumber)
-    {
-        var getFloor = await floorsRepository.GetByBuildingIdAsync(buildingId, floorNumber).ConfigureAwait(false);
-        if (getFloor is null)
-            return OperationResult<FloorInfo>.Failure(
-                BuildingsApiErrors.FloorWithBuildingAndFloorNumberNotFoundError(buildingId, floorNumber));
-        return await GetFloorInfoByEntity(getFloor).ConfigureAwait(false);
     }
 
 

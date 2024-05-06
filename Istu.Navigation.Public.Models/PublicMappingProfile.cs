@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
+using Istu.Navigation.Domain.Models.ExternalRoutes;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Public.Models.BuildingRoutes;
 using Istu.Navigation.Public.Models.Buildings;
+using Istu.Navigation.Public.Models.ExternalRoutes;
 using Istu.Navigation.Public.Models.Users;
 
 namespace Istu.Navigation.Public.Models;
@@ -55,6 +57,11 @@ public class PublicMappingProfile : Profile
         
     */
         CreateMap<User, UserDto>();
-        
+
+        CreateMap<ExternalPoint, ExternalPointDto>();
+        CreateMap<ExternalPointDto, ExternalPoint>();
+        CreateMap<ExternalRoute, ExternalRouteResponse>()
+            .ForMember(x => x.Points, x => x.MapFrom(src => src.Points))
+            .ForMember(x => x.TotalTime, x => x.MapFrom(src => src.TotalTime));
     }
 }
