@@ -1,11 +1,11 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Models.Entities;
-using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
 
-namespace Istu.Navigation.Domain.Services;
+namespace Istu.Navigation.Domain.Services.Buildings;
 
 public interface IFloorsBuilder
 {

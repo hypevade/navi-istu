@@ -2,6 +2,7 @@
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Services;
+using Istu.Navigation.Domain.Services.Users;
 using Istu.Navigation.Public.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using LoginRequest = Istu.Navigation.Public.Models.Users.LoginRequest;

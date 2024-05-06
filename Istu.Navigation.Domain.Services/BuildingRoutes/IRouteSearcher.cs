@@ -6,7 +6,7 @@ using QuikGraph;
 using QuikGraph.Algorithms.Observers;
 using QuikGraph.Algorithms.ShortestPath;
 
-namespace Istu.Navigation.Domain.Services;
+namespace Istu.Navigation.Domain.Services.BuildingRoutes;
 
 public interface IRouteSearcher
 {

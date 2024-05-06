@@ -139,4 +139,10 @@ public static class ApiRoutes
         public const string RegisterPart = "register";
         public const string RefreshPart = "refresh";
     }
+    
+    public static class ExternalRoutes
+    {
+        public const string ExternalRoutesApi = Base + "/external-routes";
+        public const string CreatePart = "";
+    }
 }

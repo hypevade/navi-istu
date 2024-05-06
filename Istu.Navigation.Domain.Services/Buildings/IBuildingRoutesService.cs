@@ -1,8 +1,9 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
+using Istu.Navigation.Domain.Services.BuildingRoutes;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors;
 
-namespace Istu.Navigation.Domain.Services;
+namespace Istu.Navigation.Domain.Services.Buildings;
 
 public interface IBuildingRoutesService
 {

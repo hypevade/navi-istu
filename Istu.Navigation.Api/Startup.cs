@@ -3,7 +3,12 @@ using Istu.Navigation.Api.Middlewares;
 using Istu.Navigation.Domain.Models;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Domain.Repositories.Buildings;
+using Istu.Navigation.Domain.Repositories.Users;
 using Istu.Navigation.Domain.Services;
+using Istu.Navigation.Domain.Services.BuildingRoutes;
+using Istu.Navigation.Domain.Services.Buildings;
+using Istu.Navigation.Domain.Services.Users;
 using Istu.Navigation.Infrastructure.Common;
 using Istu.Navigation.Infrastructure.EF;
 using Istu.Navigation.Public.Models;
@@ -67,7 +72,7 @@ public class Startup
         services.AddSwaggerGen();
 
         services.AddAutoMapper(typeof(PublicMappingProfile).Assembly);
-        services.AddAutoMapper(typeof(MappingProfile).Assembly);
+        services.AddAutoMapper(typeof(DomainMappingProfile).Assembly);
 
         services.AddTransient<DbContext, AppDbContext>();
         services.AddScoped<IBuildingObjectsRepository, BuildingObjectsRepository>();

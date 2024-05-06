@@ -6,9 +6,9 @@ using Istu.Navigation.Domain.Models.Users;
 
 namespace Istu.Navigation.Domain.Models;
 
-public class MappingProfile : Profile
+public class DomainMappingProfile : Profile
 {
-    public MappingProfile()
+    public DomainMappingProfile()
     {
         CreateMap<BuildingObject, BuildingObjectEntity>();
         CreateMap<BuildingObjectEntity, BuildingObject>().ConstructUsing(x =>

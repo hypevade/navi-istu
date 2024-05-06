@@ -1,4 +1,4 @@
-﻿namespace Istu.Navigation.Domain.Models.Entities.User;
+﻿namespace Istu.Navigation.Domain.Models.Users;
 
 public enum UserRole
 {

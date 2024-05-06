@@ -2,7 +2,7 @@
 using Istu.Navigation.Domain.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace Istu.Navigation.Domain.Repositories;
+namespace Istu.Navigation.Domain.Repositories.Buildings;
 
 public interface IFloorsRepository : IRepository<FloorEntity>
 {

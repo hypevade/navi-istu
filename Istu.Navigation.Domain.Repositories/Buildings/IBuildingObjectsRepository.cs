@@ -1,11 +1,9 @@
-﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
-using Istu.Navigation.Domain.Models.Entities;
+﻿using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Base;
 using Istu.Navigation.Infrastructure.EF.Filters;
-using Istu.Navigation.Infrastructure.Errors;
 using Microsoft.EntityFrameworkCore;
 
-namespace Istu.Navigation.Domain.Repositories;
+namespace Istu.Navigation.Domain.Repositories.Buildings;
 
 public interface IBuildingObjectsRepository : IRepository<BuildingObjectEntity>
 {

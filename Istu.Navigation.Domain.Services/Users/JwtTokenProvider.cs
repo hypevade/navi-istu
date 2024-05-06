@@ -7,7 +7,7 @@ using Istu.Navigation.Infrastructure.Errors.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors.UsersApiErrors;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Istu.Navigation.Domain.Services;
+namespace Istu.Navigation.Domain.Services.Users;
 
 public abstract class JwtTokenProvider
 {

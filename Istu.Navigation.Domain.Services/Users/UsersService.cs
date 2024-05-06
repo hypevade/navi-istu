@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Domain.Models.Entities.User;
 using Istu.Navigation.Domain.Models.Users;
-using Istu.Navigation.Domain.Repositories;
+using Istu.Navigation.Domain.Repositories.Users;
 using Istu.Navigation.Infrastructure.Common;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.Errors.UsersApiErrors;
 
-namespace Istu.Navigation.Domain.Services;
+namespace Istu.Navigation.Domain.Services.Users;
 
 public interface IUsersService
 {

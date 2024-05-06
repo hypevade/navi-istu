@@ -1,4 +1,6 @@
-﻿namespace Istu.Navigation.Domain.Models.Entities.User;
+﻿using Istu.Navigation.Domain.Models.Users;
+
+namespace Istu.Navigation.Domain.Models.Entities.User;
 
 public class UserEntity : BaseEntity
 {
