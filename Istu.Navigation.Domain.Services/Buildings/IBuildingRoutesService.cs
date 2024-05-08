@@ -1,7 +1,6 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Domain.Services.BuildingRoutes;
 using Istu.Navigation.Infrastructure.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors;
 
 namespace Istu.Navigation.Domain.Services.Buildings;
 
@@ -50,7 +49,7 @@ public class BuildingRoutesService(
         if (getFloorRoutes.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getFloorRoutes.ApiError);
 
-        var getBuilding = await service.GetById(buildingId).ConfigureAwait(false);
+        var getBuilding = await service.GetByIdAsync(buildingId).ConfigureAwait(false);
         if (getBuilding.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getBuilding.ApiError);
 

@@ -12,7 +12,7 @@ public class AppDbContext : DbContext
 
     public DbSet<EdgeEntity> Edges { get; set; }
 
-    public DbSet<ImageLinkEntity> ImageLinks { get; set; }
+    public DbSet<ImageInfoEntity> Images { get; set; }
 
     public DbSet<FloorEntity> Floors { get; set; }
     
@@ -34,15 +34,16 @@ public class AppDbContext : DbContext
         ConfigureEdges(modelBuilder);
         ConfigureImageLinks(modelBuilder);
         ConfigureFloors(modelBuilder);
+        ConfigureUsers(modelBuilder);
     }
     
     private void ConfigureUsers(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserEntity>(a =>
         {
-            a.Property(x => x.Email).IsRequired();
-            a.Property(x => x.FirstName).IsRequired();
-            a.Property(x => x.LastName).IsRequired();
+            a.Property(x => x.Email).HasMaxLength(40).IsRequired();
+            a.Property(x => x.FirstName).HasMaxLength(20).IsRequired();
+            a.Property(x => x.LastName).HasMaxLength(20).IsRequired();
             a.Property(x => x.Role).IsRequired();
         });
         modelBuilder.Entity<UserEntity>().HasIndex(x => x.Email).IsUnique();
@@ -50,13 +51,12 @@ public class AppDbContext : DbContext
 
     private void ConfigureImageLinks(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ImageLinkEntity>(a =>
+        modelBuilder.Entity<ImageInfoEntity>(a =>
         {
-            a.Property(x => x.Link).IsRequired();
             a.Property(x => x.ObjectId).IsRequired();
-            a.Property(x => x.CreatedByAdmin).IsRequired();
+            a.Property(x => x.Title).HasMaxLength(20).IsRequired();
         });
-        modelBuilder.Entity<ImageLinkEntity>().HasIndex(x => new { x.ObjectId });
+        modelBuilder.Entity<ImageInfoEntity>().HasIndex(x => new { x.ObjectId });
     }
 
     private void ConfigureBuildings(ModelBuilder modelBuilder)

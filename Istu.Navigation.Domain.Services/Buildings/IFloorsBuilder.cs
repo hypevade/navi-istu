@@ -3,7 +3,7 @@ using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
 
 namespace Istu.Navigation.Domain.Services.Buildings;
 
@@ -47,7 +47,7 @@ public class FloorsBuilder : IFloorsBuilder
         var floors = new List<Floor>();
         foreach (var floorEntity in sortedFloors)
         {
-            var floor = await GetFloorByEntity(floorEntity).ConfigureAwait(false);
+            var floor = await BuildFloor(floorEntity).ConfigureAwait(false);
             if (floor.IsFailure)
             {
                 return OperationResult<List<Floor>>.Failure(floor.ApiError);
@@ -65,10 +65,10 @@ public class FloorsBuilder : IFloorsBuilder
         if (floorEntity is null)
             return OperationResult<Floor>.Failure(
                 BuildingsApiErrors.FloorWithBuildingAndFloorNumberNotFoundError(buildingId, floorNumber));
-        return await GetFloorByEntity(floorEntity).ConfigureAwait(false);
+        return await BuildFloor(floorEntity).ConfigureAwait(false);
     }
 
-    private async Task<OperationResult<Floor>> GetFloorByEntity(FloorEntity floorEntity)
+    private async Task<OperationResult<Floor>> BuildFloor(FloorEntity floorEntity)
     {
         var buildingId = floorEntity.BuildingId;
         var floorNumber = floorEntity.FloorNumber;
@@ -92,16 +92,10 @@ public class FloorsBuilder : IFloorsBuilder
         if (edges.IsFailure)
             return OperationResult<Floor>.Failure(edges.ApiError);
 
-        var images = await imageService.GetAllByObjectId(floorEntity.Id).ConfigureAwait(false);
+        var images = await imageService.GetInfosByObjectIdAsync(floorEntity.Id).ConfigureAwait(false);
         if (images.IsFailure)
             return OperationResult<Floor>.Failure(images.ApiError);
 
-        var image = images.Data.FirstOrDefault();
-        if (image is null)
-            return OperationResult<Floor>.Failure(
-                BuildingsApiErrors.ImageWithFloorIdNotFoundError(floorEntity.BuildingId, floorEntity.FloorNumber));
-
-        return OperationResult<Floor>.Success(new Floor(buildingId, floorNumber, objects.Data, edges.Data,
-            image.Link));
+        return OperationResult<Floor>.Success(new Floor(buildingId, floorNumber, objects.Data, edges.Data));
     }
 }

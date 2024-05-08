@@ -35,7 +35,7 @@ public class BuildingsController : ControllerBase
     public async Task<ActionResult<CreateBuildingResponse>> Create([FromBody] CreateBuildingRequest request)
     {
         var createOperation = await buildingsService
-            .Create(request.Title, request.Latitude, request.Longitude, request.Address,request.Description).ConfigureAwait(false);
+            .CreateAsync(request.Title, request.Latitude, request.Longitude, request.Address,request.Description).ConfigureAwait(false);
 
         return createOperation.IsSuccess
             ? Ok(new CreateBuildingResponse { BuildingId = createOperation.Data })
@@ -47,11 +47,11 @@ public class BuildingsController : ControllerBase
     public async Task<IActionResult> Update([FromBody] UpdateBuildingRequest request)
     {
         var update = await buildingsService
-            .Patch(request.Id, request.UpdatedTitle, request.UpdatedLatitude, request.UpdatedLongitude, request.UpdatedAddress,
+            .PatchAsync(request.Id, request.UpdatedTitle, request.UpdatedLatitude, request.UpdatedLongitude, request.UpdatedAddress,
                 request.UpdatedDescription)
             .ConfigureAwait(false);
         return update.IsSuccess
-            ? Accepted()
+            ? NoContent()
             : StatusCode(update.ApiError.StatusCode, update.ApiError.ToErrorDto());
     }
 
@@ -59,9 +59,9 @@ public class BuildingsController : ControllerBase
     [Route(ApiRoutes.Buildings.DeleteBuildingPart)]
     public async Task<IActionResult> Delete(Guid buildingId)
     {
-        var delete = await buildingsService.Delete(buildingId).ConfigureAwait(false);
+        var delete = await buildingsService.DeleteAsync(buildingId).ConfigureAwait(false);
         return delete.IsSuccess 
-            ? Accepted() 
+            ? NoContent() 
             : StatusCode(delete.ApiError.StatusCode, delete.ApiError.ToErrorDto());
     }
 
@@ -69,7 +69,7 @@ public class BuildingsController : ControllerBase
     [Route(ApiRoutes.Buildings.GetBuildingPart)]
     public async Task<ActionResult<BuildingDto>> GetById(Guid buildingId)
     {
-        var getBuilding = await buildingsService.GetById(buildingId).ConfigureAwait(false);
+        var getBuilding = await buildingsService.GetByIdAsync(buildingId).ConfigureAwait(false);
         return getBuilding.IsSuccess
             ? Ok(mapper.Map<BuildingDto>(getBuilding.Data))
             : StatusCode(getBuilding.ApiError.StatusCode, getBuilding.ApiError.ToErrorDto());
@@ -80,7 +80,7 @@ public class BuildingsController : ControllerBase
     public async Task<ActionResult<List<BuildingDto>>> GetAllByFilter([FromQuery] BuildingFilter filter)
     {
         var timer = Stopwatch.StartNew();
-        var getBuilding = await buildingsService.GetAllByFilter(filter).ConfigureAwait(false);
+        var getBuilding = await buildingsService.GetAllByFilterAsync(filter).ConfigureAwait(false);
         timer.Stop();
         Console.WriteLine(timer.Elapsed.Milliseconds);
         return getBuilding.IsSuccess
@@ -93,7 +93,7 @@ public class BuildingsController : ControllerBase
     public async Task<ActionResult<CreateFloorResponse>> CreateFloor(Guid buildingId,
         [FromBody] CreateFloorRequest request)
     {
-        var createOperation = await floorsService.CreateFloor(buildingId, request.ImageLink, request.FloorNumber)
+        var createOperation = await floorsService.CreateFloor(buildingId, request.FloorNumber)
             .ConfigureAwait(false);
         return createOperation.IsSuccess
             ? Ok(new CreateFloorResponse { FloorId = createOperation.Data })
@@ -106,6 +106,7 @@ public class BuildingsController : ControllerBase
     {
         var floor = await floorsBuilder.GetFloor(buildingId, floorNumber)
             .ConfigureAwait(false);
+        
         return floor.IsSuccess
             ? Ok(mapper.Map<FloorDto>(floor.Data))
             : StatusCode(floor.ApiError.StatusCode, floor.ApiError.ToErrorDto());
@@ -117,7 +118,7 @@ public class BuildingsController : ControllerBase
     {
         var deleteFloor = await floorsService.DeleteFloor(buildingId, floorNumber).ConfigureAwait(false);
         return deleteFloor.IsSuccess
-            ? Accepted()
+            ? NoContent()
             : StatusCode(deleteFloor.ApiError.StatusCode, deleteFloor.ApiError.ToErrorDto());
     }
 

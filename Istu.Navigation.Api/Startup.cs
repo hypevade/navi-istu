@@ -96,18 +96,22 @@ public class Startup
         services.AddAutoMapper(typeof(DomainMappingProfile).Assembly);
 
         services.AddTransient<DbContext, AppDbContext>();
-        services.AddScoped<IBuildingObjectsRepository, BuildingObjectsRepository>();
-        services.AddScoped<IBuildingsRepository, BuildingsRepository>();
-        services.AddScoped<IEdgesRepository, EdgesRepository>();
-        services.AddScoped<IImageRepository, ImageRepository>();
-        services.AddScoped<IFloorsRepository, FloorsRepository>();
-        services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
         services.AddScoped<IBuildingObjectsService, BuildingObjectsService>();
-        services.AddScoped<IBuildingsService, BuildingsService>();
-        services.AddScoped<IEdgesService, EdgesService>();
+        services.AddScoped<IBuildingObjectsRepository, BuildingObjectsRepository>();
+
         services.AddScoped<IImageService, ImageService>();
+        services.AddScoped<IImageStorage, ImageStorage>();
+        services.AddScoped<IImageRepository, ImageRepository>();
+
+        services.AddScoped<IBuildingsService, BuildingsService>();
+        services.AddScoped<IBuildingsRepository, BuildingsRepository>();
+
+        services.AddScoped<IEdgesRepository, EdgesRepository>();
+        services.AddScoped<IEdgesService, EdgesService>();
+
         services.AddScoped<IFloorsService, FloorsService>();
         services.AddScoped<IFloorsBuilder, FloorsBuilder>();
+        services.AddScoped<IFloorsRepository, FloorsRepository>();
 
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IUsersService, UsersService>();
@@ -115,6 +119,8 @@ public class Startup
         services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         
+        services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
+
         services.AddScoped<IRouteSearcher, RouteSearcher>();
 
         services.AddControllers().AddJsonOptions(options =>

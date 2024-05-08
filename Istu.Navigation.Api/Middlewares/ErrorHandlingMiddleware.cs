@@ -1,4 +1,4 @@
-﻿using Istu.Navigation.Infrastructure.Errors.Errors;
+﻿using Istu.Navigation.Infrastructure.Errors;
 using Newtonsoft.Json;
 
 namespace Istu.Navigation.Api.Middlewares;

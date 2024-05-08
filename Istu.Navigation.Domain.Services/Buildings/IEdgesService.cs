@@ -3,7 +3,7 @@ using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
 
 namespace Istu.Navigation.Domain.Services.Buildings;
 
@@ -18,20 +18,12 @@ public interface IEdgesService
     public Task<OperationResult> DeleteRange(List<Guid> edgeIds);
 }
 
-public class EdgesService : IEdgesService
+public class EdgesService(IEdgesRepository repository, IBuildingObjectsService objectsService)
+    : IEdgesService
 {
-    private readonly IEdgesRepository edgesRepository;
-    private readonly IBuildingObjectsService buildingObjectsService;
-
-    public EdgesService(IEdgesRepository edgesRepository, IBuildingObjectsService buildingObjectsService)
-    {
-        this.edgesRepository = edgesRepository;
-        this.buildingObjectsService = buildingObjectsService;
-    }
-
     public async Task<OperationResult<List<Edge>>> GetAllByFilter(EdgeFilter filter)
     {
-        var edgeEntities = await edgesRepository.GetAllByFilterAsync(filter).ConfigureAwait(false);
+        var edgeEntities = await repository.GetAllByFilterAsync(filter).ConfigureAwait(false);
         var edges = new List<Edge>();
         foreach (var edgeEntity in edgeEntities)
         {
@@ -47,13 +39,13 @@ public class EdgesService : IEdgesService
     //Подумать над тем как можно оптимизировать. 
     public async Task<OperationResult<Edge>> GetById(Guid edgeId)
     {
-        var edge = await edgesRepository.GetByIdAsync(edgeId).ConfigureAwait(false);
+        var edge = await repository.GetByIdAsync(edgeId).ConfigureAwait(false);
         if (edge is null)
             return OperationResult<Edge>.Failure(BuildingsErrors.EdgeWithIdNotFoundError(edgeId));
-        var getFromObj = await buildingObjectsService.GetById(edge.FromObject).ConfigureAwait(false);
+        var getFromObj = await objectsService.GetById(edge.FromObject).ConfigureAwait(false);
         if (getFromObj.IsFailure)
             return OperationResult<Edge>.Failure(getFromObj.ApiError);
-        var getToObj = await buildingObjectsService.GetById(edge.ToObject).ConfigureAwait(false);
+        var getToObj = await objectsService.GetById(edge.ToObject).ConfigureAwait(false);
         if (getToObj.IsFailure)
             return OperationResult<Edge>.Failure(getToObj.ApiError);
 
@@ -76,7 +68,7 @@ public class EdgesService : IEdgesService
         {
             var getEdgeEntity = await CheckEdgeAndGetEntity(edge.fromId, edge.toId).ConfigureAwait(false);
             
-            var existEdges = await edgesRepository
+            var existEdges = await repository
                 .GetAllByFilterAsync(new EdgeFilter { FromBuildingObjectId = edge.fromId, ToBuildingObjectId = edge.toId }).ConfigureAwait(false);
             var existEdge = existEdges.FirstOrDefault();
             if (existEdge is not null)
@@ -93,23 +85,23 @@ public class EdgesService : IEdgesService
             edgeEntities.Add(getEdgeEntity.Data);
         }
 
-        var addedEdges = await edgesRepository.AddRangeAsync(edgeEntities).ConfigureAwait(false);
-        await edgesRepository.SaveChangesAsync().ConfigureAwait(false);
+        var addedEdges = await repository.AddRangeAsync(edgeEntities).ConfigureAwait(false);
+        await repository.SaveChangesAsync().ConfigureAwait(false);
 
         return OperationResult<List<Guid>>.Success(addedEdges.Select(x => x.Id).Concat(existingEdges).ToList());
     }
 
     public async Task<OperationResult> Delete(Guid fromId, Guid toId)
     {
-        var edges = await edgesRepository.FindAsync(x =>
+        var edges = await repository.FindAsync(x =>
                 x.FromObject == fromId && x.ToObject == toId || x.FromObject == toId && x.ToObject == fromId)
             .ConfigureAwait(false);
 
         if (edges.Count == 0)
             return OperationResult.Success();
         
-        await edgesRepository.RemoveRangeAsync(edges.Select(x=>x.Id)).ConfigureAwait(false);
-        await edgesRepository.SaveChangesAsync().ConfigureAwait(false);
+        await repository.RemoveRangeAsync(edges.Select(x=>x.Id)).ConfigureAwait(false);
+        await repository.SaveChangesAsync().ConfigureAwait(false);
         return OperationResult.Success();
     }
 
@@ -120,8 +112,8 @@ public class EdgesService : IEdgesService
 
     public async Task<OperationResult> DeleteRange(List<Guid> edgeIds)
     {
-        await edgesRepository.RemoveRangeAsync(edgeIds).ConfigureAwait(false);
-        await edgesRepository.SaveChangesAsync().ConfigureAwait(false);
+        await repository.RemoveRangeAsync(edgeIds).ConfigureAwait(false);
+        await repository.SaveChangesAsync().ConfigureAwait(false);
         return OperationResult.Success();
     }
 
@@ -131,11 +123,11 @@ public class EdgesService : IEdgesService
             return OperationResult<EdgeEntity>.Failure(EdgesApiErrors.EdgeFromToSameError(fromId, toId));
         
         
-        var fromObj = await buildingObjectsService.GetById(fromId).ConfigureAwait(false);
+        var fromObj = await objectsService.GetById(fromId).ConfigureAwait(false);
         if (fromObj.IsFailure)
             return OperationResult<EdgeEntity>.Failure(fromObj.ApiError);
 
-        var toObj = await buildingObjectsService.GetById(toId).ConfigureAwait(false);
+        var toObj = await objectsService.GetById(toId).ConfigureAwait(false);
         if (toObj.IsFailure)
             return OperationResult<EdgeEntity>.Failure(toObj.ApiError);
         

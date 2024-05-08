@@ -425,3 +425,5 @@ rider.project.model.nuget.info
 
 # Ignore directory obj
 /Istu.Navigation.Api/obj/
+/Istu.Navigation.Api/wwwroot/uploads
+/.idea

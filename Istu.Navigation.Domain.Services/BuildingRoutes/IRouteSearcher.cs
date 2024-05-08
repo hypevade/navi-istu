@@ -1,7 +1,6 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Infrastructure.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
 using QuikGraph;
 using QuikGraph.Algorithms.Observers;
 using QuikGraph.Algorithms.ShortestPath;

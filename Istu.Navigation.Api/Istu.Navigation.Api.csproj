@@ -42,4 +42,9 @@
       <ProjectReference Include="..\Istu.Navigation.Public.Models\Istu.Navigation.Public.Models.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+      <Folder Include="wwwroot\uploads\" />
+    </ItemGroup>
+
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace Istu.Navigation.Infrastructure.Errors.Errors.UsersApiErrors;
+﻿namespace Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
 
 public class UsersApiErrors
 {

@@ -151,34 +151,29 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                     b.ToTable("Floors");
                 });
 
-            modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.ImageLinkEntity", b =>
+            modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.ImageInfoEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("CreatedByAdmin")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Link")
+                    b.Property<Guid?>("ObjectId")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("ObjectId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ObjectId");
 
-                    b.ToTable("ImageLinks");
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("Istu.Navigation.Domain.Models.Entities.User.UserEntity", b =>
@@ -189,11 +184,13 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("HashPassword")
                         .IsRequired()
@@ -210,7 +207,8 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("RefreshToken")
                         .HasColumnType("text");
@@ -219,6 +217,9 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });

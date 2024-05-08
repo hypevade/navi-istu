@@ -2,19 +2,16 @@
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Infrastructure.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
 
 namespace Istu.Navigation.Domain.Services.Buildings;
 
 public interface IFloorsService
-{
-    //public Task<OperationResult<FloorInfo>> GetFloorInfo(Guid buildingId, int floorNumber);
-    public Task<OperationResult<Guid>> CreateFloor(Guid buildingId, string imageLink, int? floorNumber = null);
+{ 
+    public Task<OperationResult<Guid>> CreateFloor(Guid buildingId, int? floorNumber = null);
     public Task<OperationResult> DeleteFloor(Guid buildingId, int floorNumber);
     public Task<OperationResult<List<FloorInfo>>> GetFloorInfosByBuilding(Guid buildingId);
 }
-
 
 public class FloorsService : IFloorsService
 {
@@ -57,7 +54,7 @@ public class FloorsService : IFloorsService
         return OperationResult<List<FloorInfo>>.Success(floorInfos);
     }
 
-    public async Task<OperationResult<Guid>> CreateFloor(Guid buildingId, string imageLink, int? floorNumber = null)
+    public async Task<OperationResult<Guid>> CreateFloor(Guid buildingId, int? floorNumber = null)
     {
         var checkFloor = await CheckFloor(buildingId, floorNumber).ConfigureAwait(false);
         if (checkFloor.IsFailure)
@@ -68,12 +65,11 @@ public class FloorsService : IFloorsService
             return OperationResult<Guid>.Failure(
                 BuildingsApiErrors.FloorWithBuildingAndFloorNumberAlreadyExistsError(buildingId, floorNumber.Value));
 
-
         if (floorsByBuilding.Any())
             floorNumber ??= floorsByBuilding.Max(x => x.FloorNumber) + 1;
         else
             floorNumber ??= 1;
-        
+
         var floorEntity = new FloorEntity
         {
             Id = Guid.NewGuid(),
@@ -83,29 +79,20 @@ public class FloorsService : IFloorsService
 
         await floorsRepository.AddAsync(floorEntity).ConfigureAwait(false);
         await floorsRepository.SaveChangesAsync().ConfigureAwait(false);
-        
-        var link = new ImageLink(Guid.NewGuid(), floorEntity.Id, imageLink, $"floor_{floorNumber}");
-        var createLink = await imageService.Create(link).ConfigureAwait(false);
-        if (createLink.IsFailure)
-        {
-            return createLink.ApiError.Urn == ImagesApiErrors.ImageWithEmptyLinkError().Urn
-                ? OperationResult<Guid>.Failure(createLink.ApiError)
-                : OperationResult<Guid>.Failure(CommonErrors.InternalServerError());
-        }
         return OperationResult<Guid>.Success(floorEntity.Id);
     }
 
 
     private async Task<OperationResult<FloorInfo>> GetFloorInfoByEntity(FloorEntity floorEntity)
     {
-        var images = await imageService.GetAllByObjectId(floorEntity.Id).ConfigureAwait(false);
+        var images = await imageService.GetInfosByObjectIdAsync(floorEntity.Id).ConfigureAwait(false);
         if (images.IsFailure)
             return OperationResult<FloorInfo>.Failure(images.ApiError);
         var image = images.Data.FirstOrDefault();
         if (image is null)
             return OperationResult<FloorInfo>.Failure(
                 BuildingsApiErrors.ImageWithFloorIdNotFoundError(floorEntity.BuildingId, floorEntity.FloorNumber));
-        return OperationResult<FloorInfo>.Success(new FloorInfo(floorEntity.Id, floorEntity.FloorNumber, image.Link));
+        return OperationResult<FloorInfo>.Success(new FloorInfo(floorEntity.Id, floorEntity.FloorNumber));
     }
 
     private async Task<OperationResult> CheckFloor(Guid buildingId, int? floorNumber = null)

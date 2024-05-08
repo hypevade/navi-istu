@@ -1,4 +1,4 @@
-﻿namespace Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+﻿namespace Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
 
 public class BuildingObjectsApiErrors
 {

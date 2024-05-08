@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Istu.Navigation.Infrastructure.EF;
 using Istu.Navigation.Infrastructure.EF.Filters;
-using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
 using Istu.Navigation.Public.Models.Buildings;
 using Istu.Navigation.TestClient;
 using Istu.Navigation.TestClient.SubsidiaryClients;
@@ -26,7 +26,7 @@ public class BuildingsServiceTests
     public async Task TearDown()
     {
         dbContext.Buildings.RemoveRange(dbContext.Buildings);
-        dbContext.ImageLinks.RemoveRange(dbContext.ImageLinks);
+        dbContext.Images.RemoveRange(dbContext.Images);
         await dbContext.SaveChangesAsync();
     }
 
@@ -170,37 +170,4 @@ public class BuildingsServiceTests
         getBuildingOperation.IsSuccess.Should().BeFalse();
         getBuildingOperation.ApiError.Urn.Should().BeEquivalentTo(BuildingsApiErrors.BuildingWithIdNotFoundError(buildingId).Urn);
     }
-
-    /*[TestCaseSource(nameof(TestCasesWithWrongFloorNumbers))]
-    public async Task Should_return_bad_request_when_floor_numbers_is_invalid(int[] floorNumbers)
-    {
-        var floors = TestDataGenerator.GetTestFloors(floorNumbers);
-        var testBuilding = new CreateBuildingRequest
-        {
-            Title = "TestBuilding",
-            Description = "TestDescription", 
-            Floors = floors
-        };
-        
-        var operationResult = await client.CreateBuildingAsync(testBuilding);
-        
-        operationResult.IsSuccess.Should().BeFalse();
-        
-        var error = operationResult.ApiError;
-        var expectedError = BuildingsApiErrors.WrongFloorNumberError(1, 1);
-        error.Urn.Should().BeEquivalentTo(expectedError.Urn);
-    }*/
-
-
-    /*public static IEnumerable<int[]> TestCasesWithWrongFloorNumbers
-    {
-        get
-        {
-            yield return new[] {-1 };
-            yield return new[] { 0 };
-            yield return new[] { 2 };
-            yield return new[] { 1, 3};
-            yield return new[] { 1, -1 };
-        }
-    }*/
 }

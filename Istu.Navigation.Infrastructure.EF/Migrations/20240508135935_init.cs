@@ -29,19 +29,17 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ImageLinks",
+                name: "Images",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Link = table.Column<string>(type: "text", nullable: false),
                     ObjectId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    CreatedByAdmin = table.Column<bool>(type: "boolean", nullable: false),
+                    Title = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ImageLinks", x => x.Id);
+                    table.PrimaryKey("PK_Images", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,10 +47,10 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
                     HashPassword = table.Column<string>(type: "text", nullable: false),
-                    FirstName = table.Column<string>(type: "text", nullable: false),
-                    LastName = table.Column<string>(type: "text", nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    LastName = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Role = table.Column<int>(type: "integer", nullable: false),
                     RefreshToken = table.Column<string>(type: "text", nullable: true),
                     IstuId = table.Column<string>(type: "text", nullable: true),
@@ -132,6 +130,17 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Buildings_Title",
+                table: "Buildings",
+                column: "Title",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Edges_BuildingId_ToObject_FromObject",
+                table: "Edges",
+                columns: new[] { "BuildingId", "ToObject", "FromObject" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Edges_ToObject",
                 table: "Edges",
                 column: "ToObject");
@@ -142,9 +151,20 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                 column: "BuildingId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Images_ObjectId",
+                table: "Images",
+                column: "ObjectId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Objects_BuildingId",
                 table: "Objects",
                 column: "BuildingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -157,7 +177,7 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                 name: "Floors");
 
             migrationBuilder.DropTable(
-                name: "ImageLinks");
+                name: "Images");
 
             migrationBuilder.DropTable(
                 name: "Users");

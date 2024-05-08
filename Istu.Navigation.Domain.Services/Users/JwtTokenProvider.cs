@@ -3,8 +3,7 @@ using System.Security.Claims;
 using Istu.Navigation.Domain.Models.Entities.User;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Infrastructure.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors.UsersApiErrors;
+using Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Istu.Navigation.Domain.Services.Users;

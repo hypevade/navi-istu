@@ -1,4 +1,4 @@
-﻿namespace Istu.Navigation.Infrastructure.Errors.Errors;
+﻿namespace Istu.Navigation.Infrastructure.Errors;
 
 public class CommonErrors 
 {

@@ -20,8 +20,9 @@ public static class TestDataGenerator
 
         return buildingIds;
     }
-    
-    public static async Task<List<Guid>> CreateRandomBuildingsObjects(IBuildingObjectsClient client, Guid buildingId, int count)
+
+    public static async Task<List<Guid>> CreateRandomBuildingsObjects(IBuildingObjectsClient client, Guid buildingId,
+        int count)
     {
         var requests = GenerateBuildingObjects(count, buildingId);
         var boIds = new List<Guid>();
@@ -33,15 +34,13 @@ public static class TestDataGenerator
 
         return boIds;
     }
-    
-    
 
-    public static CreateFloorRequest GetCreateFloorRequest(string? link = null, int? floorNumber = null)
+
+
+    public static CreateFloorRequest GetCreateFloorRequest(int? floorNumber = null)
     {
-        link ??= "TestLink";
         return new CreateFloorRequest
         {
-            ImageLink = link,
             FloorNumber = floorNumber
         };
     }
@@ -64,7 +63,7 @@ public static class TestDataGenerator
 
         return requests;
     }
-    
+
     public static List<CreateBuildingObjectRequest> GenerateBuildingObjects(int count, Guid buildingId)
     {
         var random = new Random();
@@ -76,8 +75,9 @@ public static class TestDataGenerator
 
         return GenerateBuildingObjects(points, buildingId);
     }
-    
-    public static List<CreateBuildingObjectRequest> GenerateBuildingObjects(List<(double X, double Y)> points, Guid buildingId)
+
+    public static List<CreateBuildingObjectRequest> GenerateBuildingObjects(List<(double X, double Y)> points,
+        Guid buildingId)
     {
 
         return points.Select((point, i) => new CreateBuildingObjectRequest()
@@ -95,13 +95,14 @@ public static class TestDataGenerator
     public static string GetRandomString(int length)
     {
         if (length < 1) return "";
-        var r = new Random();  
+        var r = new Random();
         var s = new StringBuilder();
         for (var i = 0; i < length; i++)
         {
             char a = (char)r.Next(0, 255);
             s.Append(a);
         }
+
         return s.ToString();
     }
 }

@@ -5,6 +5,8 @@ public static class ApiRoutes
     public const string Root = "api";
     public const string Version = "v1";
     public const string Base = Root + "/" + Version;
+    public const string Test = Base + "/test";
+    
     
     public static class Buildings
     {
@@ -138,6 +140,13 @@ public static class ApiRoutes
         public const string LoginPart = "login";
         public const string RegisterPart = "register";
         public const string RefreshPart = "refresh";
+    }
+    
+    public static class Images
+    {
+        public const string ImagesApi = Base + "/images";
+        public const string UploadPart = "upload/{objectId}";
+        public const string DownloadPart = "download/{imageId}";
     }
     
     public static class ExternalRoutes

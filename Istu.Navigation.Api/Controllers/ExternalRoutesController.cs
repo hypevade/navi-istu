@@ -7,7 +7,6 @@ using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Domain.Services.ExternalRoutes;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors;
 using Istu.Navigation.Infrastructure.Errors.ExternalRoutesApiErrors;
 using Istu.Navigation.Public.Models.ExternalRoutes;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +25,7 @@ public class ExternalRoutesController(
     [Route(ApiRoutes.ExternalRoutes.CreatePart)]
     public async Task<ActionResult<ExternalRouteResponse>> FindRoute([FromBody] ExternalRouteRequest request)
     {
-        var getOperation = await buildingsService.GetBuildingCoordinates(request.BuildingId).ConfigureAwait(false);
+        var getOperation = await buildingsService.GetBuildingCoordinatesAsync(request.BuildingId).ConfigureAwait(false);
         if (getOperation.IsFailure)
         {
             var apiError = getOperation.ApiError;

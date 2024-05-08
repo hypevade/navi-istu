@@ -61,7 +61,7 @@ public class EdgesController : ControllerBase
         var deleteRangeOperation = await edgesService.Delete(edgeId).ConfigureAwait(false);
 
         return deleteRangeOperation.IsSuccess
-            ? Accepted()
+            ? NoContent()
             : StatusCode(deleteRangeOperation.ApiError.StatusCode, deleteRangeOperation.ApiError.ToErrorDto());
     }
 }

@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Istu.Navigation.Infrastructure.EF;
-using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
 using Istu.Navigation.Public.Models.Buildings;
 using Istu.Navigation.TestClient;
 using Istu.Navigation.TestClient.SubsidiaryClients;
@@ -35,7 +35,7 @@ public class FloorsServiceTests
         var floor = await client.AddFloorAsync(buildingDto.Id, createFloorRequest).ConfigureAwait(false);
         floor.IsSuccess.Should().BeTrue();
 
-        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, createFloorRequest.ImageLink, floorNumber);
+        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, floorNumber);
     }
 
     [Test]
@@ -46,12 +46,11 @@ public class FloorsServiceTests
         var floor = await client.AddFloorAsync(buildingDto.Id, createFloorRequest).ConfigureAwait(false);
         floor.IsSuccess.Should().BeTrue();
 
-        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, createFloorRequest.ImageLink, floorNumber);
+        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, floorNumber);
         var get = await client.GetFloorAsync(buildingDto.Id, floorNumber).ConfigureAwait(false);
         get.IsSuccess.Should().BeTrue();
         var floorDto = get.Data;
         floorDto.FloorNumber.Should().Be(floorNumber);
-        floorDto.ImageLink.Should().Be(createFloorRequest.ImageLink);
         floorDto.Edges.Should().BeEmpty();
         floorDto.Objects.Should().BeEmpty();
     }
@@ -64,7 +63,7 @@ public class FloorsServiceTests
         var floor = await client.AddFloorAsync(buildingDto.Id, createFloorRequest).ConfigureAwait(false);
         floor.IsSuccess.Should().BeTrue();
 
-        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, createFloorRequest.ImageLink, floorNumber);
+        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, floorNumber);
         var get = await client.GetFloorAsync(buildingDto.Id, 2).ConfigureAwait(false);
         get.IsSuccess.Should().BeFalse();
         var error = get.ApiError;
@@ -81,7 +80,7 @@ public class FloorsServiceTests
         var floor = await client.AddFloorAsync(buildingDto.Id, createFloorRequest).ConfigureAwait(false);
         floor.IsSuccess.Should().BeTrue();
 
-        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, createFloorRequest.ImageLink, floorNumber);
+        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, floorNumber);
         var delete = await client.DeleteFloorAsync(buildingDto.Id, floorNumber).ConfigureAwait(false);
         delete.IsSuccess.Should().BeTrue();
 
@@ -104,9 +103,9 @@ public class FloorsServiceTests
 
         var floor = await client.AddFloorAsync(buildingDto.Id, createFloorRequest).ConfigureAwait(false);
         floor.IsSuccess.Should().BeTrue();
-        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, createFloorRequest.ImageLink, 1);
+        await ShouldCreateFloor(buildingDto.Id, floor.Data.FloorId, 1);
     }
-    
+
     [TestCase(0)]
     [TestCase(-1)]
     [TestCase(int.MinValue)]
@@ -130,19 +129,8 @@ public class FloorsServiceTests
         var floor2 = await client.AddFloorAsync(buildingDto.Id, createFloorRequest2).ConfigureAwait(false);
 
         floor1.IsSuccess.Should().BeTrue();
-        await ShouldCreateFloor(buildingDto.Id, floor1.Data.FloorId, createFloorRequest1.ImageLink, 1);
-        await ShouldCreateFloor(buildingDto.Id, floor2.Data.FloorId, createFloorRequest2.ImageLink, 2);
-    }
-
-    [TestCase("")]
-    [TestCase(" ")]
-    [TestCase(" \n ")]
-    public async Task CreateFloor_Should_return_error_when_link_is_invalid(string invalidLink)
-    {
-        var createFloorRequest = TestDataGenerator.GetCreateFloorRequest(link: invalidLink);
-        var floor = await client.AddFloorAsync(buildingDto.Id, createFloorRequest).ConfigureAwait(false);
-        floor.IsSuccess.Should().BeFalse();
-        floor.ApiError.Urn.Should().Be(ImagesApiErrors.ImageWithEmptyLinkError().Urn);
+        await ShouldCreateFloor(buildingDto.Id, floor1.Data.FloorId, 1);
+        await ShouldCreateFloor(buildingDto.Id, floor2.Data.FloorId, 2);
     }
 
     [Test]
@@ -155,25 +143,20 @@ public class FloorsServiceTests
         floor.ApiError.Should().BeEquivalentTo(BuildingsApiErrors.BuildingWithIdNotFoundError(fakeBuildingId));
     }
 
-    private async Task ShouldCreateFloor(Guid buildingId, Guid floorId, string imageLink, int floorNumber)
+    private async Task ShouldCreateFloor(Guid buildingId, Guid floorId, int floorNumber)
     {
         var floorEntity = await dbContext.Floors.FirstOrDefaultAsync(x => x.Id == floorId);
         floorEntity.Should().NotBeNull();
 
         floorEntity?.BuildingId.Should().Be(buildingId);
         floorEntity?.FloorNumber.Should().Be(floorNumber);
-
-        var image = await dbContext.ImageLinks.FirstOrDefaultAsync(x => x.ObjectId == floorId)
-            .ConfigureAwait(false);
-        image.Should().NotBeNull();
-        image?.Link.Should().Be(imageLink);
     }
 
     [TearDown]
     public async Task TearDown()
     {
         dbContext.Floors.RemoveRange(dbContext.Floors);
-        dbContext.ImageLinks.RemoveRange(dbContext.ImageLinks);
+        dbContext.Images.RemoveRange(dbContext.Images);
         await dbContext.SaveChangesAsync();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Istu.Navigation.Infrastructure.EF;
 using Istu.Navigation.Infrastructure.EF.Filters;
-using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
 using Istu.Navigation.Public.Models;
 using Istu.Navigation.Public.Models.Buildings;
 using Istu.Navigation.TestClient;

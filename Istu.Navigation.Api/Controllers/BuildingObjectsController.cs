@@ -96,6 +96,6 @@ public class BuildingObjectsController : ControllerBase
             return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
         }
 
-        return Accepted();
+        return NoContent();
     }
 }

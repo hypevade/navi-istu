@@ -16,8 +16,8 @@ public class DomainMappingProfile : Profile
         CreateMap<BuildingEntity, Building>();
         CreateMap<Building, BuildingEntity>();
         
-        CreateMap<ImageLink, ImageLinkEntity>();
-        CreateMap<ImageLinkEntity, ImageLink>();
+        CreateMap<ImageInfo, ImageInfoEntity>();
+        CreateMap<ImageInfoEntity, ImageInfo>();
         CreateMap<User, UserEntity>();
         CreateMap<UserEntity, User>();
     }

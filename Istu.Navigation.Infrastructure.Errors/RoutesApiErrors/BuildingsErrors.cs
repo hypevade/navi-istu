@@ -1,6 +1,4 @@
-﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
-
-namespace Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+﻿namespace Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
 
 public class BuildingsErrors : ErrorBase
 {
@@ -59,12 +57,6 @@ public class BuildingsErrors : ErrorBase
     {
         return new ApiError(404, $"Этаж '{floorNumber}' в здании с идентификатором '{buildingId}' не найден.",
             GetUrn("floor-with-building-id-and-floor-number-not-found"));
-    }
-    
-    public static ApiError ImageWithIdNotFoundError(Guid imageId)
-    {
-        return new ApiError(404, $"Изображение с идентификатором '{imageId}' не найдено.",
-            GetUrn("image-with-id-not-found"));
     }
     
     public static ApiError ImageWithFloorIdNotFoundError(Guid buildingId, int floorNumber)

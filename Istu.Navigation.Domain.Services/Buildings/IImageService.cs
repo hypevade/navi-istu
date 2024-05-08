@@ -4,85 +4,71 @@ using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
-using Istu.Navigation.Infrastructure.Errors.Errors.RoutesApiErrors;
+using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
+using Microsoft.AspNetCore.Http;
+using FileInfo = Istu.Navigation.Domain.Models.BuildingRoutes.FileInfo;
+
 
 namespace Istu.Navigation.Domain.Services.Buildings;
 public interface IImageService
 {
-    public Task<OperationResult<ImageLink>> GetById(Guid imageId);
-    public Task<OperationResult<List<ImageLink>>> GetAllByFilter(ImageFilter filter);
-    public Task<OperationResult<List<ImageLink>>> GetAllByObjectId(Guid objectId);
-    public Task<OperationResult<Guid>> Create(ImageLink image);
-    public Task<OperationResult<List<Guid>>> CreateRange(List<ImageLink> image);
-    public Task<OperationResult> Delete(Guid imageId);
+    public Task<OperationResult<Guid>> CreateAsync(IFormFile file, Guid objectId);
+    public Task<OperationResult<FileInfo>> GetImageByIdAsync(Guid imageId);
+    public Task<OperationResult<List<ImageInfo>>> GetInfosByFilterAsync(ImageFilter filter);
+    public Task<OperationResult<List<ImageInfo>>> GetInfosByObjectIdAsync(Guid objectId);
+    public Task<OperationResult> DeleteAsync(Guid imageId);
 }
 
-public class ImageService : IImageService
+public class ImageService(IImageRepository repository, IImageStorage storage, IMapper mapper) : IImageService
 {
-    private readonly IImageRepository imageRepository;
-    private readonly IMapper mapper;
-
-    public ImageService(IImageRepository imageRepository, IMapper mapper)
+    public async Task<OperationResult<FileInfo>> GetImageByIdAsync(Guid imageId)
     {
-        this.imageRepository = imageRepository;
-        this.mapper = mapper;
-    }
-
-    public async Task<OperationResult<ImageLink>> GetById(Guid imageId)
-    {
-        var image = await imageRepository.GetByIdAsync(imageId).ConfigureAwait(false);
+        var image = await repository.GetByIdAsync(imageId).ConfigureAwait(false);
         if (image is null)
-            return OperationResult<ImageLink>.Failure(BuildingsErrors.ImageWithIdNotFoundError(imageId));
-        return OperationResult<ImageLink>.Success(mapper.Map<ImageLink>(image));
+            return OperationResult<FileInfo>.Failure(ImagesApiErrors.ImageWithIdNotFoundError(imageId));
+        return await storage.DownloadAsync(image.Title).ConfigureAwait(false);
     }
 
-    public async Task<OperationResult<List<ImageLink>>> GetAllByFilter(ImageFilter filter)
+    public async Task<OperationResult<List<ImageInfo>>> GetInfosByFilterAsync(ImageFilter filter)
     {
-        var images = await imageRepository.GetAllByFilterAsync(filter).ConfigureAwait(false);
-        return OperationResult<List<ImageLink>>.Success(mapper.Map<List<ImageLink>>(images));
+        var images = await repository.GetAllByFilterAsync(filter).ConfigureAwait(false);
+        return OperationResult<List<ImageInfo>>.Success(mapper.Map<List<ImageInfo>>(images));
     }
 
-    public async Task<OperationResult<List<ImageLink>>> GetAllByObjectId(Guid objectId)
+    public async Task<OperationResult<List<ImageInfo>>> GetInfosByObjectIdAsync(Guid objectId)
     {
-        var images = await imageRepository.GetAllByObjectId(objectId).ConfigureAwait(false);
-        return OperationResult<List<ImageLink>>.Success(mapper.Map<List<ImageLink>>(images));
-    }
-    
-    public async Task<OperationResult<ImageLink>> GetByFloorId(Guid buildingId, int floorNumber)
-    {
-        var res = await imageRepository.FindAsync(x => x.ObjectId == buildingId && x.Title == "floor_" + floorNumber);
-        if (res.Count == 0)
-            return OperationResult<ImageLink>.Failure(
-                BuildingsErrors.ImageWithFloorIdNotFoundError(buildingId, floorNumber));
-
-        return OperationResult<ImageLink>.Success(mapper.Map<ImageLink>(res.First()));
-        
+        var images = await repository.GetAllByObjectId(objectId).ConfigureAwait(false);
+        return OperationResult<List<ImageInfo>>.Success(mapper.Map<List<ImageInfo>>(images));
     }
 
-    public async Task<OperationResult<Guid>> Create(ImageLink image)
+    public async Task<OperationResult<Guid>> CreateAsync(IFormFile file, Guid objectId)
     {
-        if(string.IsNullOrEmpty(image.Link.Trim()))
-            return OperationResult<Guid>.Failure(ImagesApiErrors.ImageWithEmptyLinkError());
-        var imageEntity = mapper.Map<ImageLinkEntity>(image);
-        var linkEntity = await imageRepository.AddAsync(imageEntity).ConfigureAwait(false);
-        await imageRepository.SaveChangesAsync().ConfigureAwait(false);
-        return OperationResult<Guid>.Success(linkEntity.Id);
+        var imageId = Guid.NewGuid();
+        var filename = CreateUniqueFileName(file.FileName, imageId);
+        var image = new ImageInfoEntity
+        {
+            Id = imageId,
+            Title = filename,
+            ObjectId = objectId
+        };
+        var addAsync = await repository.AddAsync(image).ConfigureAwait(false);
+        await repository.SaveChangesAsync().ConfigureAwait(false);
+        var uploadOperation = await storage.UploadAsync(file, filename).ConfigureAwait(false);
+        return uploadOperation.IsSuccess
+            ? OperationResult<Guid>.Success(addAsync.Id)
+            : OperationResult<Guid>.Failure(uploadOperation.ApiError);
     }
 
-    public async Task<OperationResult<List<Guid>>> CreateRange(List<ImageLink> images)
+    private string CreateUniqueFileName(string originalFileName, Guid id)
     {
-        var imageEntities = mapper.Map<List<ImageLinkEntity>>(images);
-        var linkEntities = await imageRepository.AddRangeAsync(imageEntities).ConfigureAwait(false);
-        await imageRepository.SaveChangesAsync().ConfigureAwait(false);
-        
-        var linkIds = linkEntities.Select(x => x.Id).ToList();
-        return OperationResult<List<Guid>>.Success(linkIds);
+        var extension = Path.GetExtension(originalFileName);
+        return $"{id}{extension}";
     }
 
-    public async Task<OperationResult> Delete(Guid imageId)
+    public async Task<OperationResult> DeleteAsync(Guid imageId)
     {
-        await imageRepository.RemoveByIdAsync(imageId).ConfigureAwait(false);
-        await imageRepository.SaveChangesAsync().ConfigureAwait(false);
+        await repository.RemoveByIdAsync(imageId).ConfigureAwait(false);
+        await repository.SaveChangesAsync().ConfigureAwait(false);
         return OperationResult.Success();
     }
 }
