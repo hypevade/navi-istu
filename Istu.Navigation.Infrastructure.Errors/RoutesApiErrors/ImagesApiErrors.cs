@@ -27,9 +27,10 @@ public class ImagesApiErrors
         return new ApiError(400, $"Изображение не найдено.",
             GetUrn("image-not-found"));
     }
-    public static ApiError NotImageFileError()
+    public static ApiError NotImageFileError(string[] imageMimeTypes)
     {
-        return new ApiError(400, $"Переданный файл не является изображением.",
+        return new ApiError(400,
+            $"Переданный файл не является изображением. Поддерживаемые типы: {string.Join(", ", imageMimeTypes)}.",
             GetUrn("not-image-file"));
     }
 }

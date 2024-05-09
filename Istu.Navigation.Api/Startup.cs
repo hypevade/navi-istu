@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Middlewares;
 using Istu.Navigation.Domain.Models;
 using Istu.Navigation.Domain.Models.ExternalRoutes;
@@ -100,7 +101,7 @@ public class Startup
         services.AddScoped<IBuildingObjectsRepository, BuildingObjectsRepository>();
 
         services.AddScoped<IImageService, ImageService>();
-        services.AddScoped<IImageStorage, ImageStorage>();
+        services.AddScoped<IFileStorage, FileStorage>();
         services.AddScoped<IImageRepository, ImageRepository>();
 
         services.AddScoped<IBuildingsService, BuildingsService>();
@@ -126,6 +127,10 @@ public class Startup
         services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.PropertyNamingPolicy = null;
+        });
+        services.AddControllers(options =>
+        {
+            options.Filters.Add<ValidationModelErrorWrapFilter>(-2001);
         });
     }
 

@@ -19,8 +19,9 @@ public interface IImageService
     public Task<OperationResult> DeleteAsync(Guid imageId);
 }
 
-public class ImageService(IImageRepository repository, IImageStorage storage, IMapper mapper) : IImageService
+public class ImageService(IImageRepository repository, IFileStorage storage, IMapper mapper) : IImageService
 {
+    private readonly string[] imageMimeTypes = { "image/jpeg", "image/jpg", "image/png", "image/bmp" };
     public async Task<OperationResult<FileInfo>> GetImageByIdAsync(Guid imageId)
     {
         var image = await repository.GetByIdAsync(imageId).ConfigureAwait(false);
@@ -43,6 +44,8 @@ public class ImageService(IImageRepository repository, IImageStorage storage, IM
 
     public async Task<OperationResult<Guid>> CreateAsync(IFormFile file, Guid objectId)
     {
+        if (!imageMimeTypes.Contains(file.ContentType))
+            return OperationResult<Guid>.Failure(ImagesApiErrors.NotImageFileError(imageMimeTypes));
         var imageId = Guid.NewGuid();
         var filename = CreateUniqueFileName(file.FileName, imageId);
         var image = new ImageInfoEntity
@@ -53,6 +56,7 @@ public class ImageService(IImageRepository repository, IImageStorage storage, IM
         };
         var addAsync = await repository.AddAsync(image).ConfigureAwait(false);
         await repository.SaveChangesAsync().ConfigureAwait(false);
+        
         var uploadOperation = await storage.UploadAsync(file, filename).ConfigureAwait(false);
         return uploadOperation.IsSuccess
             ? OperationResult<Guid>.Success(addAsync.Id)

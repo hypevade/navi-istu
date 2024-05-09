@@ -1,4 +1,5 @@
 using Istu.Navigation.Api.Extensions;
+using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Services.Buildings;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +11,8 @@ namespace Istu.Navigation.Api.Controllers;
 public class ImagesController(IImageService imageService) : ControllerBase
 {
 
+    [MaxFileSize(10485760)]
     [HttpPost(ApiRoutes.Images.UploadPart)]
-    
     public async Task<ActionResult<Guid>> Create(IFormFile file, Guid objectId)
     {
         var uploadOperation = await imageService.CreateAsync(file, objectId).ConfigureAwait(false);

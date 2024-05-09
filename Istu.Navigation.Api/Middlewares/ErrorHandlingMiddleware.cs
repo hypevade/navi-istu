@@ -3,22 +3,15 @@ using Newtonsoft.Json;
 
 namespace Istu.Navigation.Api.Middlewares;
 
-public class ErrorHandlingMiddleware
+public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
 {
-    private readonly RequestDelegate next;
-    private readonly ILogger<ErrorHandlingMiddleware> logger;
-
-    public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
-    {
-        this.next = next;
-        this.logger = logger;
-    }
+    private readonly RequestDelegate next = next;
+    private readonly ILogger<ErrorHandlingMiddleware> logger = logger;
 
     public async Task Invoke(HttpContext context)
     {
         try
         {
-            
             await next(context);
         }
         catch (Exception ex)
