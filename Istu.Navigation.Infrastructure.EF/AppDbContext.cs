@@ -41,9 +41,9 @@ public class AppDbContext : DbContext
     {
         modelBuilder.Entity<UserEntity>(a =>
         {
-            a.Property(x => x.Email).HasMaxLength(40).IsRequired();
-            a.Property(x => x.FirstName).HasMaxLength(20).IsRequired();
-            a.Property(x => x.LastName).HasMaxLength(20).IsRequired();
+            a.Property(x => x.Email).HasMaxLength(100).IsRequired();
+            a.Property(x => x.FirstName).HasMaxLength(100).IsRequired();
+            a.Property(x => x.LastName).HasMaxLength(100).IsRequired();
             a.Property(x => x.Role).IsRequired();
         });
         modelBuilder.Entity<UserEntity>().HasIndex(x => x.Email).IsUnique();
@@ -54,7 +54,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ImageInfoEntity>(a =>
         {
             a.Property(x => x.ObjectId).IsRequired();
-            a.Property(x => x.Title).HasMaxLength(20).IsRequired();
+            a.Property(x => x.Title).HasMaxLength(100).IsRequired();
         });
         modelBuilder.Entity<ImageInfoEntity>().HasIndex(x => new { x.ObjectId });
     }
