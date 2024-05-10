@@ -1,0 +1,14 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Istu.Navigation.Public.Models.Buildings;
+
+public class CreateBuildingRequest
+{
+    [Required]
+    public required string Title { get; set; }
+    
+    public required string Address { get; set; }
+    public string? Description { get; set; }
+    public required double Latitude { get; set; }
+    public required double Longitude { get; set; }
+}

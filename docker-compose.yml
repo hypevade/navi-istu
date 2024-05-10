@@ -1,0 +1,42 @@
+version: '3.4'
+services:
+  
+  postgres:
+    image: postgres.latest
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: main
+    expose:
+      - 5432
+    networks:
+      - back
+    restart: always
+    volumes:
+      - postgres:/var/lib/postgresql
+
+  navi-app:
+    build: 
+      context: ${BACKEND_SRC_DIR}
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      ConnectionStrings__TestDataBase: Host=localhost;Port=5432;Database=main;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      ASPNETCORE_ENVIRONMENT: Production
+      JwtOptions__PrivateKey: ${JwtOptions__PrivateKey}
+    volumes:
+      - /var/www/myapp:Istu.Navigation.Api/wwwroot
+    networks:
+      - back
+      - reverse-proxy
+
+networks:
+  back:
+    driver: bridge
+  reverse-proxy:
+    external: 
+      name: reverse-proxy
+
+volumes:
+  postgres:
