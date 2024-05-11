@@ -138,11 +138,13 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseSwagger();
-        if (env.IsDevelopment())
-        {
+        
+        //TODO: отключить свагер UI для прода
+        /*if (env.IsDevelopment())
+        {*/
             app.UseDeveloperExceptionPage();
             app.UseSwaggerUI();
-        }
+        /*}*/
 
         using var scope = app.ApplicationServices.CreateScope();
 
