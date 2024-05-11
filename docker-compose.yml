@@ -20,15 +20,15 @@ services:
   navi-app:
     build: 
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Istu.Navigation.Api/Dockerfile
     depends_on:
       - postgres
     environment:
-      ConnectionStrings__TestDataBase: Server=postgres;Port=5432;Database=main;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      ASPNETCORE_ENVIRONMENT: Production
-      JwtOptions__PrivateKey: ${JwtOptions__PrivateKey}
+      ConnectionStrings__TestDataBase: Server=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT}
+      JwtOptions__PrivateKey: ${JWT_PRIVATE_KEY}
     volumes:
-      - ${BACKEND_WWWROOT}:/app/wwwroot 
+      - ${BACKEND_STORAGE}:/app/Storage 
       
     ports:
       - 8080:8080

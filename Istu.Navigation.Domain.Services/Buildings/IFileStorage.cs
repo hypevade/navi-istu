@@ -18,7 +18,7 @@ public class FileStorage : IFileStorage
     
     public FileStorage(IWebHostEnvironment env)
     {
-        storagePath = Path.Combine(env.WebRootPath, "uploads");
+        storagePath = Path.Combine(env.ContentRootPath, "Storage");
         if (!Directory.Exists(storagePath))
             Directory.CreateDirectory(storagePath);
     }
