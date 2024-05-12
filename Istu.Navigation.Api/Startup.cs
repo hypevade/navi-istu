@@ -132,6 +132,7 @@ public class Startup
         {
             options.Filters.Add<ValidationModelErrorWrapFilter>(-2001);
         });
+        services.AddHttpClient();
     }
 
 
