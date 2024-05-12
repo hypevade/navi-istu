@@ -88,7 +88,7 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     BuildingId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Title = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     Floor = table.Column<int>(type: "integer", nullable: false),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     Type = table.Column<int>(type: "integer", nullable: false),

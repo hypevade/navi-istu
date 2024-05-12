@@ -79,7 +79,6 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 

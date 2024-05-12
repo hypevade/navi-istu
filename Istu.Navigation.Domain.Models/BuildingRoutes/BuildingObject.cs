@@ -2,7 +2,7 @@
 
 public class BuildingObject
 {
-    public BuildingObject(Guid id, Guid buildingId, string title, int floor, BuildingObjectType type, double x, double y, string? description = null)
+    public BuildingObject(Guid id, Guid buildingId, int floor, BuildingObjectType type, double x, double y, string? title, string? description = null)
     {
         Id = id;
         BuildingId = buildingId;
@@ -18,7 +18,7 @@ public class BuildingObject
 
     public Guid BuildingId { get; init; }
 
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     public string? Description { get; set; }
 

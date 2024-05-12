@@ -12,20 +12,15 @@ namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
 [Route(ApiRoutes.BuildingObjects.BuildingsObjectsApi)]
-
-//Добавить методы Update и Delete для объектов и delete для ребер
-
 public class BuildingObjectsController : ControllerBase
 {
     private readonly IBuildingObjectsService buildingObjectsService;
-    private readonly IEdgesService edgesService;
     private readonly IMapper mapper;
 
-    public BuildingObjectsController(IBuildingObjectsService buildingObjectsService, IMapper mapper, IEdgesService edgesService)
+    public BuildingObjectsController(IBuildingObjectsService buildingObjectsService, IMapper mapper)
     {
         this.buildingObjectsService = buildingObjectsService;
         this.mapper = mapper;
-        this.edgesService = edgesService;
     }
     
     [HttpPatch]
@@ -43,7 +38,7 @@ public class BuildingObjectsController : ControllerBase
     {
         var buildingObject = request.ToBuildingObject(Guid.NewGuid());
 
-        var createOperation = await buildingObjectsService.CreateRange(buildingObject);
+        var createOperation = await buildingObjectsService.Create(buildingObject);
 
         if (createOperation.IsFailure)
         {

@@ -1,4 +1,6 @@
-﻿namespace Istu.Navigation.Public.Models.Users;
+﻿using Istu.Navigation.Domain.Models.Users;
+
+namespace Istu.Navigation.Public.Models.Users;
 
 public class UserDto
 {
@@ -6,5 +8,5 @@ public class UserDto
     public required string Email { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
-    //public UserRole Role { get; set; }
+    public UserRole Role { get; set; }
 }

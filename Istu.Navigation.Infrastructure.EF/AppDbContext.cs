@@ -76,7 +76,7 @@ public class AppDbContext : DbContext
     {
         modelBuilder.Entity<BuildingObjectEntity>(a =>
         {
-            a.Property(x => x.Title).HasMaxLength(100).IsRequired();
+            a.Property(x => x.Title).HasMaxLength(100);
             a.Property(x => x.Description).HasMaxLength(1000);
             a.Property(x => x.Floor).IsRequired();
             a.Property(x => x.Type).IsRequired();

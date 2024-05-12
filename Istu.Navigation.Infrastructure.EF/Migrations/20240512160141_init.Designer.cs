@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Istu.Navigation.Infrastructure.EF.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240509120628_init")]
+    [Migration("20240512160141_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -82,7 +82,6 @@ namespace Istu.Navigation.Infrastructure.EF.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 

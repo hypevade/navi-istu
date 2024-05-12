@@ -10,12 +10,9 @@ public interface IBuildingObjectsRepository : IRepository<BuildingObjectEntity>
     public Task<List<BuildingObjectEntity>> GetAllByFilterAsync(BuildingObjectFilter filter);
 }
 
-public class BuildingObjectsRepository : Repository<BuildingObjectEntity>, IBuildingObjectsRepository
+public class BuildingObjectsRepository(DbContext context)
+    : Repository<BuildingObjectEntity>(context), IBuildingObjectsRepository
 {
-    public BuildingObjectsRepository(DbContext context) : base(context)
-    {
-    }
-
     public Task<List<BuildingObjectEntity>> GetAllByFilterAsync(BuildingObjectFilter filter)
     {
         var query = DbSet.AsQueryable();

@@ -10,8 +10,7 @@ namespace Istu.Navigation.Domain.Services.Buildings;
 
 public interface IBuildingObjectsService
 {
-    public Task<OperationResult<List<Guid>>> CreateRange(List<BuildingObject> buildingObjects);
-    public Task<OperationResult<Guid>> CreateRange(BuildingObject buildingObject);
+    public Task<OperationResult<Guid>> Create(BuildingObject buildingObject);
     public Task<OperationResult> Patch(List<BuildingObject> buildingObjects);
     public Task<OperationResult> Delete(List<Guid> buildingObjectsIds);
     public Task<OperationResult<BuildingObject>> GetById(Guid id);
@@ -32,29 +31,15 @@ public class BuildingObjectsService : IBuildingObjectsService
         this.buildingsRepository = buildingsRepository;
     }
 
-    public async Task<OperationResult<List<Guid>>> CreateRange(List<BuildingObject> buildingObjects)
+    public async Task<OperationResult<Guid>> Create(BuildingObject buildingObject)
     {
-        foreach (var buildingObject in buildingObjects)
-        {
-            var check = await CheckBuildingObject(buildingObject).ConfigureAwait(false);
-            if (check.IsFailure)
-                return OperationResult<List<Guid>>.Failure(check.ApiError);
-        }
-
-        var buildingObjectsEntity = mapper.Map<List<BuildingObjectEntity>>(buildingObjects);
-        var buildingObjectsAdded =
-            await buildingObjectsRepository.AddRangeAsync(buildingObjectsEntity).ConfigureAwait(false);
+        var check = await CheckBuildingObject(buildingObject).ConfigureAwait(false);
+        if (check.IsFailure)
+            return OperationResult<Guid>.Failure(check.ApiError);
+        var entity = mapper.Map<BuildingObjectEntity>(buildingObject);
+        var result = await buildingObjectsRepository.AddAsync(entity).ConfigureAwait(false);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
-
-        return OperationResult<List<Guid>>.Success(buildingObjectsAdded.Select(x => x.Id).ToList());
-    }
-
-    public async Task<OperationResult<Guid>> CreateRange(BuildingObject buildingObject)
-    {
-        var result = await CreateRange([buildingObject]).ConfigureAwait(false);
-        return result.IsSuccess
-            ? OperationResult<Guid>.Success(result.Data.First())
-            : OperationResult<Guid>.Failure(result.ApiError);
+        return OperationResult<Guid>.Success(result.Id);
     }
 
     public async Task<OperationResult> Patch(List<BuildingObject> buildingObjects)
@@ -103,22 +88,11 @@ public class BuildingObjectsService : IBuildingObjectsService
         if (!checkY || !checkX)
             return OperationResult.Failure(
                 BuildingObjectsApiErrors.InvalidCoordinatesError(buildingObject.X, buildingObject.Y));
-        if (string.IsNullOrWhiteSpace(buildingObject.Title))
-            return OperationResult.Failure(CommonErrors.EmptyTitleError());
 
         var getBuilding = await buildingsRepository.GetByIdAsync(buildingObject.BuildingId).ConfigureAwait(false);
         if (getBuilding is null)
             return OperationResult.Failure(BuildingsApiErrors.BuildingWithIdNotFoundError(buildingObject.BuildingId));
-
-        if (!checkExist)
-            return OperationResult.Success();
-
-        var isExist =
-            await buildingObjectsRepository.GetByIdAsync(buildingObject.BuildingId).ConfigureAwait(false) is null;
-
-        return isExist
-            ? OperationResult.Success()
-            : OperationResult.Failure(
-                BuildingObjectsApiErrors.BuildingObjectAlreadyExistsError(buildingObject.BuildingId));
+        
+        return OperationResult.Success();
     }
 }
