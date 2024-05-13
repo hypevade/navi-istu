@@ -15,15 +15,12 @@ public interface IFloorsService
 
 public class FloorsService : IFloorsService
 {
-    private readonly IImageService imageService;
     private readonly IBuildingsRepository buildingsRepository;
     private readonly IFloorsRepository floorsRepository;
 
-    public FloorsService(IImageService imageService,
-        IFloorsRepository floorsRepository,
+    public FloorsService(IFloorsRepository floorsRepository,
         IBuildingsRepository buildingsRepository)
     {
-        this.imageService = imageService;
         this.floorsRepository = floorsRepository;
         this.buildingsRepository = buildingsRepository;
     }
@@ -42,16 +39,9 @@ public class FloorsService : IFloorsService
     public async Task<OperationResult<List<FloorInfo>>> GetFloorInfosByBuilding(Guid buildingId)
     {
         var floors = await floorsRepository.GetAllByBuildingIdAsync(buildingId).ConfigureAwait(false);
-        var floorInfos = new List<FloorInfo>();
-        foreach (var floorEntity in floors)
-        {
-            var getFloorInfo = await GetFloorInfoByEntity(floorEntity).ConfigureAwait(false);
-            if (getFloorInfo.IsFailure)
-                return OperationResult<List<FloorInfo>>.Failure(getFloorInfo.ApiError);
-            floorInfos.Add(getFloorInfo.Data);
-        }
+        var result = floors.Select(x=> new FloorInfo(x.Id, x.FloorNumber)).ToList();
 
-        return OperationResult<List<FloorInfo>>.Success(floorInfos);
+        return OperationResult<List<FloorInfo>>.Success(result);
     }
 
     public async Task<OperationResult<Guid>> CreateFloor(Guid buildingId, int? floorNumber = null)
@@ -80,19 +70,6 @@ public class FloorsService : IFloorsService
         await floorsRepository.AddAsync(floorEntity).ConfigureAwait(false);
         await floorsRepository.SaveChangesAsync().ConfigureAwait(false);
         return OperationResult<Guid>.Success(floorEntity.Id);
-    }
-
-
-    private async Task<OperationResult<FloorInfo>> GetFloorInfoByEntity(FloorEntity floorEntity)
-    {
-        var images = await imageService.GetInfosByObjectIdAsync(floorEntity.Id).ConfigureAwait(false);
-        if (images.IsFailure)
-            return OperationResult<FloorInfo>.Failure(images.ApiError);
-        var image = images.Data.FirstOrDefault();
-        if (image is null)
-            return OperationResult<FloorInfo>.Failure(
-                BuildingsApiErrors.ImageWithFloorIdNotFoundError(floorEntity.BuildingId, floorEntity.FloorNumber));
-        return OperationResult<FloorInfo>.Success(new FloorInfo(floorEntity.Id, floorEntity.FloorNumber));
     }
 
     private async Task<OperationResult> CheckFloor(Guid buildingId, int? floorNumber = null)
