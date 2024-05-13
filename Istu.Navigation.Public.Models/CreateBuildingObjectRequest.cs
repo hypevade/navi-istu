@@ -10,6 +10,8 @@ public class CreateBuildingObjectRequest
 
     public required BuildingObjectType Type { get; set; }
     public string? Title { get; set; }
+    
+    public string? Keywords { get; set; }
 
     public required double X { get; set; }
     public required double Y { get; set; }
