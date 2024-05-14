@@ -12,6 +12,7 @@ public class CreateBuildingObjectRequest
     public string? Title { get; set; }
     
     public string? Keywords { get; set; }
+    public string? Description { get; set; }
 
     public required double X { get; set; }
     public required double Y { get; set; }
@@ -19,5 +20,5 @@ public class CreateBuildingObjectRequest
     public BuildingObject ToBuildingObject(Guid objectId)
         =>
             new(objectId, BuildingId, Floor, Type, X,
-                Y, Title);
+                Y, Title, keywords:Keywords, description:Description);
 }
