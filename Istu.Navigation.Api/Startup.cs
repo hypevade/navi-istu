@@ -139,6 +139,7 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseSwagger();
+        app.UseMiddleware<RequestLoggingMiddleware>();
         
         //TODO: отключить свагер UI для прода
         /*if (env.IsDevelopment())
