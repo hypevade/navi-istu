@@ -5,12 +5,13 @@ using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
 namespace Istu.Navigation.Domain.Services.Buildings;
 
 public interface IBuildingsService
 {
-    public Task<OperationResult<Guid>> CreateAsync(string title, double latitude, double longitude, string address, string? description = null);
+    public Task<OperationResult<Guid>> CreateAsync(string title, double latitude, double longitude, string address, string?  keywords = null, string? description = null);
     public Task<OperationResult> PatchAsync(Guid id, string? title = null, double? latitude = null, double? longitude = null, string? address = null, string? description = null);
     public Task<OperationResult> DeleteAsync(Guid id);
     public Task<OperationResult<Building>> GetByIdAsync(Guid id);
@@ -19,11 +20,11 @@ public interface IBuildingsService
     public Task<OperationResult> CheckExistAsync(Guid buildingId);
 }
 
-public class BuildingsService(IBuildingsRepository repository, IFloorsService service)
+public class BuildingsService(IBuildingsRepository repository, IFloorsService service, ILuceneService luceneService)
     : IBuildingsService
 {
     public async Task<OperationResult<Guid>> CreateAsync(string title, double latitude, double longitude,
-        string address, string? description = null)
+        string address, string?  keywords = null,string? description = null)
     {
         var checkResult = await CheckTitle(title).ConfigureAwait(false);
         if (checkResult.IsFailure)
@@ -41,6 +42,7 @@ public class BuildingsService(IBuildingsRepository repository, IFloorsService se
 
         buildingEntity = await repository.AddAsync(buildingEntity).ConfigureAwait(false);
         await repository.SaveChangesAsync().ConfigureAwait(false);
+        Task.Run(() => luceneService.AddDocument(buildingEntity.Id, ContentType.Building, buildingEntity.Title, keywords ?? "", description ??""));
         return OperationResult<Guid>.Success(buildingEntity.Id);
     }
 
@@ -80,6 +82,7 @@ public class BuildingsService(IBuildingsRepository repository, IFloorsService se
         await repository.RemoveByIdAsync(id).ConfigureAwait(false);
         await repository.SaveChangesAsync().ConfigureAwait(false);
 
+        Task.Run(() => luceneService.DeleteDocument(id));
         return OperationResult.Success();
     }
 

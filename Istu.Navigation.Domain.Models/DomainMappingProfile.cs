@@ -12,7 +12,7 @@ public class DomainMappingProfile : Profile
     {
         CreateMap<BuildingObject, BuildingObjectEntity>();
         CreateMap<BuildingObjectEntity, BuildingObject>().ConstructUsing(x =>
-            new BuildingObject(x.Id, x.BuildingId, x.Floor, x.Type, x.X, x.Y, x.Title, x.Description));
+            new BuildingObject(x.Id, x.BuildingId, x.Floor, x.Type, x.X, x.Y, x.Title, x.Description, null));
         CreateMap<BuildingEntity, Building>();
         CreateMap<Building, BuildingEntity>();
         

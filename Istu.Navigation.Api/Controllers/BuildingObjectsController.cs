@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Paths;
-using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Public.Models;
@@ -17,7 +16,8 @@ public class BuildingObjectsController : ControllerBase
     private readonly IBuildingObjectsService buildingObjectsService;
     private readonly IMapper mapper;
 
-    public BuildingObjectsController(IBuildingObjectsService buildingObjectsService, IMapper mapper)
+    public BuildingObjectsController(IBuildingObjectsService buildingObjectsService,
+        IMapper mapper)
     {
         this.buildingObjectsService = buildingObjectsService;
         this.mapper = mapper;
@@ -45,7 +45,7 @@ public class BuildingObjectsController : ControllerBase
             var apiError = createOperation.ApiError;
             return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
         }
-
+        
         return Ok(new CreateBuildingObjectResponse() { BuildingObjectId = createOperation.Data });
     }
 

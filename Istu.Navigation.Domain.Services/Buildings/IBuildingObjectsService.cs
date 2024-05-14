@@ -5,6 +5,7 @@ using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
 namespace Istu.Navigation.Domain.Services.Buildings;
 
@@ -22,13 +23,15 @@ public class BuildingObjectsService : IBuildingObjectsService
     private readonly IBuildingObjectsRepository buildingObjectsRepository;
     private readonly IBuildingsRepository buildingsRepository;
     private readonly IMapper mapper;
+    private readonly ILuceneService luceneService;
 
     public BuildingObjectsService(IBuildingObjectsRepository buildingObjectsRepository, IMapper mapper,
-        IBuildingsRepository buildingsRepository)
+        IBuildingsRepository buildingsRepository, ILuceneService luceneService)
     {
         this.buildingObjectsRepository = buildingObjectsRepository;
         this.mapper = mapper;
         this.buildingsRepository = buildingsRepository;
+        this.luceneService = luceneService;
     }
 
     public async Task<OperationResult<Guid>> Create(BuildingObject buildingObject)
@@ -39,6 +42,9 @@ public class BuildingObjectsService : IBuildingObjectsService
         var entity = mapper.Map<BuildingObjectEntity>(buildingObject);
         var result = await buildingObjectsRepository.AddAsync(entity).ConfigureAwait(false);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
+        //Todo: прокидывать keywords
+        if (entity.Title is not null)
+            Task.Run(() => luceneService.AddDocument(result.Id, ContentType.Object, entity.Title, buildingObject.Keywords ?? "", buildingObject.Description ?? ""));
         return OperationResult<Guid>.Success(result.Id);
     }
 
@@ -62,6 +68,12 @@ public class BuildingObjectsService : IBuildingObjectsService
     {
         await buildingObjectsRepository.RemoveRangeAsync(buildingObjectsIds).ConfigureAwait(false);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
+        
+        foreach (var id in buildingObjectsIds)
+        {
+            luceneService.DeleteDocument(id);
+        }
+        
         return OperationResult.Success();
     }
 

@@ -6,6 +6,7 @@ using Istu.Navigation.Domain.Models.ExternalRoutes;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Domain.Repositories.Users;
+using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.BuildingRoutes;
 using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Domain.Services.ExternalRoutes;
@@ -119,6 +120,8 @@ public class Startup
         services.AddScoped<IRefreshTokenProvider, RefreshTokenProvider>();
         services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        
+        services.AddScoped<ILuceneService, LuceneService>();
         
         services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
 

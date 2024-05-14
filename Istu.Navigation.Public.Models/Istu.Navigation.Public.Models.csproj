@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Istu.Navigation.Domain.Services\Istu.Navigation.Domain.Services.csproj" />
       <ProjectReference Include="..\Istu.Navigation.Infrastructure.Errors\Istu.Navigation.Infrastructure.Errors.csproj" />
     </ItemGroup>
 

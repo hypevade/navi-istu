@@ -154,4 +154,10 @@ public static class ApiRoutes
         public const string ExternalRoutesApi = Base + "/external-routes";
         public const string CreatePart = "";
     }
+    
+    public static class Search
+    {
+        public const string SearchApi = Base + "/search";
+        public const string SearchPart = "";
+    }
 }
