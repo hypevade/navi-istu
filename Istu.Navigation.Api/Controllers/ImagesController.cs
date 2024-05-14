@@ -1,14 +1,16 @@
+using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Services.Buildings;
+using Istu.Navigation.Public.Models.Images;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
 [Route(ApiRoutes.Images.ImagesApi)]
-public class ImagesController(IImageService imageService) : ControllerBase
+public class ImagesController(IImageService imageService, IMapper mapper) : ControllerBase
 {
 
     [MaxFileSize(10485760)]
@@ -39,4 +41,18 @@ public class ImagesController(IImageService imageService) : ControllerBase
 
         return File(fileInfo.Content, "application/octet-stream", fileInfo.Name);
     }
+    [HttpGet(ApiRoutes.Images.GetPart)]
+    public async Task<ActionResult<ImageInfosResponse>> GetByObject(Guid objectId)
+    {
+        var downloadOperation = await imageService.GetInfosByObjectIdAsync(objectId).ConfigureAwait(false);
+        if (downloadOperation.IsFailure)
+        {
+            var apiError = downloadOperation.ApiError;
+            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
+        }
+
+        var imageInfos = mapper.Map<List<ImageInfoDto>>(downloadOperation.Data);
+        return Ok(new ImageInfosResponse {Images = imageInfos});
+    }
+    
 }

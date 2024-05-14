@@ -6,6 +6,7 @@ using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Public.Models.BuildingRoutes;
 using Istu.Navigation.Public.Models.Buildings;
 using Istu.Navigation.Public.Models.ExternalRoutes;
+using Istu.Navigation.Public.Models.Images;
 using Istu.Navigation.Public.Models.Search;
 using Istu.Navigation.Public.Models.Users;
 
@@ -66,5 +67,6 @@ public class PublicMappingProfile : Profile
             .ForMember(x => x.Points, x => x.MapFrom(src => src.Points))
             .ForMember(x => x.TotalTime, x => x.MapFrom(src => src.TotalTime));
         CreateMap<SearchResult, SearchResultDto>();
+        CreateMap<ImageInfo, ImageInfoDto>();
     }
 }

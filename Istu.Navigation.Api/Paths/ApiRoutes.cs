@@ -147,6 +147,7 @@ public static class ApiRoutes
         public const string ImagesApi = Base + "/images";
         public const string UploadPart = "upload/{objectId}";
         public const string DownloadPart = "download/{imageId}";
+        public const string GetPart = "{objectId}";
     }
     
     public static class ExternalRoutes
