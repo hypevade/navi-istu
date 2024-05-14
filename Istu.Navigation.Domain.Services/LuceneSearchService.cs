@@ -6,7 +6,6 @@ using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Directory = System.IO.Directory;
 
@@ -78,8 +77,8 @@ public class LuceneService : ILuceneService
             new StringField(IdFieldName, id.ToString(), Field.Store.YES),
             new StringField(TypeFieldName, contentType.ToString(), Field.Store.YES),
             new TextField(TitleFieldName, title, Field.Store.YES),
-            new TextField(KeywordsFieldName, keywords, Field.Store.NO),
-            new TextField(DescriptionFieldName, description, Field.Store.NO)
+            new TextField(KeywordsFieldName, keywords, Field.Store.YES),
+            new TextField(DescriptionFieldName, description, Field.Store.YES)
         };
 
         writer.AddDocument(doc);

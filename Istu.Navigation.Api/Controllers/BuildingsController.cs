@@ -35,7 +35,7 @@ public class BuildingsController : ControllerBase
     public async Task<ActionResult<CreateBuildingResponse>> Create([FromBody] CreateBuildingRequest request)
     {
         var createOperation = await buildingsService
-            .CreateAsync(request.Title, request.Latitude, request.Longitude, request.Address,request.Description).ConfigureAwait(false);
+            .CreateAsync(request.Title, request.Latitude, request.Longitude, request.Address, keywords: request.Keywords, description:request.Description).ConfigureAwait(false);
 
         return createOperation.IsSuccess
             ? Ok(new CreateBuildingResponse { BuildingId = createOperation.Data })

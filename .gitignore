@@ -427,3 +427,4 @@ rider.project.model.nuget.info
 /Istu.Navigation.Api/obj/
 /Istu.Navigation.Api/wwwroot/uploads
 /.idea
+/Istu.Navigation.Api/LuceneIndex
