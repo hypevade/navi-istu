@@ -16,8 +16,13 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
         finally
         {
             stopwatch.Stop();
-            logger.LogInformation(
-                $"Request {context.Request.Method} {context.Request.Path} completed in {stopwatch.ElapsedMilliseconds} ms with status code {context.Response.StatusCode}");
+            var log = $"{context.Request.Method} {context.Request.Path} {stopwatch.ElapsedMilliseconds}ms , {context.Response.StatusCode}";
+            if(context.Response.StatusCode >= 400)
+                logger.LogWarning(log);
+            else
+            {
+                logger.LogInformation(log);
+            }
         }
     }
 }
