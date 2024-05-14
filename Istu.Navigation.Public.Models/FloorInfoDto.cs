@@ -3,5 +3,5 @@
 public class FloorInfoDto
 {
     public int FloorNumber { get; set; }
-    public required string ImageLink { get; set; }
+    public Guid FloorId { get; set; }
 }

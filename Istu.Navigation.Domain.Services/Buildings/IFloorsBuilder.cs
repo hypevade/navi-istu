@@ -19,17 +19,14 @@ public class FloorsBuilder : IFloorsBuilder
     private readonly IBuildingObjectsService buildingObjectsService;
     private readonly IFloorsRepository floorsRepository;
     private readonly IEdgesService edgesService;
-    private readonly IImageService imageService;
 
     public FloorsBuilder(IBuildingObjectsService buildingObjectsService,
         IFloorsRepository floorsRepository,
-        IEdgesService edgesService,
-        IImageService imageService)
+        IEdgesService edgesService)
     {
         this.buildingObjectsService = buildingObjectsService;
         this.floorsRepository = floorsRepository;
         this.edgesService = edgesService;
-        this.imageService = imageService;
     }
 
     public async Task<OperationResult<List<Floor>>> GetFloorsByBuilding(Guid buildingId, int minFloor = 1,
@@ -92,10 +89,6 @@ public class FloorsBuilder : IFloorsBuilder
         if (edges.IsFailure)
             return OperationResult<Floor>.Failure(edges.ApiError);
 
-        var images = await imageService.GetInfosByObjectIdAsync(floorEntity.Id).ConfigureAwait(false);
-        if (images.IsFailure)
-            return OperationResult<Floor>.Failure(images.ApiError);
-
-        return OperationResult<Floor>.Success(new Floor(buildingId, floorNumber, objects.Data, edges.Data));
+        return OperationResult<Floor>.Success(new Floor(buildingId, floorEntity.Id,floorNumber, objects.Data, edges.Data));
     }
 }
