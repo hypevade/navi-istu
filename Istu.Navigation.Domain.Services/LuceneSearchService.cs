@@ -71,6 +71,7 @@ public class LuceneService : ILuceneService
 
     public void AddDocument(Guid id, ContentType contentType, string title, string keywords, string description)
     {
+        logger.LogInformation($"Start adding document to Lucene index with id: {id}");
         using var dir = FSDirectory.Open(new DirectoryInfo(indexPath));
         using var analyzer = new StandardAnalyzer(LuceneVersion);
         using var writer = new IndexWriter(dir, new IndexWriterConfig(LuceneVersion, analyzer));
@@ -86,6 +87,7 @@ public class LuceneService : ILuceneService
 
         writer.AddDocument(doc);
         writer.Commit();
+        logger.LogInformation($"Added document to Lucene index with id: {id} and title: {title}");
     }
     
     public void DeleteDocument(Guid id)
@@ -97,6 +99,7 @@ public class LuceneService : ILuceneService
                 
         writer.DeleteDocuments(query);
         writer.Commit();
+        logger.LogInformation($"Deleted document from Lucene index with id: {id}");
     }
 
     private Query BuildQuery(string searchText)
