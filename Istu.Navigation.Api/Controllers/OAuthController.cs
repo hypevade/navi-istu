@@ -40,6 +40,7 @@ public class OAuthController : ControllerBase
         var authorizationUrl =
             $"{oAuthOptions.AuthorizationUrl}?response_type={oAuthOptions.ResponseType}&client_id={oAuthOptions.ClientId}&redirect_uri={oAuthOptions.RedirectUri}";
         
+        logger.LogInformation("User is redirected to: {AuthorizationUrl}", authorizationUrl);
         return Redirect(authorizationUrl);
     }
 
