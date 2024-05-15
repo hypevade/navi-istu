@@ -1,4 +1,8 @@
+using Istu.Navigation.Api.Extensions;
+using Istu.Navigation.Domain.Models.Users;
+using Istu.Navigation.Infrastructure.Errors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Istu.Navigation.Api.Controllers;
 //TODO: тестовый вариант 
@@ -6,24 +10,33 @@ namespace Istu.Navigation.Api.Controllers;
 [Route("oauth")]
 public class OAuthController : ControllerBase
 {
-    private readonly IConfiguration configuration;
+    private readonly OAuthOptions oAuthOptions;
     private readonly IHttpClientFactory httpClientFactory;
+    private readonly ILogger<OAuthController> logger;
 
-    public OAuthController(IConfiguration configuration, IHttpClientFactory httpClientFactory)
+    public OAuthController(IOptions<OAuthOptions> options,
+        IHttpClientFactory httpClientFactory,
+        ILogger<OAuthController> logger)
     {
-        this.configuration = configuration;
+        oAuthOptions = options.Value;
         this.httpClientFactory = httpClientFactory;
+        this.logger = logger;
     }
 
     [HttpGet("authenticate")]
     public IActionResult AuthenticateUser()
     {
-        var clientId = configuration["OAuth:ClientId"];
-        var redirectUri = configuration["OAuth:RedirectUri"];
-        var responseType = "code";
-        var scope = "";
+        if (string.IsNullOrEmpty(oAuthOptions.AuthorizationUrl) ||
+            oAuthOptions.ClientId == default ||
+            string.IsNullOrEmpty(oAuthOptions.RedirectUri) ||
+            string.IsNullOrEmpty(oAuthOptions.ResponseType))
+        {
+            logger.LogError("Error: OAuth options are not provided.");
+            return CommonErrors.InternalServerError().ToActionResult();
+        }
+        
         var authorizationUrl =
-            $"{configuration["OAuth:AuthorizationUrl"]}?response_type={responseType}&client_id={clientId}&redirect_uri={redirectUri}&scope={scope}";
+            $"{oAuthOptions.AuthorizationUrl}?response_type={oAuthOptions.ResponseType}&client_id={oAuthOptions.ClientId}&redirect_uri={oAuthOptions.RedirectUri}";
         
         return Redirect(authorizationUrl);
     }
@@ -37,28 +50,34 @@ public class OAuthController : ControllerBase
         }
         
         var token = await ExchangeCodeForTokenAsync(code);
+
+        if (string.IsNullOrEmpty(token))
+        {
+            return Unauthorized();
+        }
         
         return Ok(token);
     }
 
     private async Task<string> ExchangeCodeForTokenAsync(string code)
     {
-        var tokenUrl = configuration["OAuth:TokenUrl"];
-        var clientId = configuration["OAuth:ClientId"];
-        var clientSecret = configuration["OAuth:ClientSecret"];
-        var redirectUri = configuration["OAuth:RedirectUri"];
-
+        if (string.IsNullOrEmpty(oAuthOptions.TokenUrl) || string.IsNullOrEmpty(oAuthOptions.RedirectUri) ||
+            string.IsNullOrEmpty(oAuthOptions.ClientSecret))
+        {
+            return string.Empty;
+        }
+        
         var client = httpClientFactory.CreateClient();
         var requestBody = new Dictionary<string, string>
         {
             { "grant_type", "authorization_code" },
             { "code", code },
-            { "redirect_uri", redirectUri },
-            { "client_id", clientId },
-            { "client_secret", clientSecret }
+            { "redirect_uri", oAuthOptions.RedirectUri },
+            { "client_id", oAuthOptions.ClientId.ToString() },
+            { "client_secret", oAuthOptions.ClientSecret }
         };
 
-        var response = await client.PostAsync(tokenUrl, new FormUrlEncodedContent(requestBody));
+        var response = await client.PostAsync(oAuthOptions.TokenUrl, new FormUrlEncodedContent(requestBody));
 
         if (!response.IsSuccessStatusCode)
         {
@@ -66,6 +85,7 @@ public class OAuthController : ControllerBase
         }
 
         var content = await response.Content.ReadAsStringAsync();
+        logger.LogInformation(content);
         return content;
     }
 }

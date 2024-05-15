@@ -48,6 +48,19 @@ public class Startup
         services.AddScoped<IExternalRoutesSearcher, ExternalRoutesSearcher>();
     }
 
+    private void ConfigureOAuth(IServiceCollection services)
+    {
+        var clientSecret = Environment.GetEnvironmentVariable("OAuth__ClientSecret");
+        services.Configure<OAuthOptions>(Configuration.GetSection("OAuth") );
+        if (!string.IsNullOrEmpty(clientSecret))
+        {
+            services.PostConfigure<OAuthOptions>(options =>
+            {
+                options.ClientSecret = clientSecret;
+            });
+        }
+    }
+
     public void ConfigureServices(IServiceCollection services)
     {
         var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__TestDataBase");
@@ -64,6 +77,7 @@ public class Startup
         };
         
         ConfigureExternalSearcher(services);
+        ConfigureOAuth(services);
 
         services.AddSingleton(tokenValidationParameters);
 
