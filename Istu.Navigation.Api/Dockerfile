@@ -1,11 +1,17 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+ARG APP_UID=1654
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+# Создаем и устанавливаем владельца каталогов Storage и LuceneIndex
+RUN mkdir -p /app/Storage /app/LuceneIndex && \
+    chown -R $APP_UID:$APP_UID /app/Storage /app/LuceneIndex
+
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
+ARG APP_UID=1654
 WORKDIR /src
 COPY ["Istu.Navigation.Api/Istu.Navigation.Api.csproj", "Istu.Navigation.Api/"]
 RUN dotnet restore "Istu.Navigation.Api/Istu.Navigation.Api.csproj"
