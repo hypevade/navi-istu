@@ -42,7 +42,7 @@ public class BuildingsService(IBuildingsRepository repository, IFloorsService se
 
         buildingEntity = await repository.AddAsync(buildingEntity).ConfigureAwait(false);
         await repository.SaveChangesAsync().ConfigureAwait(false);
-        Task.Run(() => luceneService.AddDocument(buildingEntity.Id, ContentType.Building, buildingEntity.Title, keywords ?? "", description ??""));
+        luceneService.AddDocument(buildingEntity.Id, ContentType.Building, buildingEntity.Title, keywords ?? "", description ??"");
         return OperationResult<Guid>.Success(buildingEntity.Id);
     }
 
@@ -82,7 +82,7 @@ public class BuildingsService(IBuildingsRepository repository, IFloorsService se
         await repository.RemoveByIdAsync(id).ConfigureAwait(false);
         await repository.SaveChangesAsync().ConfigureAwait(false);
 
-        Task.Run(() => luceneService.DeleteDocument(id));
+        luceneService.DeleteDocument(id);
         return OperationResult.Success();
     }
 

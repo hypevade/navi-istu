@@ -44,7 +44,7 @@ public class BuildingObjectsService : IBuildingObjectsService
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
         //Todo: прокидывать keywords
         if (entity.Title is not null)
-            Task.Run(() => luceneService.AddDocument(result.Id, ContentType.Object, entity.Title, buildingObject.Keywords ?? "", buildingObject.Description ?? ""));
+            luceneService.AddDocument(result.Id, ContentType.Object, entity.Title, buildingObject.Keywords ?? "", buildingObject.Description ?? "");
         return OperationResult<Guid>.Success(result.Id);
     }
 
