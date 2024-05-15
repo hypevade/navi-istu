@@ -25,4 +25,9 @@ public class UsersApiErrors
         return new ApiError(401, $"Токен недействителен.",
             GetUrn("token-is-not-valid"));
     }
+    public static ApiError CodeNotValidError()
+    {
+        return new ApiError(401, $"Код недействителен.",
+            GetUrn("code-not-valid"));
+    }
 }

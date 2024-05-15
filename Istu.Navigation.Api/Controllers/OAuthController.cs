@@ -1,11 +1,13 @@
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Infrastructure.Errors;
+using Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace Istu.Navigation.Api.Controllers;
-//TODO: тестовый вариант 
+//TODO: тестовый вариант, нужно будет переписать  
 [ApiController]
 [Route("oauth")]
 public class OAuthController : ControllerBase
@@ -45,26 +47,25 @@ public class OAuthController : ControllerBase
     public async Task<IActionResult> OAuthCallback(string code)
     {
         if (string.IsNullOrEmpty(code))
-        {
-            return BadRequest("Error: Authorization code is not provided.");
-        }
+            return UsersApiErrors.CodeNotValidError().ToActionResult();
         
-        var token = await ExchangeCodeForTokenAsync(code);
+        var getTokenOperation = await ExchangeCodeForTokenAsync(code);
 
-        if (string.IsNullOrEmpty(token))
-        {
-            return Unauthorized();
-        }
-        
-        return Ok(token);
+        if (getTokenOperation.IsFailure)
+            return getTokenOperation.ApiError.ToActionResult();
+
+        HttpContext.Response.Headers.Append("Authorization", $"Bearer {getTokenOperation.Data.AccessToken}");
+        HttpContext.Response.Headers.Append("Refresh", $"Bearer {getTokenOperation.Data.RefreshToken}");
+        return NoContent();
     }
 
-    private async Task<string> ExchangeCodeForTokenAsync(string code)
+    private async Task<OperationResult<TokenResponse>> ExchangeCodeForTokenAsync(string code)
     {
         if (string.IsNullOrEmpty(oAuthOptions.TokenUrl) || string.IsNullOrEmpty(oAuthOptions.RedirectUri) ||
             string.IsNullOrEmpty(oAuthOptions.ClientSecret))
         {
-            return string.Empty;
+            logger.LogError("Error: OAuth options are not provided.");
+            return OperationResult<TokenResponse>.Failure(CommonErrors.InternalServerError());
         }
         
         var client = httpClientFactory.CreateClient();
@@ -81,11 +82,29 @@ public class OAuthController : ControllerBase
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException("Error retrieving access token.");
+            logger.LogWarning($"Error: Failed to exchange code for token. Status code: {response.StatusCode}");
+            return OperationResult<TokenResponse>.Failure(UsersApiErrors.CodeNotValidError());
         }
+        
+        TokenResponse? tokenResponse;
 
         var content = await response.Content.ReadAsStringAsync();
-        logger.LogInformation(content);
-        return content;
+        try
+        {
+            tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(content);
+        }
+        catch (Exception e)
+        {
+            logger.LogError("Error: Failed to deserialize token response. {Error}", e.Message);
+            throw;
+        }
+
+        if (tokenResponse == null)
+        {
+            logger.LogError("Error: Failed to deserialize token response.");
+            return OperationResult<TokenResponse>.Failure(CommonErrors.InternalServerError());
+        }
+
+        return OperationResult<TokenResponse>.Success(tokenResponse);
     }
 }
