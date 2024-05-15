@@ -36,7 +36,10 @@ public class LuceneService : ILuceneService
         this.logger = logger;
         indexPath = Path.Combine(env.ContentRootPath, "LuceneIndex");
         if (!Directory.Exists(indexPath))
+        {
+            this.logger.LogWarning($"Lucene index directory not found, will be created at: {indexPath}");
             Directory.CreateDirectory(indexPath);
+        }
     }
 
     public List<SearchResult> Search(string searchText, int limit = 10)
