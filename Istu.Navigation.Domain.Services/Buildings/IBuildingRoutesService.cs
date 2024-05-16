@@ -6,8 +6,7 @@ namespace Istu.Navigation.Domain.Services.Buildings;
 
 public interface IBuildingRoutesService
 {
-    Task<OperationResult<BuildingRoute>> CreateRoute(Guid buildingId, Guid toId, Guid fromId = default);
-    //Task<OperationResult<BuildingRoute>> GetRouteById(Guid routeId);
+    Task<OperationResult<BuildingRoute>> CreateRoute(Guid toId, Guid fromId = default);
 }
 public class BuildingRoutesService(
     IBuildingObjectsService objectService,
@@ -15,21 +14,17 @@ public class BuildingRoutesService(
     IRouteSearcher searcher,
     IFloorsBuilder floorsBuilder) : IBuildingRoutesService
 {
-    public async Task<OperationResult<BuildingRoute>> CreateRoute(Guid buildingId, Guid toId, Guid fromId = default)
+    public async Task<OperationResult<BuildingRoute>> CreateRoute(Guid toId, Guid fromId = default)
     {
         //TODO: Добавить  поддержку, когда fromID = default
-
-        var getToObject = await objectService.GetById(toId).ConfigureAwait(false);
-        if (getToObject.IsFailure)
-            return OperationResult<BuildingRoute>.Failure(getToObject.ApiError);
-
-        var getFromObject = await objectService.GetById(fromId).ConfigureAwait(false);
-        if (getFromObject.IsFailure)
-            return OperationResult<BuildingRoute>.Failure(getFromObject.ApiError);
-
-        var toObject = getToObject.Data;
-        var fromObject = getFromObject.Data;
-
+        var getOperation  = await GetTwoObjects(fromId, toId).ConfigureAwait(false);
+        if (getOperation.IsFailure)
+            return OperationResult<BuildingRoute>.Failure(getOperation.ApiError);
+        
+        var toObject = getOperation.Data.toObject;
+        var fromObject = getOperation.Data.fromObject;
+        var buildingId = toObject.BuildingId;
+        
         var (start, end) = GetFloorsNumbers(fromObject, toObject);
         var getFloors = await floorsBuilder.GetFloorsByBuilding(buildingId, start, end).ConfigureAwait(false);
         if (getFloors.IsFailure)
@@ -45,22 +40,28 @@ public class BuildingRoutesService(
         var fullRoute = getFullRoute.Data;
         var slicedRoute = SliceRouteByFloors(fullRoute);
 
-        var getFloorRoutes = GetFloorRoutes(slicedRoute, getFloors.Data);
-        if (getFloorRoutes.IsFailure)
-            return OperationResult<BuildingRoute>.Failure(getFloorRoutes.ApiError);
+        var floorRoutes = GetFloorRoutes(slicedRoute, getFloors.Data);
 
         var getBuilding = await service.GetByIdAsync(buildingId).ConfigureAwait(false);
         if (getBuilding.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getBuilding.ApiError);
-
-        var resultRoute = new BuildingRoute(getBuilding.Data,
-            getFloorRoutes.Data,
-            startObject: fromObject,
-            finishObject: toObject);
-
-        return OperationResult<BuildingRoute>.Success(resultRoute);
+        
+        return OperationResult<BuildingRoute>.Success(new BuildingRoute(getBuilding.Data, floorRoutes));
     }
 
+    private async Task<OperationResult<(BuildingObject fromObject, BuildingObject toObject)>> GetTwoObjects(Guid fromId, Guid toId)
+    {
+        var getToObject = await objectService.GetById(toId).ConfigureAwait(false);
+        if (getToObject.IsFailure)
+            return OperationResult<(BuildingObject fromObject, BuildingObject toObject)>.Failure(getToObject.ApiError);
+
+        var getFromObject = await objectService.GetById(fromId).ConfigureAwait(false);
+        if (getFromObject.IsFailure)
+            return OperationResult<(BuildingObject fromObject, BuildingObject toObject)>.Failure(getFromObject.ApiError);
+        
+        return OperationResult<(BuildingObject fromObject, BuildingObject toObject)>.Success((getFromObject.Data, getToObject.Data));
+    }
+    
     private Dictionary<int, List<BuildingObject>> SliceRouteByFloors(List<BuildingObject> totalPath)
     {
         var result = new Dictionary<int, List<BuildingObject>>();
@@ -79,20 +80,19 @@ public class BuildingRoutesService(
         return result;
     }
 
-    private OperationResult<List<FloorRoute>> GetFloorRoutes(Dictionary<int, List<BuildingObject>> routes,
+    private List<FloorRoute> GetFloorRoutes(Dictionary<int, List<BuildingObject>> routes,
         List<Floor> floors)
     {
         var floorRoutes = new List<FloorRoute>();
         foreach (var floor in floors)
         {
             if (!routes.ContainsKey(floor.FloorNumber))
-                return OperationResult<List<FloorRoute>>.Failure(CommonErrors.InternalServerError());
-
-            var route = routes[floor.FloorNumber];
-            floorRoutes.Add(new FloorRoute(route, floor, route[0], route[^1]));
+                throw new Exception($"Floor {floor.FloorNumber} not found in routes");
+            
+            floorRoutes.Add(new FloorRoute(floor, routes[floor.FloorNumber]));
         }
 
-        return OperationResult<List<FloorRoute>>.Success(floorRoutes);
+        return floorRoutes;
     }
 
     private (int start, int end) GetFloorsNumbers(BuildingObject fromBuildingObject, BuildingObject toBuildingObject)

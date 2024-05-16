@@ -24,10 +24,31 @@ public class BuildingObject(
 
     public BuildingObjectType Type { get; set; } = type;
 
-    public double X { get; set; } = x;
+    public double X { get; init; } = x;
+    
+    public double Y { get; init; } = y;
 
+    public override bool Equals(object? obj)
+    {
+        return obj is BuildingObject other && Equals(other);
+    }
 
-    public double Y { get; set; } = y;
+    private bool Equals(BuildingObject other)
+    {
+        return Id.Equals(other.Id) && BuildingId.Equals(other.BuildingId) && Title == other.Title &&
+               Description == other.Description && Keywords == other.Keywords && Floor == other.Floor &&
+               Type == other.Type && X.Equals(other.X) && Y.Equals(other.Y);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(Id);
+        hashCode.Add(BuildingId);
+        hashCode.Add(X);
+        hashCode.Add(Y);
+        return hashCode.ToHashCode();
+    }
 
     public static bool CoordinateIsValid(double coordinate) => coordinate is >= 0 and <= 1;
 }
