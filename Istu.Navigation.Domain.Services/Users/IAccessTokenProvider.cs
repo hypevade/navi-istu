@@ -2,6 +2,9 @@
 using System.Security.Claims;
 using Istu.Navigation.Domain.Models.Entities.User;
 using Istu.Navigation.Domain.Models.Users;
+using Istu.Navigation.Infrastructure.Errors;
+using Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -11,10 +14,12 @@ public interface IAccessTokenProvider
 {
     public string GenerateToken(User user);
     public string GenerateToken(UserEntity user);
+    public OperationResult<ClaimsPrincipal> ValidateToken(string token);
+    public OperationResult<(Guid Id, UserRole Role)> GetUser(string token);
 }
 
-public class AccessTokenProvider(IOptions<JwtOptions> options, TokenValidationParameters validationParameters)
-    : JwtTokenProvider(validationParameters), IAccessTokenProvider
+public class AccessTokenProvider(IOptions<JwtOptions> options, TokenValidationParameters validationParameters, ILogger<JwtTokenProvider> logger)
+    : JwtTokenProvider(validationParameters, logger), IAccessTokenProvider
 {
     private readonly JwtOptions options = options.Value;
     private readonly TokenValidationParameters validationParameters = validationParameters;
@@ -32,8 +37,9 @@ public class AccessTokenProvider(IOptions<JwtOptions> options, TokenValidationPa
 
         var claims = new[]
         {
-            new Claim(type: "id", value: user.Id.ToString()),
-            new Claim(type: "email", value: user.Email)
+            new Claim(type: IdClaim, value: user.Id.ToString()),
+            new Claim(type: EmailClaim, value: user.Email),
+            new Claim(type: RoleClaim, value: ((int)user.Role).ToString())
         };
 
         var token = new JwtSecurityToken(signingCredentials: signingCredentials,
@@ -41,5 +47,21 @@ public class AccessTokenProvider(IOptions<JwtOptions> options, TokenValidationPa
             claims: claims);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public OperationResult<(Guid Id, UserRole Role)> GetUser(string token)
+    {
+        var principal = ValidateToken(token);
+        if(principal.IsFailure)
+            return OperationResult<(Guid Id, UserRole Role)>.Failure(principal.ApiError);
+        var id = principal.Data.FindFirst(IdClaim);
+        var role = principal.Data.FindFirst(RoleClaim);
+        if (id is null || role is null)
+        {
+            Logger.LogError("Token was verified, but it was not possible to get the necessary stamps");
+            return OperationResult<(Guid Id, UserRole Role)>.Failure(UsersApiErrors.TokenIsNotValidError());
+        }
+        
+        return OperationResult<(Guid Id, UserRole Role)>.Success((Guid.Parse(id.Value), (UserRole)int.Parse(role.Value)));
     }
 }

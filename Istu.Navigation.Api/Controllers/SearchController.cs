@@ -1,5 +1,7 @@
 using AutoMapper;
+using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
+using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Public.Models.Search;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +10,7 @@ namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
 [Route(ApiRoutes.Search.SearchApi)]
+[AuthorizationFilter(UserRole.User)]
 public class SearchController(ILuceneService service, IMapper mapper) : ControllerBase
 {
     private readonly IMapper mapper = mapper;

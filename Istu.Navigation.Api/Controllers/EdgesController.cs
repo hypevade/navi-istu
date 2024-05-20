@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
+using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
+using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
@@ -25,6 +27,7 @@ public class EdgesController : ControllerBase
     
     [HttpPost]
     [Route(ApiRoutes.BuildingEdges.CreatePart)]
+    [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<CreateEdgesResponse>> CreateEdges([FromBody] CreateEdgesRequest request)
     {
         var edges = request.Edges.Select(x => (x.FromId, x.ToId)).ToList();
@@ -41,6 +44,7 @@ public class EdgesController : ControllerBase
     
     [HttpGet]
     [Route(ApiRoutes.BuildingEdges.GetAllPart)]
+    [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<EdgeDto>>> GetAllEdges([FromQuery] EdgeFilter filter)
     {
         var getEdgesOperation = await edgesService.GetAllByFilter(filter).ConfigureAwait(false);
@@ -56,6 +60,7 @@ public class EdgesController : ControllerBase
 
     [HttpDelete]
     [Route(ApiRoutes.BuildingEdges.DeletePart)]
+    [AuthorizationFilter(UserRole.Admin)]
     public async Task<IActionResult> DeleteEdge(Guid edgeId)
     {
         var deleteRangeOperation = await edgesService.Delete(edgeId).ConfigureAwait(false);

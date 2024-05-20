@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
+using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
+using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Public.Models.BuildingRoutes;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +11,7 @@ namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
 [Route(ApiRoutes.BuildingRoutes.BuildingsRoutesApi)]
+[AuthorizationFilter(UserRole.User)]
 public class BuildingRoutesController: ControllerBase
 {
     private readonly IBuildingRoutesService buildingRoutesService;

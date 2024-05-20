@@ -28,12 +28,17 @@ public class UsersApiErrors
     
     public static ApiError AuthorizationHeaderIsEmptyError()
     {
-        return new ApiError(401, $"Заголовок 'Authorization' не может быть пустым.",
+        return new ApiError(401, "Заголовок 'Authorization' не может быть пустым.",
             GetUrn("authorization-header-is-empty"));
     }
     public static ApiError CodeNotValidError()
     {
         return new ApiError(401, $"Код недействителен.",
             GetUrn("code-not-valid"));
+    }
+
+    public static ApiError AccessDeniedError()
+    {
+        return new ApiError(403, $"Доступ запрещен.",GetUrn("access-denied"));
     }
 }

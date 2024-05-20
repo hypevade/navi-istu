@@ -73,6 +73,8 @@ public class Startup
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey ?? "testPrivateKey")),
             ValidateLifetime = true,
+            ValidateAudience = false,
+            ValidateIssuer = false,
             ClockSkew = TimeSpan.Zero
         };
         

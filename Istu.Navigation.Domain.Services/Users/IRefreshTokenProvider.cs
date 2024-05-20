@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Istu.Navigation.Domain.Models.Entities.User;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Infrastructure.Errors;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,21 +15,24 @@ public interface IRefreshTokenProvider
     public string GenerateToken(UserEntity user);
     public IEnumerable<Claim>? GetClaims(string token);
     public Guid? GetUserId(string token);
-    public OperationResult ValidateToken(string token);
+    public OperationResult<ClaimsPrincipal> ValidateToken(string token);
 }
 
-public class RefreshTokenProvider(IOptions<JwtOptions> options, TokenValidationParameters validationParameters)
-    : JwtTokenProvider(validationParameters), IRefreshTokenProvider
+public class RefreshTokenProvider(IOptions<JwtOptions> options, TokenValidationParameters validationParameters, ILogger<RefreshTokenProvider> logger)
+    : JwtTokenProvider(validationParameters, logger), IRefreshTokenProvider
 {
     private readonly JwtOptions options = options.Value;
     private readonly TokenValidationParameters validationParameters = validationParameters;
 
     public Guid? GetUserId(string token)
     {
-        var claims = GetClaims(token);
-        if (claims is null)
+        var principal = ValidateToken(token);
+        if (principal.IsFailure)
             return null;
-        return Guid.Parse(claims.First(x => x.Type == "id").Value);
+        var id = principal.Data.FindFirst(IdClaim);
+        return id is null 
+            ? null 
+            : Guid.Parse(id.Value);
     }
 
     public override string GenerateToken(User user)
@@ -43,7 +47,7 @@ public class RefreshTokenProvider(IOptions<JwtOptions> options, TokenValidationP
         var signingCredentials = new SigningCredentials(key: key, algorithm: SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
-            new Claim(type: "id", value: user.Id.ToString()),
+            new Claim(type: IdClaim, value: user.Id.ToString()),
         };
         var token = new JwtSecurityToken(signingCredentials: signingCredentials,
             expires: DateTime.Now.AddDays(options.RefreshTokenExpirationDays),

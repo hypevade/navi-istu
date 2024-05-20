@@ -4,6 +4,7 @@ using Istu.Navigation.Domain.Models.Entities.User;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Istu.Navigation.Domain.Services.Users;
@@ -11,10 +12,15 @@ namespace Istu.Navigation.Domain.Services.Users;
 public abstract class JwtTokenProvider
 {
     private readonly TokenValidationParameters validationParameters;
+    protected readonly ILogger Logger;
+    protected const string IdClaim = "id";
+    protected const string EmailClaim = "email";
+    protected const string RoleClaim = "user-role";
 
-    protected JwtTokenProvider(TokenValidationParameters validationParameters)
+    protected JwtTokenProvider(TokenValidationParameters validationParameters, ILogger logger)
     {
         this.validationParameters = validationParameters;
+        Logger = logger;
     }
 
     public virtual string GenerateToken(UserEntity user)
@@ -24,7 +30,7 @@ public abstract class JwtTokenProvider
         var signingCredentials = new SigningCredentials(key: key, algorithm: SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
-            new Claim(type: "id", value: user.Id.ToString()),
+            new Claim(type: IdClaim, value: user.Id.ToString()),
         };
         var token = new JwtSecurityToken(signingCredentials: signingCredentials,
             claims: claims);
@@ -36,30 +42,34 @@ public abstract class JwtTokenProvider
        return GenerateToken(User.ToEntity(user)); 
     }
     
-    public virtual OperationResult ValidateToken(string token)
+    public virtual OperationResult<ClaimsPrincipal> ValidateToken(string token)
     {
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
-            
-            var jwtToken = (JwtSecurityToken)validatedToken;
-            if (jwtToken.ValidTo < DateTime.UtcNow)
-            {
-                return OperationResult.Failure(UsersApiErrors.TokenExpiredError());
-            }
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken ar);
 
-            return OperationResult.Success();
+            return OperationResult<ClaimsPrincipal>.Success(principal);
+        }
+        catch (SecurityTokenExpiredException ste)
+        {
+            Logger.LogWarning("Token expired: {ste}", ste);
+            return OperationResult<ClaimsPrincipal>.Failure(UsersApiErrors.TokenExpiredError());
         }
         catch (SecurityTokenValidationException stve)
         {
-            Console.WriteLine($"Token validation failed: {stve.Message}");
-            return OperationResult.Failure(UsersApiErrors.TokenIsNotValidError());
+            Logger.LogWarning($"Token validation failed: {stve.Message}");
+            return OperationResult<ClaimsPrincipal>.Failure(UsersApiErrors.TokenIsNotValidError());
+        }
+        catch (SecurityTokenMalformedException stme)
+        {
+            Logger.LogWarning("Invalid token: {stme}", stme);
+            return OperationResult<ClaimsPrincipal>.Failure(UsersApiErrors.TokenIsNotValidError());
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Token validation failed: {ex.Message}");
-            return OperationResult.Failure(CommonErrors.InternalServerError());
+            Logger.LogWarning($"Unexpected error: Token validation failed: {ex.Message}");
+            return OperationResult<ClaimsPrincipal>.Failure(CommonErrors.InternalServerError());
         }
     }
     

@@ -2,6 +2,7 @@ using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
+using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Public.Models.Images;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,13 @@ namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
 [Route(ApiRoutes.Images.ImagesApi)]
+[AuthorizationFilter(UserRole.User)]
 public class ImagesController(IImageService imageService, IMapper mapper) : ControllerBase
 {
 
     [MaxFileSize(10485760)]
     [HttpPost(ApiRoutes.Images.UploadPart)]
+    
     public async Task<ActionResult<Guid>> Create(IFormFile file, Guid objectId)
     {
         var uploadOperation = await imageService.CreateAsync(file, objectId).ConfigureAwait(false);

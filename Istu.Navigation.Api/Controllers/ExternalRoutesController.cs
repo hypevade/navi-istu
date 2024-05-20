@@ -1,11 +1,11 @@
 using AutoMapper;
 using Istu.Navigation.Api.Extensions;
+using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Models.ExternalRoutes;
-using Istu.Navigation.Domain.Services;
+using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Domain.Services.ExternalRoutes;
-using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.ExternalRoutesApiErrors;
 using Istu.Navigation.Public.Models.ExternalRoutes;
@@ -15,6 +15,7 @@ namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
 [Route(ApiRoutes.ExternalRoutes.ExternalRoutesApi)]
+[AuthorizationFilter(UserRole.User)]
 public class ExternalRoutesController(
     IBuildingsService buildingsService,
     IExternalRoutesSearcher routesSearcher,
