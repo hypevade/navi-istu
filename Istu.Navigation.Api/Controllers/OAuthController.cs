@@ -1,111 +1,57 @@
 using Istu.Navigation.Api.Extensions;
-using Istu.Navigation.Domain.Models.Users;
-using Istu.Navigation.Infrastructure.Errors;
+using Istu.Navigation.Api.Paths;
+using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace Istu.Navigation.Api.Controllers;
-//TODO: тестовый вариант, нужно будет переписать  
+
 [ApiController]
-[Route("oauth")]
+[Route(ApiRoutes.OAuth.OauthApi)]
 public class OAuthController : ControllerBase
 {
-    private readonly OAuthOptions oAuthOptions;
-    private readonly IHttpClientFactory httpClientFactory;
     private readonly ILogger<OAuthController> logger;
+    private readonly IIstuService istuService;
 
-    public OAuthController(IOptions<OAuthOptions> options,
-        IHttpClientFactory httpClientFactory,
-        ILogger<OAuthController> logger)
+    public OAuthController(ILogger<OAuthController> logger, IIstuService istuService)
     {
-        oAuthOptions = options.Value;
-        this.httpClientFactory = httpClientFactory;
         this.logger = logger;
+        this.istuService = istuService;
     }
 
-    [HttpGet("authenticate")]
+    [HttpGet(ApiRoutes.OAuth.AuthenticatePart)]
     public IActionResult AuthenticateUser()
     {
-        if (string.IsNullOrEmpty(oAuthOptions.AuthorizationUrl) ||
-            oAuthOptions.ClientId == default ||
-            string.IsNullOrEmpty(oAuthOptions.RedirectUri) ||
-            string.IsNullOrEmpty(oAuthOptions.ResponseType))
-        {
-            logger.LogError("Error: OAuth options are not provided.");
-            return CommonErrors.InternalServerError().ToActionResult();
-        }
+        var getUrl = istuService.GenerateRedirectUrl();
+        if (getUrl.IsFailure)
+            return getUrl.ApiError.ToActionResult();
         
-        var authorizationUrl =
-            $"{oAuthOptions.AuthorizationUrl}?response_type={oAuthOptions.ResponseType}&client_id={oAuthOptions.ClientId}&redirect_uri={oAuthOptions.RedirectUri}";
-        
-        logger.LogInformation("User is redirected to: {AuthorizationUrl}", authorizationUrl);
-        return Redirect(authorizationUrl);
+        logger.LogInformation("User is redirected to: {AuthorizationUrl}", getUrl.Data);
+        return Redirect(getUrl.Data);
     }
 
-    [HttpGet("callback")]
+    [HttpGet(ApiRoutes.OAuth.CallBackPart)]
     public async Task<IActionResult> OAuthCallback(string code)
     {
         if (string.IsNullOrEmpty(code))
             return UsersApiErrors.CodeNotValidError().ToActionResult();
-        
-        var getTokenOperation = await ExchangeCodeForTokenAsync(code);
 
+        var getTokenOperation = await istuService.ExchangeCodeForTokenAsync(code).ConfigureAwait(false);
         if (getTokenOperation.IsFailure)
             return getTokenOperation.ApiError.ToActionResult();
 
-        HttpContext.Response.Headers.Append("Authorization", $"Bearer {getTokenOperation.Data.AccessToken}");
-        HttpContext.Response.Headers.Append("Refresh", $"Bearer {getTokenOperation.Data.RefreshToken}");
-        return Ok(getTokenOperation.Data);
-    }
+        var userInfo = await istuService.GetUserInfo(getTokenOperation.Data.AccessToken).ConfigureAwait(false);
+        if (userInfo.IsFailure)
+            return userInfo.ApiError.ToActionResult();
 
-    private async Task<OperationResult<TokenResponse>> ExchangeCodeForTokenAsync(string code)
-    {
-        if (string.IsNullOrEmpty(oAuthOptions.TokenUrl) || string.IsNullOrEmpty(oAuthOptions.RedirectUri) ||
-            string.IsNullOrEmpty(oAuthOptions.ClientSecret))
-        {
-            logger.LogError("Error: OAuth options are not provided.");
-            return OperationResult<TokenResponse>.Failure(CommonErrors.InternalServerError());
-        }
-        
-        var client = httpClientFactory.CreateClient();
-        var requestBody = new Dictionary<string, string>
-        {
-            { "grant_type", "authorization_code" },
-            { "code", code },
-            { "redirect_uri", oAuthOptions.RedirectUri },
-            { "client_id", oAuthOptions.ClientId.ToString() },
-            { "client_secret", oAuthOptions.ClientSecret }
-        };
+        var registerUserOperation = await istuService.RegisterIstuUser(userInfo.Data,
+            getTokenOperation.Data.AccessToken,
+            getTokenOperation.Data.RefreshToken);
+        if (registerUserOperation.IsFailure)
+            return registerUserOperation.ApiError.ToActionResult();
 
-        var response = await client.PostAsync(oAuthOptions.TokenUrl, new FormUrlEncodedContent(requestBody));
-
-        if (!response.IsSuccessStatusCode)
-        {
-            logger.LogWarning($"Error: Failed to exchange code for token. Status code: {response.StatusCode}");
-            return OperationResult<TokenResponse>.Failure(UsersApiErrors.CodeNotValidError());
-        }
-        
-        TokenResponse? tokenResponse;
-
-        var content = await response.Content.ReadAsStringAsync();
-        try
-        {
-            tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(content);
-        }
-        catch (Exception e)
-        {
-            logger.LogError("Error: Failed to deserialize token response. {Error}", e.Message);
-            throw;
-        }
-
-        if (tokenResponse == null)
-        {
-            logger.LogError("Error: Failed to deserialize token response.");
-            return OperationResult<TokenResponse>.Failure(CommonErrors.InternalServerError());
-        }
-
-        return OperationResult<TokenResponse>.Success(tokenResponse);
+        HttpContext.Response.Headers.Append("Authorization", $"Bearer {registerUserOperation.Data.AccessToken}");
+        HttpContext.Response.Headers.Append("Refresh", $"Bearer {registerUserOperation.Data.RefreshToken}");
+        return Ok(registerUserOperation.Data);
     }
 }

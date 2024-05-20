@@ -2,16 +2,25 @@
 
 namespace Istu.Navigation.Domain.Models.Users;
 
-public class IstuUser: User
+public class IstuUser(
+    Guid id,
+    string email,
+    string firstName,
+    string lastName,
+    string istuId,
+    string istuAccessToken,
+    string istuRefreshToken)
+    : BaseUser(id, email, firstName, lastName, UserRole.Student)
 {
-    public IstuUser(Guid id, string email, string hashPassword, string firstName, string lastName, UserRole role,
-        string istuId, string istuToken) : base(id, email, hashPassword, firstName, lastName, role)
+    public string IstuId { get; set; } = istuId;
+    public string IstuAccessToken { get; set; } = istuAccessToken;
+    public string IstuRefreshToken { get; set; } = istuRefreshToken;
+    
+
+    public static IstuUser FromEntity(UserEntity userEntity)
     {
-        IstuId = istuId;
-        IstuToken = istuToken;
+        return new IstuUser(userEntity.Id, userEntity.Email, userEntity.FirstName, userEntity.LastName,
+            userEntity.IstuId ?? string.Empty, userEntity.IstuAccessToken ?? string.Empty,
+            userEntity.IstuRefreshToken ?? string.Empty);
     }
-
-    public string IstuId { get; set; }
-
-    public string IstuToken { get; set; }
 }

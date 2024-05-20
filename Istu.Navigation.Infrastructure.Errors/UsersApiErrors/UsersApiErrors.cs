@@ -25,6 +25,12 @@ public class UsersApiErrors
         return new ApiError(401, $"Токен недействителен.",
             GetUrn("token-is-not-valid"));
     }
+    
+    public static ApiError AuthorizationHeaderIsEmptyError()
+    {
+        return new ApiError(401, $"Заголовок 'Authorization' не может быть пустым.",
+            GetUrn("authorization-header-is-empty"));
+    }
     public static ApiError CodeNotValidError()
     {
         return new ApiError(401, $"Код недействителен.",

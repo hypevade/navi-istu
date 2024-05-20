@@ -2,9 +2,9 @@
 
 namespace Istu.Navigation.Domain.Models.Users;
 
-public class User
+public class User: BaseUser
 {
-    public User(Guid id, string email, string hashPassword, string firstName, string lastName, UserRole role, string? refreshToken = null, string? accessToken = null)
+    public User(Guid id, string email, string hashPassword, string firstName, string lastName, UserRole role) : base(id, email, firstName, lastName, role)
     {
         Id = id;
         Email = email;
@@ -12,19 +12,9 @@ public class User
         FirstName = firstName;
         LastName = lastName;
         Role = role;
-        RefreshToken = refreshToken;
-        AccessToken = accessToken;
     }
-
-    public Guid Id { get; set; }
-    public string Email { get; set; }
+    
     public string HashPassword { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-
-    public string? RefreshToken { get; set; }
-    public string? AccessToken { get; set; }
-    public UserRole Role { get; set; }
 
     public static UserEntity ToEntity(User user) => new()
     {

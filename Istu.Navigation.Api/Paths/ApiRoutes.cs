@@ -161,4 +161,11 @@ public static class ApiRoutes
         public const string SearchApi = Base + "/search";
         public const string SearchPart = "";
     }
+
+    public static class OAuth
+    {
+        public const string OauthApi = "oauth";
+        public const string AuthenticatePart = "authenticate";
+        public const string CallBackPart = "callback";
+    }
 }

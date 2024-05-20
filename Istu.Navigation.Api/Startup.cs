@@ -141,6 +141,8 @@ public class Startup
 
         services.AddScoped<IRouteSearcher, RouteSearcher>();
 
+        services.AddScoped<IIstuService, IstuService>();
+
         services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.PropertyNamingPolicy = null;

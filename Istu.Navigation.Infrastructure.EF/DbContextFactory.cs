@@ -19,6 +19,7 @@ public class DbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 
         //var connectionString = configuration.GetConnectionString("BuildingsDatabaseTest");
         var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__TestDataBase");
+        
 
         dbContextBuilder.UseNpgsql(connectionString);
 
