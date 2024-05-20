@@ -57,7 +57,7 @@ public class OAuthController : ControllerBase
 
         HttpContext.Response.Headers.Append("Authorization", $"Bearer {getTokenOperation.Data.AccessToken}");
         HttpContext.Response.Headers.Append("Refresh", $"Bearer {getTokenOperation.Data.RefreshToken}");
-        return NoContent();
+        return Ok(getTokenOperation.Data);
     }
 
     private async Task<OperationResult<TokenResponse>> ExchangeCodeForTokenAsync(string code)
