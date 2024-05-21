@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Filters;
+using Istu.Navigation.Api.Helpers;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services.Users;
+using Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
 using Istu.Navigation.Public.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using LoginRequest = Istu.Navigation.Public.Models.Users.LoginRequest;
@@ -84,8 +86,15 @@ public class UsersController(IUsersService usersService, IMapper mapper, ILogger
     [Route(ApiRoutes.Users.RefreshPart)]
     public async Task<ActionResult<RefreshTokenResult>> RefreshToken()
     {
+        if (!HttpContext.Request.Headers.TryGetValue("RefreshToken", out var headerValue))
+        {
+            var error =  UsersApiErrors.AuthorizationHeaderIsEmptyError();
+            return StatusCode(error.StatusCode, error.ToErrorDto());
+        }
+        var extractedToken = JwtTokenHelper.ExtractToken(headerValue.ToString());
+        
         var refreshToken =
-            await usersService.RefreshToken(Request.Headers["RefreshToken"].ToString())
+            await usersService.RefreshToken(extractedToken)
                 .ConfigureAwait(false);
 
         return refreshToken.IsSuccess
