@@ -10,6 +10,23 @@ public class UsersApiErrors
             GetUrn("user-with-email-not-found"));
     }
     
+    public static ApiError FirstNameOrLastNameIsEmptyError(string firstName, string lastName)
+    {
+        return new ApiError(400, $"Имя '{firstName}' или фамилия '{lastName}' не может быть пустым.",
+            GetUrn("first-name-or-last-name-is-empty"));
+    }
+    
+    public static ApiError UserWithEmailAlreadyExistsError(string email)
+    {
+        return new ApiError(400, $"Пользователь с почтой '{email}' уже существует.",
+            GetUrn("user-with-email-already-exists"));
+    }
+    public static ApiError PasswordIsTooShortError()
+    {
+        return new ApiError(400, $"Пароль слишком короткий. Минимум 6 символов.",
+            GetUrn("user-with-email-already-exists"));
+    }
+    
     public static ApiError IncorrectPasswordError(string email)
     {
         return new ApiError(401, $"Неверный пароль для пользователя с почтой '{email}'.",

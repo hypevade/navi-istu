@@ -111,11 +111,17 @@ public class UsersService : IUsersService
 
         return OperationResult<UserEntity>.Success(user);
     }
-
-    //TODO: add validation
+    
     private async Task<OperationResult> CheckUser(string email, string password, string firstName,
         string lastName)
     {
+        var user = await usersRepository.GetByEmailAsync(email);
+        if (user is not null)
+            return OperationResult.Failure(UsersApiErrors.UserWithEmailAlreadyExistsError(email));
+        if(string.IsNullOrWhiteSpace(password) || password.Length < 6)
+            return OperationResult.Failure(UsersApiErrors.PasswordIsTooShortError());
+        if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+            return OperationResult.Failure(UsersApiErrors.FirstNameOrLastNameIsEmptyError(firstName, lastName));
         return OperationResult.Success();
     }
 
