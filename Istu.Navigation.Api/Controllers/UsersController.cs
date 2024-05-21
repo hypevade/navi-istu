@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
+using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
-using Istu.Navigation.Domain.Models.Entities.User;
+using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services.Users;
 using Istu.Navigation.Public.Models.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
 [Route(ApiRoutes.Users.UsersApi)]
-public class UsersController(IUsersService usersService, IMapper mapper) : ControllerBase
+public class UsersController(IUsersService usersService, IMapper mapper, ILogger<UsersController> logger) : ControllerBase
 {
     private readonly IUsersService usersService = usersService;
     private readonly IMapper mapper = mapper;
@@ -55,6 +56,28 @@ public class UsersController(IUsersService usersService, IMapper mapper) : Contr
         };
         
         return Ok(response);
+    }
+    
+    [HttpGet]
+    [Route(ApiRoutes.Users.GetUserInfo)]
+    [AuthorizationFilter(UserRole.User)]
+    public async Task<ActionResult<UserDto>> GetUserInfo()
+    {
+        var userId = HttpContext.GetUserId(logger);
+        if (userId is null)
+            return Unauthorized();
+
+        var getUserOperation =
+            await usersService.GetUserInfo(userId.Value)
+                .ConfigureAwait(false);
+
+        if (getUserOperation.IsFailure)
+        {
+            var apiError = getUserOperation.ApiError;
+            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
+        }
+
+        return Ok(mapper.Map<UserDto>(getUserOperation.Data));
     }
     
     [HttpPost]

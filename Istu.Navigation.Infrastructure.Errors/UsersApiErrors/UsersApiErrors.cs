@@ -38,6 +38,13 @@ public class UsersApiErrors
         return new ApiError(401, $"Неверный пароль для пользователя с почтой '{email}'.",
             GetUrn("incorrect-password"));
     }
+    
+    public static ApiError IstuLoginWithPasswordError(string email)
+    {
+        return new ApiError(401, $"Ввойдите с помощью личного кабинета студента с почтой '{email}'.",
+            GetUrn("istu-login-with-password-error"));
+    }
+    
     public static ApiError TokenExpiredError()
     {
         return new ApiError(401, $"Токен устарел.",

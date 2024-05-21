@@ -140,6 +140,7 @@ public static class ApiRoutes
         public const string LoginPart = "login";
         public const string RegisterPart = "register";
         public const string RefreshPart = "refresh";
+        public const string GetUserInfo = "info";
     }
     
     public static class Images

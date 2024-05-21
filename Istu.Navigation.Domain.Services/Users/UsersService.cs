@@ -5,6 +5,7 @@ using Istu.Navigation.Domain.Repositories.Users;
 using Istu.Navigation.Infrastructure.Common;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
+using Microsoft.Extensions.Logging;
 
 namespace Istu.Navigation.Domain.Services.Users;
 
@@ -12,6 +13,8 @@ public interface IUsersService
 {
     Task<OperationResult<User>> RegisterUser(string email, string password, string firstName, string lastName);
     Task<OperationResult<User>> LoginUser(string email, string password);
+    Task<OperationResult<User>> GetUserInfo(Guid userId);
+    
     Task<OperationResult<(string accessToken, string refreshToken)>> RefreshToken(string refreshToken);
 }
 
@@ -22,15 +25,17 @@ public class UsersService : IUsersService
     private readonly IMapper mapper;
     private readonly IAccessTokenProvider accessTokenProvider;
     private readonly IRefreshTokenProvider refreshTokenProvider;
+    private readonly ILogger<UsersService> logger;
 
     public UsersService(IPasswordHasher passwordHasher, IUsersRepository usersRepository, IMapper mapper,
-        IAccessTokenProvider accessTokenProvider, IRefreshTokenProvider refreshTokenProvider)
+        IAccessTokenProvider accessTokenProvider, IRefreshTokenProvider refreshTokenProvider, ILogger<UsersService> logger)
     {
         this.passwordHasher = passwordHasher;
         this.usersRepository = usersRepository;
         this.mapper = mapper;
         this.accessTokenProvider = accessTokenProvider;
         this.refreshTokenProvider = refreshTokenProvider;
+        this.logger = logger;
     }
 
     public async Task<OperationResult<User>> RegisterUser(string email, string password, string firstName,
@@ -59,6 +64,12 @@ public class UsersService : IUsersService
         var userEntity = await usersRepository.GetByEmailAsync(email);
         if (userEntity is null)
             return OperationResult<User>.Failure(UsersApiErrors.UserWithEmailNotFoundError(email));
+        if (userEntity.HashPassword is null)
+        {
+            logger.LogWarning("Attempt to login istu user without password, will return a 401 error");
+            return OperationResult<User>.Failure(UsersApiErrors.IstuLoginWithPasswordError(email));
+        }
+        
         var verifyPassword = passwordHasher.Verify(password, userEntity.HashPassword);
         if (!verifyPassword)
             return OperationResult<User>.Failure(UsersApiErrors.IncorrectPasswordError(email));
@@ -70,6 +81,17 @@ public class UsersService : IUsersService
         user.RefreshToken = refreshToken;
 
         return OperationResult<User>.Success(user);
+    }
+
+    public async Task<OperationResult<User>> GetUserInfo(Guid userId)
+    {
+        var user = await usersRepository.GetByIdAsync(userId).ConfigureAwait(false);
+        if (user is null)
+        {
+            logger.LogError("GetUserInfo: User with id {UserId} not found, but authorization was successful", userId);
+            return OperationResult<User>.Failure(UsersApiErrors.UserWithIdNotFoundError(userId));
+        }
+        return OperationResult<User>.Success(mapper.Map<User>(user));
     }
 
     public async Task<OperationResult<(string accessToken, string refreshToken)>> RefreshToken(string refreshToken)
