@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Paths;
+using Istu.Navigation.Domain.Models.Entities.User;
 using Istu.Navigation.Domain.Services.Users;
 using Istu.Navigation.Public.Models.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ public class UsersController(IUsersService usersService, IMapper mapper) : Contr
 
     [HttpPost]
     [Route(ApiRoutes.Users.LoginPart)]
-    public async Task<ActionResult<string>> Login([FromBody] LoginRequest request)
+    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
     {
         var loginUser =
             await usersService.LoginUser(request.Email, request.Password)
@@ -45,8 +46,15 @@ public class UsersController(IUsersService usersService, IMapper mapper) : Contr
             var apiError = loginUser.ApiError;
             return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
         }
-
-        return Ok(loginUser.Data);
+        
+        var response = new LoginResponse
+        {
+            User = mapper.Map<UserDto>(loginUser.Data),
+            AccessToken = loginUser.Data.AccessToken,
+            RefreshToken = loginUser.Data.RefreshToken
+        };
+        
+        return Ok(response);
     }
     
     [HttpPost]
