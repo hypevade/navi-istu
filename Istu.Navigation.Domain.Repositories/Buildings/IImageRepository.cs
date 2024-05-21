@@ -1,5 +1,6 @@
 ﻿using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Base;
+using Istu.Navigation.Infrastructure.EF;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ public interface IImageRepository : IRepository<ImageInfoEntity>
     public Task<List<ImageInfoEntity>> GetAllByFilterAsync(ImageFilter filter);
 }
 
-public class ImageRepository(DbContext context) : Repository<ImageInfoEntity>(context), IImageRepository
+public class ImageRepository(AppDbContext context) : Repository<ImageInfoEntity>(context), IImageRepository
 {
     public Task<List<ImageInfoEntity>> GetAllByObjectId(Guid objectId)
     {

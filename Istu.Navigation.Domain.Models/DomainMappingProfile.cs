@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
+using Istu.Navigation.Domain.Models.Cards;
 using Istu.Navigation.Domain.Models.Entities;
+using Istu.Navigation.Domain.Models.Entities.Cards;
 using Istu.Navigation.Domain.Models.Entities.User;
 using Istu.Navigation.Domain.Models.Users;
 
@@ -20,5 +22,8 @@ public class DomainMappingProfile : Profile
         CreateMap<ImageInfoEntity, ImageInfo>();
         CreateMap<User, UserEntity>();
         CreateMap<UserEntity, User>();
+        CreateMap<CommentWithUserEntity, Comment>().ConstructUsing(x =>
+            new Comment(x.CommentId, x.CreatorId, x.Text, x.CreationDate, $"{x.FirstName} {x.LastName}"));
+        
     }
 }

@@ -1,17 +1,18 @@
 ﻿using System.Linq.Expressions;
+using Istu.Navigation.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 
 namespace Istu.Navigation.Domain.Repositories.Base;
 
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {
-    private readonly DbContext context;
+    protected readonly AppDbContext Context;
     protected readonly DbSet<TEntity> DbSet;
 
-    public Repository(DbContext context)
+    public Repository(AppDbContext context)
     {
-        this.context = context;
-        DbSet = this.context.Set<TEntity>();
+        Context = context;
+        DbSet = Context.Set<TEntity>();
     }
 
     public async Task<TEntity?> GetByIdAsync(Guid id)
@@ -19,16 +20,16 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         return await DbSet.FindAsync(id).ConfigureAwait(false);
     }
 
-    public async Task<List<TEntity>> GetAllAsync(int skip = 0, int take = 100)
+    public Task<List<TEntity>> GetAllAsync(int skip = 0, int take = 100)
     {
-        return await DbSet.Skip(skip)
+        return DbSet.Skip(skip)
             .Take(take)
             .ToListAsync();
     }
 
-    public async Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
+    public Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
     {
-        return await DbSet.Where(predicate).ToListAsync().ConfigureAwait(false);
+        return DbSet.Where(predicate).ToListAsync();
     }
 
     public async Task<TEntity> AddAsync(TEntity entity)
@@ -83,8 +84,8 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         DbSet.RemoveRange(entities);
     }
 
-    public async Task<int> SaveChangesAsync()
+    public Task<int> SaveChangesAsync()
     {
-        return await context.SaveChangesAsync().ConfigureAwait(false);
+        return Context.SaveChangesAsync();
     }
 }

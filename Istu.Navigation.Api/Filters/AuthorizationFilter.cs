@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Helpers;
 using Istu.Navigation.Domain.Models.Users;
@@ -22,7 +23,7 @@ public class AuthorizationFilter(UserRole minimumRole) : Attribute, IAuthorizati
             context.Result = UsersApiErrors.AuthorizationHeaderIsEmptyError().ToActionResult();
             return;
         }
-    
+
         ValidateToken(context, headerValue.ToString());
     }
 
@@ -34,7 +35,7 @@ public class AuthorizationFilter(UserRole minimumRole) : Attribute, IAuthorizati
             context.Result = UsersApiErrors.TokenIsNotValidError().ToActionResult();
             return;
         }
-    
+
         var tokenHandler = context.HttpContext.RequestServices.GetRequiredService<IAccessTokenProvider>();
         OperationResult<(Guid Id, UserRole Role)> validateTokenAndGetUserId = tokenHandler.GetUser(token);
 
@@ -43,18 +44,20 @@ public class AuthorizationFilter(UserRole minimumRole) : Attribute, IAuthorizati
             context.Result = validateTokenAndGetUserId.ApiError.ToActionResult();
             return;
         }
-    
-        CheckRole(context, validateTokenAndGetUserId.Data.Role, validateTokenAndGetUserId.Data.Id);
+
+        CheckRoleAndSetUser(context, validateTokenAndGetUserId.Data.Role, validateTokenAndGetUserId.Data.Id);
     }
 
-    private void CheckRole(AuthorizationFilterContext context, UserRole role, Guid userId)
+    private void CheckRoleAndSetUser(AuthorizationFilterContext context, UserRole role, Guid userId)
     {
         if (role < minimumRole)
         {
             context.Result = UsersApiErrors.AccessDeniedError().ToActionResult();
             return;
         }
-    
-        context.RouteData.Values.Add("userId", userId);
+
+        var claims = new[] { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
+        var identity = new ClaimsIdentity(claims, "Custom");
+        context.HttpContext.User = new ClaimsPrincipal(identity);
     }
 }

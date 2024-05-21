@@ -1,5 +1,6 @@
 ﻿using Istu.Navigation.Domain.Models.Entities.User;
 using Istu.Navigation.Domain.Repositories.Base;
+using Istu.Navigation.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 
 namespace Istu.Navigation.Domain.Repositories.Users;
@@ -10,7 +11,7 @@ public interface IUsersRepository : IRepository<UserEntity>
     public Task<UserEntity?> GetByEmailAsync(string email);
     public void UpdateRefreshToken(Guid userId, string refreshToken);
 }
-public class UsersRepository(DbContext context): Repository<UserEntity>(context), IUsersRepository 
+public class UsersRepository(AppDbContext context): Repository<UserEntity>(context), IUsersRepository 
 {
     public Task<UserEntity?> GetByEmailAsync(string email)
     {

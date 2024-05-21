@@ -156,10 +156,14 @@ public static class ApiRoutes
         public const string CreatePart = "";
     }
     
-    public static class Search
+    public static class Cards
     {
-        public const string SearchApi = Base + "/search";
-        public const string SearchPart = "";
+        public const string CardsApi = Base + "/cards";
+        public const string SearchPart = "search";
+        public const string GetByIdPart = "{objectId}";
+        public const string AddCommentPart = "{objectId}/comment";
+        public const string DeleteCommentPart = "{objectId}/comment/{commentId}";
+        public const string GetCommentsPart = "comments";
     }
 
     public static class OAuth

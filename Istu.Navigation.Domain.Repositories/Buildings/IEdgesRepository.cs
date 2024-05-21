@@ -1,5 +1,6 @@
 ﻿using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Base;
+using Istu.Navigation.Infrastructure.EF;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ public interface IEdgesRepository : IRepository<EdgeEntity>
 
 public class EdgesRepository : Repository<EdgeEntity>, IEdgesRepository
 {
-    public EdgesRepository(DbContext context) : base(context)
+    public EdgesRepository(AppDbContext context) : base(context)
     { }
     
     public Task<List<EdgeEntity>> GetAllByFilterAsync(EdgeFilter filter)

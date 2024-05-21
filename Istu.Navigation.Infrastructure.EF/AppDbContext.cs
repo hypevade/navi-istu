@@ -1,4 +1,5 @@
 ﻿using Istu.Navigation.Domain.Models.Entities;
+using Istu.Navigation.Domain.Models.Entities.Cards;
 using Istu.Navigation.Domain.Models.Entities.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,8 @@ public class AppDbContext : DbContext
     public DbSet<FloorEntity> Floors { get; set; }
     
     public DbSet<UserEntity> Users { get; set; }
+    
+    public DbSet<CommentEntity> Comments { get; set; }
 
 #pragma warning disable CS8618 // Required by Entity Framework
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
@@ -35,6 +38,24 @@ public class AppDbContext : DbContext
         ConfigureImageLinks(modelBuilder);
         ConfigureFloors(modelBuilder);
         ConfigureUsers(modelBuilder);
+        ConfigureComments(modelBuilder);
+    }
+
+    private void ConfigureComments(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CommentEntity>(a =>
+        {
+            a.Property(x => x.ObjectId).IsRequired();
+            a.Property(x => x.Text).HasMaxLength(1000).IsRequired();
+            a.Property(x => x.CreationDate).IsRequired();
+        });
+        
+        modelBuilder.Entity<CommentEntity>()
+            .HasOne<UserEntity>()
+            .WithMany()
+            .HasForeignKey(x => x.CreatorId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
     }
     
     private void ConfigureUsers(ModelBuilder modelBuilder)

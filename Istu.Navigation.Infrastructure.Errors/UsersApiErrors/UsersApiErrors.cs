@@ -10,6 +10,12 @@ public class UsersApiErrors
             GetUrn("user-with-email-not-found"));
     }
     
+    public static ApiError UserWithIdNotFoundError(Guid id)
+    {
+        return new ApiError(404, $"Пользователь с идентификатором '{id}' не найден.",
+            GetUrn("user-with-id-not-found"));
+    }
+    
     public static ApiError FirstNameOrLastNameIsEmptyError(string firstName, string lastName)
     {
         return new ApiError(400, $"Имя '{firstName}' или фамилия '{lastName}' не может быть пустым.",
@@ -58,4 +64,6 @@ public class UsersApiErrors
     {
         return new ApiError(403, $"Доступ запрещен.",GetUrn("access-denied"));
     }
+    
+    
 }

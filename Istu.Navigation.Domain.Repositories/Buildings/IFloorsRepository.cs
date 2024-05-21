@@ -1,5 +1,6 @@
 ﻿using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Base;
+using Istu.Navigation.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore;
 
 namespace Istu.Navigation.Domain.Repositories.Buildings;
@@ -10,7 +11,7 @@ public interface IFloorsRepository : IRepository<FloorEntity>
     public Task<FloorEntity?> GetByBuildingIdAsync(Guid buildingId, int floorNumber);
 }
 
-public class FloorsRepository(DbContext context) : Repository<FloorEntity>(context), IFloorsRepository
+public class FloorsRepository(AppDbContext context) : Repository<FloorEntity>(context), IFloorsRepository
 {
     public Task<List<FloorEntity>> GetAllByBuildingIdAsync(Guid buildingId, int minFloor = 1, int maxFloor = int.MaxValue)
     {

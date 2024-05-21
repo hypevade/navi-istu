@@ -1,6 +1,6 @@
 using Istu.Navigation.Domain.Services;
 
-namespace Istu.Navigation.Public.Models.Search;
+namespace Istu.Navigation.Public.Models.Cards;
 
 public class SearchResultDto
 {

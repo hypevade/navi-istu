@@ -5,10 +5,12 @@ using Istu.Navigation.Domain.Models;
 using Istu.Navigation.Domain.Models.ExternalRoutes;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Repositories.Buildings;
+using Istu.Navigation.Domain.Repositories.Cards;
 using Istu.Navigation.Domain.Repositories.Users;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.BuildingRoutes;
 using Istu.Navigation.Domain.Services.Buildings;
+using Istu.Navigation.Domain.Services.Cards;
 using Istu.Navigation.Domain.Services.ExternalRoutes;
 using Istu.Navigation.Domain.Services.Users;
 using Istu.Navigation.Infrastructure.Common;
@@ -162,6 +164,9 @@ public class Startup
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         
         services.AddScoped<ILuceneService, LuceneService>();
+
+        services.AddScoped<ICommentsRepository, CommentsRepository>();
+        services.AddScoped<ICommentsService, CommentsService>();
         
         services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
 

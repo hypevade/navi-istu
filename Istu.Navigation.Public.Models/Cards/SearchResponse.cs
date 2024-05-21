@@ -1,4 +1,4 @@
-namespace Istu.Navigation.Public.Models.Search;
+namespace Istu.Navigation.Public.Models.Cards;
 
 public class SearchResponse
 {

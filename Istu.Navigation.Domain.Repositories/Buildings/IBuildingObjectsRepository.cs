@@ -1,5 +1,6 @@
 ﻿using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Base;
+using Istu.Navigation.Infrastructure.EF;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,7 @@ public interface IBuildingObjectsRepository : IRepository<BuildingObjectEntity>
     public Task<List<BuildingObjectEntity>> GetAllByFilterAsync(BuildingObjectFilter filter);
 }
 
-public class BuildingObjectsRepository(DbContext context)
+public class BuildingObjectsRepository(AppDbContext context)
     : Repository<BuildingObjectEntity>(context), IBuildingObjectsRepository
 {
     public Task<List<BuildingObjectEntity>> GetAllByFilterAsync(BuildingObjectFilter filter)
