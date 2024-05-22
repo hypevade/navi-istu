@@ -61,7 +61,7 @@ public class UsersController(IUsersService usersService, IMapper mapper, ILogger
     }
     
     [HttpGet]
-    [Route(ApiRoutes.Users.GetUserInfo)]
+    [Route(ApiRoutes.Users.GetUserInfoPart)]
     [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<UserDto>> GetUserInfo()
     {
@@ -88,7 +88,7 @@ public class UsersController(IUsersService usersService, IMapper mapper, ILogger
     {
         if (!HttpContext.Request.Headers.TryGetValue("RefreshToken", out var headerValue))
         {
-            var error =  UsersApiErrors.AuthorizationHeaderIsEmptyError();
+            var error =  UsersApiErrors.RefreshTokenHeaderIsEmptyError();
             return StatusCode(error.StatusCode, error.ToErrorDto());
         }
         var extractedToken = JwtTokenHelper.ExtractToken(headerValue.ToString());
@@ -100,5 +100,19 @@ public class UsersController(IUsersService usersService, IMapper mapper, ILogger
         return refreshToken.IsSuccess
             ? Ok(new RefreshTokenResult { AccessToken = refreshToken.Data.accessToken, RefreshToken = refreshToken.Data.refreshToken })
             : StatusCode(refreshToken.ApiError.StatusCode, refreshToken.ApiError.ToErrorDto());
+    }
+
+    [HttpGet]
+    [Route(ApiRoutes.Users.GetUserSchedulePart)]
+    [AuthorizationFilter(UserRole.Student)]
+    public async Task<ActionResult<List<Lesson>>> GetUserSchedule()
+    {
+        var userId = HttpContext.GetUserId(logger);
+        if (userId is null)
+            return Unauthorized();
+        var getLessonsOperation = await usersService.GetUserSchedule(userId.Value).ConfigureAwait(false);
+        if (getLessonsOperation.IsFailure)
+            return StatusCode(getLessonsOperation.ApiError.StatusCode, getLessonsOperation.ApiError.ToErrorDto());
+        return Ok(getLessonsOperation.Data);
     }
 }

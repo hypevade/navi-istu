@@ -17,8 +17,7 @@ public interface IEdgesService
     public Task<OperationResult> DeleteAsync(Guid edgeId);
 }
 
-public class EdgesService(IEdgesRepository repository, IBuildingObjectsService objectsService)
-    : IEdgesService
+public class EdgesService(IEdgesRepository repository, IBuildingObjectsService objectsService) : IEdgesService
 {
     public async Task<OperationResult<List<Edge>>> GetAllByFilterAsync(EdgeFilter filter)
     {

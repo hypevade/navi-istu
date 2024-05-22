@@ -61,6 +61,13 @@ public class UsersApiErrors
         return new ApiError(401, "Заголовок 'Authorization' не может быть пустым.",
             GetUrn("authorization-header-is-empty"));
     }
+    
+    public static ApiError RefreshTokenHeaderIsEmptyError()
+    {
+        return new ApiError(401, "Заголовок 'RefreshToken' не может быть пустым.",
+            GetUrn("refresh-token-header-is-empty"));
+    }
+    
     public static ApiError CodeNotValidError()
     {
         return new ApiError(401, $"Код недействителен.",

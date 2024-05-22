@@ -14,6 +14,7 @@ public interface IUsersService
     Task<OperationResult<User>> RegisterUser(string email, string password, string firstName, string lastName);
     Task<OperationResult<User>> LoginUser(string email, string password);
     Task<OperationResult<User>> GetUserInfo(Guid userId);
+    Task<OperationResult<List<Lesson>>> GetUserSchedule(Guid userId);
     
     Task<OperationResult<(string accessToken, string refreshToken)>> RefreshToken(string refreshToken);
 }
@@ -25,10 +26,12 @@ public class UsersService : IUsersService
     private readonly IMapper mapper;
     private readonly IAccessTokenProvider accessTokenProvider;
     private readonly IRefreshTokenProvider refreshTokenProvider;
+    private readonly IScheduleService scheduleService;
     private readonly ILogger<UsersService> logger;
 
     public UsersService(IPasswordHasher passwordHasher, IUsersRepository usersRepository, IMapper mapper,
-        IAccessTokenProvider accessTokenProvider, IRefreshTokenProvider refreshTokenProvider, ILogger<UsersService> logger)
+        IAccessTokenProvider accessTokenProvider, IRefreshTokenProvider refreshTokenProvider,
+        ILogger<UsersService> logger, IScheduleService scheduleService)
     {
         this.passwordHasher = passwordHasher;
         this.usersRepository = usersRepository;
@@ -36,6 +39,7 @@ public class UsersService : IUsersService
         this.accessTokenProvider = accessTokenProvider;
         this.refreshTokenProvider = refreshTokenProvider;
         this.logger = logger;
+        this.scheduleService = scheduleService;
     }
 
     public async Task<OperationResult<User>> RegisterUser(string email, string password, string firstName,
@@ -92,6 +96,11 @@ public class UsersService : IUsersService
             return OperationResult<User>.Failure(UsersApiErrors.UserWithIdNotFoundError(userId));
         }
         return OperationResult<User>.Success(mapper.Map<User>(user));
+    }
+
+    public async Task<OperationResult<List<Lesson>>> GetUserSchedule(Guid userId)
+    {
+        return await scheduleService.GetUserSchedule(userId).ConfigureAwait(false);
     }
 
     public async Task<OperationResult<(string accessToken, string refreshToken)>> RefreshToken(string refreshToken)

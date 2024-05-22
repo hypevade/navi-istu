@@ -159,6 +159,7 @@ public class Startup
 
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IUsersService, UsersService>();
+        services.AddScoped<IScheduleService, MockedScheduleService>();
         services.AddScoped<IRefreshTokenProvider, RefreshTokenProvider>();
         services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
