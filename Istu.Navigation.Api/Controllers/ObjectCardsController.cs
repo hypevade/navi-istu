@@ -3,6 +3,7 @@ using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
+using Istu.Navigation.Domain.Models.Cards;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.Cards;
@@ -19,14 +20,19 @@ public class ObjectCardsController(
     ILuceneService service,
     IMapper mapper,
     ILogger<ObjectCardsController> logger,
-    ICommentsService commentsService) : ControllerBase
+    ICommentsService commentsService,
+    ICardsService cardsService) : ControllerBase
 {
+    
     [HttpGet]
     [Route(ApiRoutes.Cards.GetByIdPart)]
-    public async Task<IActionResult> GetById(Guid objectId)
+    public async Task<ActionResult<Card>> GetById(Guid objectId)
     {
-        
-        return Ok();
+        var getCardOperation = await cardsService.GetCard(objectId).ConfigureAwait(false);
+        if (getCardOperation.IsFailure)
+            return StatusCode(getCardOperation.ApiError.StatusCode, getCardOperation.ApiError.ToErrorDto());
+
+        return Ok(getCardOperation.Data);
     }
 
     [HttpGet]

@@ -1,3 +1,4 @@
+using Istu.Navigation.Domain.Models.Cards;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -121,17 +122,4 @@ public class LuceneService : ILuceneService
 
         return new SearchResult(guidId, title, contentType);
     }
-}
-
-public class SearchResult(Guid id, string title, ContentType type)
-{
-    public Guid Id { get; set; } = id;
-    public ContentType Type { get; set; } = type;
-
-    public string Title { get; set; } = title;
-}
-public enum ContentType
-{
-    Building = 0,
-    Object = 1
 }

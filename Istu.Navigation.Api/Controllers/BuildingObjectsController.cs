@@ -35,7 +35,7 @@ public class BuildingObjectsController(
     {
         var buildingObject = request.ToBuildingObject(Guid.NewGuid());
 
-        var createOperation = await objectsService.Create(buildingObject);
+        var createOperation = await objectsService.CreateAsync(buildingObject);
 
         if (createOperation.IsFailure)
         {
@@ -51,7 +51,7 @@ public class BuildingObjectsController(
     [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<BuildingObjectDto>>> GetAll([FromQuery] BuildingObjectFilter filter)
     {
-        var getObjects = await objectsService.GetAllByFilter(filter)
+        var getObjects = await objectsService.GetAllByFilterAsync(filter)
             .ConfigureAwait(false);
         if (getObjects.IsFailure)
         {
@@ -68,7 +68,7 @@ public class BuildingObjectsController(
     [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<BuildingObjectDto>> GetById(Guid objectId)
     {
-        var getObject = await objectsService.GetById(objectId).ConfigureAwait(false);
+        var getObject = await objectsService.GetByIdAsync(objectId).ConfigureAwait(false);
         if (getObject.IsFailure)
         {
             var apiError = getObject.ApiError;
@@ -84,7 +84,7 @@ public class BuildingObjectsController(
     [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<BuildingObjectDto>> Delete(Guid objectId)
     {
-        var getObject = await objectsService.Delete([objectId]).ConfigureAwait(false);
+        var getObject = await objectsService.DeleteAsync([objectId]).ConfigureAwait(false);
         if (getObject.IsFailure)
         {
             var apiError = getObject.ApiError;

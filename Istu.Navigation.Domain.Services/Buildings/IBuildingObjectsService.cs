@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Istu.Navigation.Domain.Models.BuildingRoutes;
+using Istu.Navigation.Domain.Models.Cards;
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Repositories.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
@@ -11,11 +12,11 @@ namespace Istu.Navigation.Domain.Services.Buildings;
 
 public interface IBuildingObjectsService
 {
-    public Task<OperationResult<Guid>> Create(BuildingObject buildingObject);
-    public Task<OperationResult> Patch(List<BuildingObject> buildingObjects);
-    public Task<OperationResult> Delete(List<Guid> buildingObjectsIds);
-    public Task<OperationResult<BuildingObject>> GetById(Guid id);
-    public Task<OperationResult<List<BuildingObject>>> GetAllByFilter(BuildingObjectFilter filter);
+    public Task<OperationResult<Guid>> CreateAsync(BuildingObject buildingObject);
+    public Task<OperationResult> PatchAsync(List<BuildingObject> buildingObjects);
+    public Task<OperationResult> DeleteAsync(List<Guid> buildingObjectsIds);
+    public Task<OperationResult<BuildingObject>> GetByIdAsync(Guid id);
+    public Task<OperationResult<List<BuildingObject>>> GetAllByFilterAsync(BuildingObjectFilter filter);
 }
 
 public class BuildingObjectsService : IBuildingObjectsService
@@ -34,7 +35,7 @@ public class BuildingObjectsService : IBuildingObjectsService
         this.luceneService = luceneService;
     }
 
-    public async Task<OperationResult<Guid>> Create(BuildingObject buildingObject)
+    public async Task<OperationResult<Guid>> CreateAsync(BuildingObject buildingObject)
     {
         var check = await CheckBuildingObject(buildingObject).ConfigureAwait(false);
         if (check.IsFailure)
@@ -48,7 +49,7 @@ public class BuildingObjectsService : IBuildingObjectsService
         return OperationResult<Guid>.Success(result.Id);
     }
 
-    public async Task<OperationResult> Patch(List<BuildingObject> buildingObjects)
+    public async Task<OperationResult> PatchAsync(List<BuildingObject> buildingObjects)
     {
         foreach (var buildingObject in buildingObjects)
         {
@@ -64,7 +65,7 @@ public class BuildingObjectsService : IBuildingObjectsService
         return OperationResult.Success();
     }
 
-    public async Task<OperationResult> Delete(List<Guid> buildingObjectsIds)
+    public async Task<OperationResult> DeleteAsync(List<Guid> buildingObjectsIds)
     {
         await buildingObjectsRepository.RemoveRangeAsync(buildingObjectsIds).ConfigureAwait(false);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
@@ -77,7 +78,7 @@ public class BuildingObjectsService : IBuildingObjectsService
         return OperationResult.Success();
     }
 
-    public async Task<OperationResult<BuildingObject>> GetById(Guid id)
+    public async Task<OperationResult<BuildingObject>> GetByIdAsync(Guid id)
     {
         var buildingObject = await buildingObjectsRepository.GetByIdAsync(id).ConfigureAwait(false);
         if (buildingObject is null)
@@ -86,7 +87,7 @@ public class BuildingObjectsService : IBuildingObjectsService
         return OperationResult<BuildingObject>.Success(result);
     }
 
-    public async Task<OperationResult<List<BuildingObject>>> GetAllByFilter(BuildingObjectFilter filter)
+    public async Task<OperationResult<List<BuildingObject>>> GetAllByFilterAsync(BuildingObjectFilter filter)
     {
         var buildingObjectEntities = await buildingObjectsRepository.GetAllByFilterAsync(filter).ConfigureAwait(false);
         var result = mapper.Map<List<BuildingObject>>(buildingObjectEntities);

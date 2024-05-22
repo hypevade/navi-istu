@@ -3,7 +3,6 @@ using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Models.Users;
-using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Public.Models.BuildingRoutes;
@@ -31,7 +30,7 @@ public class EdgesController : ControllerBase
     public async Task<ActionResult<CreateEdgesResponse>> CreateEdges([FromBody] CreateEdgesRequest request)
     {
         var edges = request.Edges.Select(x => (x.FromId, x.ToId)).ToList();
-        var createEdgeOperation = await edgesService.CreateRange(edges).ConfigureAwait(false);
+        var createEdgeOperation = await edgesService.CreateRangeAsync(edges).ConfigureAwait(false);
 
         if (createEdgeOperation.IsFailure)
         {
@@ -47,7 +46,7 @@ public class EdgesController : ControllerBase
     [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<EdgeDto>>> GetAllEdges([FromQuery] EdgeFilter filter)
     {
-        var getEdgesOperation = await edgesService.GetAllByFilter(filter).ConfigureAwait(false);
+        var getEdgesOperation = await edgesService.GetAllByFilterAsync(filter).ConfigureAwait(false);
         
         if (getEdgesOperation.IsFailure)
         {
@@ -63,7 +62,7 @@ public class EdgesController : ControllerBase
     [AuthorizationFilter(UserRole.Admin)]
     public async Task<IActionResult> DeleteEdge(Guid edgeId)
     {
-        var deleteRangeOperation = await edgesService.Delete(edgeId).ConfigureAwait(false);
+        var deleteRangeOperation = await edgesService.DeleteAsync(edgeId).ConfigureAwait(false);
 
         return deleteRangeOperation.IsSuccess
             ? NoContent()

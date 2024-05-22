@@ -74,7 +74,7 @@ public class FloorsBuilder : IFloorsBuilder
             BuildingId = buildingId,
             Floor = floorNumber
         };
-        var objects = await buildingObjectsService.GetAllByFilter(buildingObjectFilter).ConfigureAwait(false);
+        var objects = await buildingObjectsService.GetAllByFilterAsync(buildingObjectFilter).ConfigureAwait(false);
 
         if (objects.IsFailure)
             return OperationResult<Floor>.Failure(objects.ApiError);
@@ -84,7 +84,7 @@ public class FloorsBuilder : IFloorsBuilder
             BuildingId = buildingId,
             Floor = floorNumber
         };
-        var edges = await edgesService.GetAllByFilter(edgeFilter).ConfigureAwait(false);
+        var edges = await edgesService.GetAllByFilterAsync(edgeFilter).ConfigureAwait(false);
 
         if (edges.IsFailure)
             return OperationResult<Floor>.Failure(edges.ApiError);

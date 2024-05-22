@@ -14,7 +14,6 @@ public interface IImageService
 {
     public Task<OperationResult<Guid>> CreateAsync(IFormFile file, Guid objectId);
     public Task<OperationResult<FileInfo>> GetImageByIdAsync(Guid imageId);
-    public Task<OperationResult<List<ImageInfo>>> GetByObjectIdAsync(Guid objectId);
     public Task<OperationResult<List<ImageInfo>>> GetInfosByFilterAsync(ImageFilter filter);
     public Task<OperationResult<List<ImageInfo>>> GetInfosByObjectIdAsync(Guid objectId);
     public Task<OperationResult> DeleteAsync(Guid imageId);
@@ -29,13 +28,6 @@ public class ImageService(IImageRepository repository, IFileStorage storage, IMa
         if (image is null)
             return OperationResult<FileInfo>.Failure(ImagesApiErrors.ImageWithIdNotFoundError(imageId));
         return await storage.DownloadAsync(image.Title).ConfigureAwait(false);
-    }
-
-    public async Task<OperationResult<List<ImageInfo>>> GetByObjectIdAsync(Guid objectId)
-    {
-        var images = await repository.GetAllByObjectId(objectId).ConfigureAwait(false);
-        return OperationResult<List<ImageInfo>>.Success(mapper.Map<List<ImageInfo>>(images));
-        
     }
 
     public async Task<OperationResult<List<ImageInfo>>> GetInfosByFilterAsync(ImageFilter filter)

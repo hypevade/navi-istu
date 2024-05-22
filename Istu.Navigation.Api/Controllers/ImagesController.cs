@@ -44,6 +44,7 @@ public class ImagesController(IImageService imageService, IMapper mapper) : Cont
 
         return File(fileInfo.Content, "application/octet-stream", fileInfo.Name);
     }
+    
     [HttpGet(ApiRoutes.Images.GetPart)]
     public async Task<ActionResult<ImageInfosResponse>> GetByObject(Guid objectId)
     {

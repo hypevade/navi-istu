@@ -1,4 +1,4 @@
-using Istu.Navigation.Domain.Services;
+using Istu.Navigation.Domain.Models.Cards;
 
 namespace Istu.Navigation.Public.Models.Cards;
 

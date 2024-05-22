@@ -51,11 +51,11 @@ public class BuildingRoutesService(
 
     private async Task<OperationResult<(BuildingObject fromObject, BuildingObject toObject)>> GetTwoObjects(Guid fromId, Guid toId)
     {
-        var getToObject = await objectService.GetById(toId).ConfigureAwait(false);
+        var getToObject = await objectService.GetByIdAsync(toId).ConfigureAwait(false);
         if (getToObject.IsFailure)
             return OperationResult<(BuildingObject fromObject, BuildingObject toObject)>.Failure(getToObject.ApiError);
 
-        var getFromObject = await objectService.GetById(fromId).ConfigureAwait(false);
+        var getFromObject = await objectService.GetByIdAsync(fromId).ConfigureAwait(false);
         if (getFromObject.IsFailure)
             return OperationResult<(BuildingObject fromObject, BuildingObject toObject)>.Failure(getFromObject.ApiError);
         

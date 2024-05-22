@@ -167,6 +167,7 @@ public class Startup
 
         services.AddScoped<ICommentsRepository, CommentsRepository>();
         services.AddScoped<ICommentsService, CommentsService>();
+        services.AddScoped<ICardsService, CardsService>();
         
         services.AddScoped<IBuildingRoutesService, BuildingRoutesService>();
 

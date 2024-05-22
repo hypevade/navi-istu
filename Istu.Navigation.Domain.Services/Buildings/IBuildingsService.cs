@@ -1,4 +1,5 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
+using Istu.Navigation.Domain.Models.Cards;
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Models.ExternalRoutes;
 using Istu.Navigation.Domain.Repositories.Buildings;
