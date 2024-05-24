@@ -23,4 +23,10 @@ public class EdgesApiErrors
             $"Ребро с идентификаторами '{fromId}' и '{toId}' уже существует.",
             GetUrn("edge-already-exists"));
     }
+    
+    public static ApiError EdgeWithIdNotFoundError(Guid edgeId)
+    {
+        return new ApiError(404, $"Ребро с идентификатором '{edgeId}' не найдено.",
+            GetUrn("edge-with-id-not-found"));
+    }
 }

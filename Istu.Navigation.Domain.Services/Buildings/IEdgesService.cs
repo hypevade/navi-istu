@@ -37,7 +37,7 @@ public class EdgesService(IEdgesRepository repository, IBuildingObjectsService o
     {
         var edge = await repository.GetByIdAsync(edgeId).ConfigureAwait(false);
         if (edge is null)
-            return OperationResult<Edge>.Failure(BuildingsErrors.EdgeWithIdNotFoundError(edgeId));
+            return OperationResult<Edge>.Failure(EdgesApiErrors.EdgeWithIdNotFoundError(edgeId));
         var getFromObj = await objectsService.GetByIdAsync(edge.FromObject).ConfigureAwait(false);
         if (getFromObj.IsFailure)
             return OperationResult<Edge>.Failure(getFromObj.ApiError);

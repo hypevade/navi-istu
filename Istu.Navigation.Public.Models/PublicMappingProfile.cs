@@ -34,8 +34,13 @@ public class PublicMappingProfile : Profile
             .ForMember(x => x.BuildingId, x => x.MapFrom(src => src.Building.Id))
             .ForMember(x => x.Floors, x => x.MapFrom(src => src.FloorRoutes));
         CreateMap<BuildingObjectDto, BuildingObject>();
-        CreateMap<BuildingDto, Building>();
-        CreateMap<Building, BuildingDto>();
+        CreateMap<BuildingDto, Building>()
+            .ForMember(x => x.Latitude, x => x.MapFrom(src => src.Position.Latitude))
+            .ForMember(x => x.Longitude, x => x.MapFrom(src => src.Position.Longitude));
+        
+        CreateMap<Building, BuildingDto>()
+            .ForMember(x => x.Position,
+            x => x.MapFrom(src => PositionDto.From(src.Latitude, src.Longitude)));
         
         CreateMap<User, UserDto>();
 

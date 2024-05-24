@@ -54,8 +54,7 @@ public static class TestDataGenerator
             {
                 Title = $"TestBuilding_{i}_({GetRandomString(5)})",
                 Description = $"TestDescription_{i}",
-                Latitude = 0 + i,
-                Longitude = 0 + i,
+                Position = PositionDto.From(0 + i, 0 + i),
                 Address = $"TestAddress_{i}"
             };
             requests.Add(request);

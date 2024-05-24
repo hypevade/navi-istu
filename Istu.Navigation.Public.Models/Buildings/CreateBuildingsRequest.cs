@@ -11,6 +11,5 @@ public class CreateBuildingRequest
     public string? Description { get; set; }
     
     public string? Keywords { get; set; }
-    public required double Latitude { get; set; }
-    public required double Longitude { get; set; }
+    public required PositionDto Position { get; set; }
 }

@@ -1,6 +1,7 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
+using Microsoft.Extensions.Logging;
 using QuikGraph;
 using QuikGraph.Algorithms.Observers;
 using QuikGraph.Algorithms.ShortestPath;
@@ -17,6 +18,13 @@ public class RouteSearcher : IRouteSearcher
     private readonly Func<Edge<BuildingObject>, double> edgeWeightFunc = edge =>
         Math.Sqrt((edge.Source.X - edge.Target.X) * (edge.Source.X - edge.Target.X) +
                   (edge.Source.Y - edge.Target.Y) * (edge.Source.Y - edge.Target.Y));
+
+    private readonly ILogger<RouteSearcher> logger;
+
+    public RouteSearcher(ILogger<RouteSearcher> logger)
+    {
+        this.logger = logger;
+    }
 
     public OperationResult<List<BuildingObject>> CreateRoute(BuildingObject fromBuildingObject,
         BuildingObject toBuildingObject, List<BuildingObject> objects, List<Edge> edges)
@@ -42,10 +50,13 @@ public class RouteSearcher : IRouteSearcher
         BuildingObject to)
     {
         if (objects.Count == 0 || edges.Count == 0)
-            return OperationResult.Failure(CommonErrors.InternalServerError());
+        {
+            logger.LogError($"Invalid input data, edges or objects is empty, number of edges = {edges.Count}, number of objects = {objects.Count}");
+            return OperationResult.Failure(BuildingsApiErrors.BuildingRouteNotFoundError(from.Id, to.Id));
+        }
 
         return from.Id == to.Id
-            ? OperationResult.Failure(BuildingsErrors.TargetObjectIsEqualToSourceError(from.Id))
+            ? OperationResult.Failure(BuildingsApiErrors.TargetObjectIsEqualToSourceError(from.Id))
             : OperationResult.Success();
     }
 
@@ -72,9 +83,8 @@ public class RouteSearcher : IRouteSearcher
 
         if (!predecessorObserver.TryGetPath(to, out var path))
             return OperationResult<IEnumerable<Edge<BuildingObject>>>.Failure(
-                BuildingsErrors.BuildingRouteNotFoundError(from.Id, to.Id));
+                BuildingsApiErrors.BuildingRouteNotFoundError(from.Id, to.Id));
         
-
         return OperationResult<IEnumerable<Edge<BuildingObject>>>.Success(path);
     }
 }

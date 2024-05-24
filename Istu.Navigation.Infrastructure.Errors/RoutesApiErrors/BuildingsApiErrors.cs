@@ -10,6 +10,19 @@ public static class BuildingsApiErrors
             GetUrn("building-with-id-not-found"));
     }
     
+    public static ApiError BuildingRouteNotFoundError(Guid fromObjectId, Guid toObjectId)
+    {
+        return new ApiError(404,
+            $"Путь между объектами с идентификаторами '{fromObjectId}' и '{toObjectId}' не найден.",
+            GetUrn("building-route-not-found"));
+    }
+    
+    public static ApiError TargetObjectIsEqualToSourceError(Guid objectId)
+    {
+        return new ApiError(400, $"Объект с идентификатором '{objectId}' является целевым и совпадает с исходным.",
+            GetUrn("target-object-is-equal-to-source"));
+    }
+    
     public static ApiError FloorsWithBuildingIdNotFoundError(Guid buildingId)
     {
         return new ApiError(404, $"Этажи в здании с идентификатором '{buildingId}' не найдены.",

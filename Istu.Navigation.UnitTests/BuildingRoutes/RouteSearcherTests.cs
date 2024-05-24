@@ -4,12 +4,13 @@ using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.BuildingRoutes;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;
+using Microsoft.Extensions.Logging;
 
 namespace Istu.Navigation.UnitTests.BuildingRoutes;
 
 public class RouteSearcherTests
 {
-    private readonly IRouteSearcher routeSearcher = new RouteSearcher();
+    private readonly IRouteSearcher routeSearcher = new RouteSearcher(new Logger<RouteSearcher>(new LoggerFactory()));
     private readonly int testFloorNumber;
 
     public RouteSearcherTests()
@@ -70,7 +71,7 @@ public class RouteSearcherTests
         result.Data.Should().BeNull();
 
         result.ApiError.Urn.Should().BeEquivalentTo(
-            BuildingsErrors.TargetObjectIsEqualToSourceError(objects[0].Id).Urn);
+            BuildingsApiErrors.TargetObjectIsEqualToSourceError(objects[0].Id).Urn);
     }
     
     [Test]
@@ -118,7 +119,7 @@ public class RouteSearcherTests
         result.IsSuccess.Should().BeFalse();
         result.ApiError.Should().NotBeNull();
         result.ApiError.Urn.Should()
-            .Be(BuildingsErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
+            .Be(BuildingsApiErrors.BuildingRouteNotFoundError(objects[0].Id, objects[1].Id).Urn);
     }
 
     private static (List<BuildingObject> objects, List<Edge> edges) GetTwoObjectsWithEdge()

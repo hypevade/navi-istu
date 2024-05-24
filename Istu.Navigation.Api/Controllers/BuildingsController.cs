@@ -38,7 +38,8 @@ public class BuildingsController : ControllerBase
     public async Task<ActionResult<CreateBuildingResponse>> Create([FromBody] CreateBuildingRequest request)
     {
         var createOperation = await buildingsService
-            .CreateAsync(request.Title, request.Latitude, request.Longitude, request.Address, keywords: request.Keywords, description:request.Description).ConfigureAwait(false);
+            .CreateAsync(request.Title, request.Position.Latitude, request.Position.Longitude, request.Address,
+                keywords: request.Keywords, description: request.Description).ConfigureAwait(false);
 
         return createOperation.IsSuccess
             ? Ok(new CreateBuildingResponse { BuildingId = createOperation.Data })
@@ -51,9 +52,11 @@ public class BuildingsController : ControllerBase
     public async Task<IActionResult> Update([FromBody] UpdateBuildingRequest request)
     {
         var update = await buildingsService
-            .PatchAsync(request.Id, request.UpdatedTitle, request.UpdatedLatitude, request.UpdatedLongitude, request.UpdatedAddress,
+            .PatchAsync(request.Id, request.UpdatedTitle, request.UpdatedLatitude, request.UpdatedLongitude,
+                request.UpdatedAddress,
                 request.UpdatedDescription)
             .ConfigureAwait(false);
+        
         return update.IsSuccess
             ? NoContent()
             : StatusCode(update.ApiError.StatusCode, update.ApiError.ToErrorDto());
@@ -86,10 +89,8 @@ public class BuildingsController : ControllerBase
     [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<BuildingDto>>> GetAllByFilter([FromQuery] BuildingFilter filter)
     {
-        var timer = Stopwatch.StartNew();
         var getBuilding = await buildingsService.GetAllByFilterAsync(filter).ConfigureAwait(false);
-        timer.Stop();
-        Console.WriteLine(timer.Elapsed.Milliseconds);
+        
         return getBuilding.IsSuccess
             ? Ok(mapper.Map<List<BuildingDto>>(getBuilding.Data))
             : StatusCode(getBuilding.ApiError.StatusCode, getBuilding.ApiError.ToErrorDto());
