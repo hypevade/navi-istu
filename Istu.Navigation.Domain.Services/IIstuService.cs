@@ -83,38 +83,41 @@ public class IstuService : IIstuService
         }
         return OperationResult<IstuUserInfo>.Success(istuUserInfo);
     }
-    
-    public async Task<OperationResult<IstuUser>> RegisterIstuUser(IstuUserInfo userInfo, string istuAccessToken, string istuRefreshToken)
+
+    public async Task<OperationResult<IstuUser>> RegisterIstuUser(IstuUserInfo userInfo, string istuAccessToken,
+        string istuRefreshToken)
     {
         var existedUser = await usersRepository.GetByEmailAsync(userInfo.Email).ConfigureAwait(false);
-        if (existedUser is not null)
-            return OperationResult<IstuUser>.Success(IstuUser.FromEntity(existedUser));
-        
-        var userEntity = new UserEntity
+        if (existedUser is null)
         {
-            Id = Guid.NewGuid(),
-            Email = userInfo.Email,
-            FirstName = userInfo.FirstName,
-            LastName = userInfo.LastName,
-            Role = UserRole.Student,
-            IstuId = userInfo.Id.ToString(),
-            IstuAccessToken = istuAccessToken,
-            IstuRefreshToken = istuRefreshToken
-        };
-        
-        var accessToken = accessTokenProvider.GenerateToken(userEntity);
-        var refreshToken = refreshTokenProvider.GenerateToken(userEntity);
-        userEntity.RefreshToken = refreshToken;
+            var userEntity = new UserEntity
+            {
+                Id = Guid.NewGuid(),
+                Email = userInfo.Email,
+                FirstName = userInfo.FirstName,
+                LastName = userInfo.LastName,
+                Role = UserRole.Student,
+                IstuId = userInfo.Id.ToString(),
+                IstuAccessToken = istuAccessToken,
+                IstuRefreshToken = istuRefreshToken
+            };
 
-        await usersRepository.AddAsync(userEntity).ConfigureAwait(false);
-        await usersRepository.SaveChangesAsync().ConfigureAwait(false);
+            await usersRepository.AddAsync(userEntity).ConfigureAwait(false);
+            await usersRepository.SaveChangesAsync().ConfigureAwait(false);
 
-        var user = IstuUser.FromEntity(userEntity);
+            existedUser = userEntity;
+        }
 
-        user.AccessToken = accessToken;
-        user.RefreshToken = refreshToken;
-        
-        return OperationResult<IstuUser>.Success(user);
+        var accessToken = accessTokenProvider.GenerateToken(existedUser);
+        var refreshToken = refreshTokenProvider.GenerateToken(existedUser);
+
+        usersRepository.UpdateRefreshToken(existedUser.Id, refreshToken);
+        var istuUser = IstuUser.FromEntity(existedUser);
+
+        istuUser.AccessToken = accessToken;
+        istuUser.RefreshToken = refreshToken;
+
+        return OperationResult<IstuUser>.Success(istuUser);
     }
 
     public OperationResult<string> GenerateRedirectUrl()

@@ -43,6 +43,7 @@ public class PublicMappingProfile : Profile
             x => x.MapFrom(src => ExternalPositionDto.From(src.Latitude, src.Longitude)));
         
         CreateMap<User, UserDto>();
+        CreateMap<IstuUser, UserDto>();
 
         CreateMap<ExternalPoint, ExternalPointDto>();
         CreateMap<ExternalPointDto, ExternalPoint>();

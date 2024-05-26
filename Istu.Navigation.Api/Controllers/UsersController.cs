@@ -54,8 +54,8 @@ public class UsersController : ControllerBase
         var response = new LoginResponse
         {
             User = mapper.Map<UserDto>(loginUser.Data),
-            AccessToken = loginUser.Data.AccessToken,
-            RefreshToken = loginUser.Data.RefreshToken
+            AccessToken = loginUser.Data.AccessToken!,
+            RefreshToken = loginUser.Data.RefreshToken!
         };
         
         return Ok(response);
