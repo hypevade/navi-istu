@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route(ApiRoutes.BuildingEdges.EdgesApi)]
+[Route(ApiRoutes.BuildingEdgesRoutes.EdgesApi)]
 public class EdgesController : ControllerBase
 {
     private readonly IEdgesService edgesService;
@@ -25,47 +25,39 @@ public class EdgesController : ControllerBase
     }
     
     [HttpPost]
-    [Route(ApiRoutes.BuildingEdges.CreatePart)]
+    [Route(ApiRoutes.BuildingEdgesRoutes.CreatePart)]
     [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<CreateEdgesResponse>> CreateEdges([FromBody] CreateEdgesRequest request)
     {
         var edges = request.Edges.Select(x => (x.FromId, x.ToId)).ToList();
-        var createEdgeOperation = await edgesService.CreateRangeAsync(edges).ConfigureAwait(false);
+        var createOperation = await edgesService.CreateRangeAsync(edges).ConfigureAwait(false);
 
-        if (createEdgeOperation.IsFailure)
-        {
-            var apiError = createEdgeOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        return Ok(new CreateEdgesResponse { EdgeIds = createEdgeOperation.Data });
+        return createOperation.IsFailure
+            ? StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto())
+            : Ok(new CreateEdgesResponse { EdgeIds = createOperation.Data });
     }
     
     [HttpGet]
-    [Route(ApiRoutes.BuildingEdges.GetAllPart)]
+    [Route(ApiRoutes.BuildingEdgesRoutes.GetAllPart)]
     [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<EdgeDto>>> GetAllEdges([FromQuery] EdgeFilter filter)
     {
-        var getEdgesOperation = await edgesService.GetAllByFilterAsync(filter).ConfigureAwait(false);
+        var getOperation = await edgesService.GetAllByFilterAsync(filter).ConfigureAwait(false);
         
-        if (getEdgesOperation.IsFailure)
-        {
-            var apiError = getEdgesOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        return Ok(mapper.Map<List<EdgeDto>>(getEdgesOperation.Data));
+        return getOperation.IsFailure
+            ? StatusCode(getOperation.ApiError.StatusCode, getOperation.ApiError.ToErrorDto())
+            : Ok(mapper.Map<List<EdgeDto>>(getOperation.Data));
     }
 
     [HttpDelete]
-    [Route(ApiRoutes.BuildingEdges.DeletePart)]
+    [Route(ApiRoutes.BuildingEdgesRoutes.DeletePart)]
     [AuthorizationFilter(UserRole.Admin)]
     public async Task<IActionResult> DeleteEdge(Guid edgeId)
     {
-        var deleteRangeOperation = await edgesService.DeleteAsync(edgeId).ConfigureAwait(false);
+        var deleteOperation = await edgesService.DeleteAsync(edgeId).ConfigureAwait(false);
 
-        return deleteRangeOperation.IsSuccess
+        return deleteOperation.IsSuccess
             ? NoContent()
-            : StatusCode(deleteRangeOperation.ApiError.StatusCode, deleteRangeOperation.ApiError.ToErrorDto());
+            : StatusCode(deleteOperation.ApiError.StatusCode, deleteOperation.ApiError.ToErrorDto());
     }
 }

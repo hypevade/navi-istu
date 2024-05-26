@@ -54,7 +54,7 @@ public static class TestDataGenerator
             {
                 Title = $"TestBuilding_{i}_({GetRandomString(5)})",
                 Description = $"TestDescription_{i}",
-                Position = PositionDto.From(0 + i, 0 + i),
+                ExternalPosition = ExternalPositionDto.From(0 + i, 0 + i),
                 Address = $"TestAddress_{i}"
             };
             requests.Add(request);
@@ -85,8 +85,7 @@ public static class TestDataGenerator
                 BuildingId = buildingId,
                 Floor = 1,
                 Type = BuildingObjectType.Node,
-                X = point.X,
-                Y = point.Y
+                Position = BuildingPositionDto.From(point.X, point.Y)
             })
             .ToList();
     }

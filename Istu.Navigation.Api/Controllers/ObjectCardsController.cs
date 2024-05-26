@@ -14,29 +14,40 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route(ApiRoutes.Cards.CardsApi)]
-
-public class ObjectCardsController(
-    ILuceneService service,
-    IMapper mapper,
-    ILogger<ObjectCardsController> logger,
-    ICommentsService commentsService,
-    ICardsService cardsService) : ControllerBase
+[Route(ApiRoutes.CardsRoutes.CardsApi)]
+public class ObjectCardsController : ControllerBase
 {
-    
-    [HttpGet]
-    [Route(ApiRoutes.Cards.GetByIdPart)]
-    public async Task<ActionResult<Card>> GetById(Guid objectId)
-    {
-        var getCardOperation = await cardsService.GetCard(objectId).ConfigureAwait(false);
-        if (getCardOperation.IsFailure)
-            return StatusCode(getCardOperation.ApiError.StatusCode, getCardOperation.ApiError.ToErrorDto());
+    private readonly ILuceneService service;
+    private readonly IMapper mapper;
+    private readonly ILogger<ObjectCardsController> logger;
+    private readonly ICommentsService commentsService;
+    private readonly ICardsService cardsService;
 
-        return Ok(getCardOperation.Data);
+    public ObjectCardsController(ILuceneService service,
+        IMapper mapper,
+        ILogger<ObjectCardsController> logger,
+        ICommentsService commentsService,
+        ICardsService cardsService)
+    {
+        this.service = service;
+        this.mapper = mapper;
+        this.logger = logger;
+        this.commentsService = commentsService;
+        this.cardsService = cardsService;
     }
 
     [HttpGet]
-    [Route(ApiRoutes.Cards.SearchPart)]
+    [Route(ApiRoutes.CardsRoutes.GetByIdPart)]
+    public async Task<ActionResult<Card>> GetById(Guid objectId)
+    {
+        var getCardOperation = await cardsService.GetCard(objectId).ConfigureAwait(false);
+        return getCardOperation.IsFailure
+            ? StatusCode(getCardOperation.ApiError.StatusCode, getCardOperation.ApiError.ToErrorDto())
+            : Ok(getCardOperation.Data);
+    }
+
+    [HttpGet]
+    [Route(ApiRoutes.CardsRoutes.SearchPart)]
     public ActionResult<SearchResponse> Search([FromQuery] string text, [FromQuery] int limit = 10)
     {
         var foundDocuments = service.Search(text);
@@ -48,7 +59,7 @@ public class ObjectCardsController(
     }
     
     [HttpPost]
-    [Route(ApiRoutes.Cards.AddCommentPart)]
+    [Route(ApiRoutes.CardsRoutes.AddCommentPart)]
     [AuthorizationFilter(UserRole.Student)]
     public async Task<ActionResult<Guid>> AddComment(Guid objectId, [FromQuery] string text)
     {
@@ -60,17 +71,14 @@ public class ObjectCardsController(
         }
         var userId = Guid.Parse(userIdClaim.Value);
         var createOperation = await commentsService.CreateComment(objectId, userId, text).ConfigureAwait(false);
-        if (createOperation.IsFailure)
-        {
-            var apiError = createOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        return Ok(createOperation.Data.Id);
+        
+        return createOperation.IsFailure
+            ? StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto())
+            : Ok(createOperation.Data.Id);
     }
     
     [HttpDelete]
-    [Route(ApiRoutes.Cards.DeleteCommentPart)]
+    [Route(ApiRoutes.CardsRoutes.DeleteCommentPart)]
     [AuthorizationFilter(UserRole.Student)]
     public async Task<IActionResult> DeleteComment(Guid objectId, Guid commentId)
     {
@@ -82,26 +90,21 @@ public class ObjectCardsController(
         }
         var userId = Guid.Parse(userIdClaim.Value);
         var deleteOperation = await commentsService.DeleteComment(commentId, userId).ConfigureAwait(false);
-        if (deleteOperation.IsFailure)
-        {
-            var apiError = deleteOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-        return NoContent();
+
+        return deleteOperation.IsFailure
+            ? StatusCode(deleteOperation.ApiError.StatusCode, deleteOperation.ApiError.ToErrorDto())
+            : NoContent();
     }
     
     [HttpGet]
-    [Route(ApiRoutes.Cards.GetCommentsPart)]
+    [Route(ApiRoutes.CardsRoutes.GetCommentsPart)]
     [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<CommentDto>>> GetCommentsByFilter([FromQuery] CommentFilter filter)
     {
         var getOperation = await commentsService.GetCommentsByFilter(filter).ConfigureAwait(false);
-        if (getOperation.IsFailure)
-        {
-            var apiError = getOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        return Ok(mapper.Map<List<CommentDto>>(getOperation.Data));
+        
+        return getOperation.IsFailure
+            ? StatusCode(getOperation.ApiError.StatusCode, getOperation.ApiError.ToErrorDto())
+            : Ok(mapper.Map<List<CommentDto>>(getOperation.Data));
     }
 }

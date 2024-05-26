@@ -25,31 +25,31 @@ public class BuildingsClient : BaseClient, IBuildingsClient
 
     public async Task<OperationResult<BuildingDto>> GetBuildingByIdAsync(Guid buildingId)
     {
-        var route = ApiRoutes.Buildings.GetBuildingWithIdRoute(buildingId);
+        var route = ApiRoutes.BuildingsRoutes.GetBuildingWithIdRoute(buildingId);
         return await GetAsync<BuildingDto>(route).ConfigureAwait(false);
     }
 
     public Task<OperationResult> DeleteBuildingAsync(Guid buildingId)
     {
-        var route = ApiRoutes.Buildings.DeleteBuildingRoute(buildingId);
+        var route = ApiRoutes.BuildingsRoutes.DeleteBuildingRoute(buildingId);
         return DeleteAsync(route);
     }
 
     public Task<OperationResult<CreateBuildingResponse>> CreateBuildingAsync(CreateBuildingRequest request)
     {
-        var route = ApiRoutes.Buildings.CreateBuildingRoute();
+        var route = ApiRoutes.BuildingsRoutes.CreateBuildingRoute();
         return PostAsync<CreateBuildingRequest, CreateBuildingResponse>(route, request);
     }
 
     public Task UpdateBuildingAsync(UpdateBuildingRequest request)
     {
-        var route = ApiRoutes.Buildings.UpdateBuildingRoute();
+        var route = ApiRoutes.BuildingsRoutes.UpdateBuildingRoute();
         return PatchAsync(route, request);
     }
 
     public Task<OperationResult<List<BuildingDto>>> GetAllByFilterAsync(BuildingFilter filter)
     {
-        var route = ApiRoutes.Buildings.GetAllBuildingsRoute();
+        var route = ApiRoutes.BuildingsRoutes.GetAllBuildingsRoute();
         var queries = new Dictionary<string, string?>();
 
         if (filter.BuildingId != null)
@@ -64,19 +64,19 @@ public class BuildingsClient : BaseClient, IBuildingsClient
 
     public Task<OperationResult<CreateFloorResponse>> AddFloorAsync(Guid buildingId, CreateFloorRequest request)
     {
-        var route = ApiRoutes.Buildings.CreateFloorRoute(buildingId);
+        var route = ApiRoutes.BuildingsRoutes.CreateFloorRoute(buildingId);
         return PostAsync<CreateFloorRequest, CreateFloorResponse>(route, request);
     }
 
     public Task<OperationResult<FloorDto>> GetFloorAsync(Guid buildingId, int floorNumber)
     {
-        var route = ApiRoutes.Buildings.GetFloorRoute(buildingId, floorNumber);
+        var route = ApiRoutes.BuildingsRoutes.GetFloorRoute(buildingId, floorNumber);
         return GetAsync<FloorDto>(route);
     }
 
     public Task<OperationResult> DeleteFloorAsync(Guid buildingId, int floorNumber)
     {
-        var route = ApiRoutes.Buildings.DeleteFloorRoute(buildingId, floorNumber);
+        var route = ApiRoutes.BuildingsRoutes.DeleteFloorRoute(buildingId, floorNumber);
         return DeleteAsync(route);
     }
 }

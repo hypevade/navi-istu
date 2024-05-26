@@ -12,6 +12,6 @@ public class BuildingDto
     public required List<FloorInfoDto> Floors { get; set; }
 
     public required string Address { get; set; }
-    public required PositionDto Position { get; set; }
+    public required ExternalPositionDto ExternalPosition { get; set; }
     public string? Description { get; set; }
 }

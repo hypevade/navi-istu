@@ -18,7 +18,6 @@ public interface IBuildingsService
     public Task<OperationResult<Building>> GetByIdAsync(Guid id);
     public Task<OperationResult<ExternalPoint>> GetBuildingCoordinatesAsync(Guid id);
     public Task<OperationResult<List<Building>>> GetAllByFilterAsync(BuildingFilter filter);
-    public Task<OperationResult> CheckExistAsync(Guid buildingId);
 }
 
 public class BuildingsService(IBuildingsRepository repository, IFloorsService service, ILuceneService luceneService)
@@ -111,14 +110,6 @@ public class BuildingsService(IBuildingsRepository repository, IFloorsService se
         }
 
         return OperationResult<List<Building>>.Success(buildingResults.Select(r => r.Data).ToList());
-    }
-
-    public async Task<OperationResult> CheckExistAsync(Guid buildingId)
-    {
-        var buildingEntity = await repository.GetByIdAsync(buildingId).ConfigureAwait(false);
-        return buildingEntity is null
-            ? OperationResult.Failure(BuildingsApiErrors.BuildingWithIdNotFoundError(buildingId))
-            : OperationResult.Success();
     }
 
     public async Task<OperationResult<Building>> GetByIdAsync(Guid id)

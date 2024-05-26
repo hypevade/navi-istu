@@ -37,7 +37,7 @@ public class BuildingsServiceTests
         {
             Title = "TestBuilding",
             Description = "TestDescription",
-            Position = PositionDto.From(1,1),
+            ExternalPosition = ExternalPositionDto.From(1,1),
             Address = "TestAddress"
         };
 
@@ -52,8 +52,8 @@ public class BuildingsServiceTests
         building.Id.Should().Be(buildingId);
         building.Title.Should().Be(testBuilding.Title);
         building.Description.Should().Be(testBuilding.Description);
-        building.Position.Latitude.Should().Be(testBuilding.Position.Latitude);
-        building.Position.Longitude.Should().Be(testBuilding.Position.Longitude);
+        building.ExternalPosition.Latitude.Should().Be(testBuilding.ExternalPosition.Latitude);
+        building.ExternalPosition.Longitude.Should().Be(testBuilding.ExternalPosition.Longitude);
     }
     
     [Test]

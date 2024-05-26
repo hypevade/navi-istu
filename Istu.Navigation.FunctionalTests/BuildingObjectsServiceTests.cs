@@ -147,8 +147,8 @@ public class BuildingObjectsServiceTests
         response.BuildingId.Should().Be(request.BuildingId);
         response.Floor.Should().Be(request.Floor);
         response.Type.Should().Be(request.Type);
-        response.X.Should().Be(request.X);
-        response.Y.Should().Be(request.Y);
+        response.X.Should().Be(request.Position.X);
+        response.Y.Should().Be(request.Position.Y);
     }
 
     private async Task<List<Guid>> CreateBuildingObjects(List<CreateBuildingObjectRequest> requests)

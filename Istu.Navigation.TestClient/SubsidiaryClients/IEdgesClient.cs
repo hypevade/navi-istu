@@ -23,7 +23,7 @@ public class EdgesClient : BaseClient, IEdgesClient
 
     public async Task<OperationResult<List<EdgeDto>>> GetAllEdgesByFilter(EdgeFilter filter)
     {
-        var url = ApiRoutes.BuildingEdges.GetAllRoute();
+        var url = ApiRoutes.BuildingEdgesRoutes.GetAllRoute();
         var queries = new Dictionary<string, string?>();
 
         if (filter.BuildingId.HasValue)
@@ -50,14 +50,14 @@ public class EdgesClient : BaseClient, IEdgesClient
 
     public Task<OperationResult<CreateEdgesResponse>> CreateEdges(CreateEdgesRequest request)
     {
-        var url = ApiRoutes.BuildingEdges.CreateRoute();
+        var url = ApiRoutes.BuildingEdgesRoutes.CreateRoute();
         var result = PostAsync<CreateEdgesRequest, CreateEdgesResponse>(url, request);
         return result;
     }
 
     public Task<OperationResult> DeleteEdge(Guid edgeId)
     {
-        var url = ApiRoutes.BuildingEdges.GetDeleteRoute(edgeId);
+        var url = ApiRoutes.BuildingEdgesRoutes.GetDeleteRoute(edgeId);
         return DeleteAsync(url);
     }
 }

@@ -8,7 +8,7 @@ public static class ApiRoutes
     public const string Test = Base + "/test";
     
     
-    public static class Buildings
+    public static class BuildingsRoutes
     {
         public const string BuildingsApi = Base + "/buildings";
         public const string GetAllBuildingsPart = "";
@@ -77,7 +77,7 @@ public static class ApiRoutes
         }
     }
     
-    public static class BuildingEdges
+    public static class BuildingEdgesRoutes
     {
         public const string EdgesApi = Base + "/buildings/edges";
         public const string CreatePart = "";
@@ -99,7 +99,7 @@ public static class ApiRoutes
         }
     }
 
-    public static class BuildingObjects
+    public static class BuildingObjectsRoutes
     {
         public const string BuildingsObjectsApi = Base + "/buildings/objects";
         public const string CreatePart = "";
@@ -134,7 +134,7 @@ public static class ApiRoutes
         }
     }
 
-    public static class Users
+    public static class UsersRoutes
     {
         public const string UsersApi = Base + "/users";
         public const string LoginPart = "login";
@@ -145,7 +145,7 @@ public static class ApiRoutes
         
     }
     
-    public static class Images
+    public static class ImagesRoutes
     {
         public const string ImagesApi = Base + "/images";
         public const string UploadPart = "upload/{objectId}";
@@ -159,7 +159,7 @@ public static class ApiRoutes
         public const string CreatePart = "";
     }
     
-    public static class Cards
+    public static class CardsRoutes
     {
         public const string CardsApi = Base + "/cards";
         public const string SearchPart = "search";
@@ -169,7 +169,7 @@ public static class ApiRoutes
         public const string GetCommentsPart = "comments";
     }
 
-    public static class OAuth
+    public static class OAuthRoutes
     {
         public const string OauthApi = "oauth";
         public const string AuthenticatePart = "authenticate";

@@ -27,15 +27,11 @@ public class BuildingRoutesController: ControllerBase
     [Route(ApiRoutes.BuildingRoutes.CreatePart)]
     public async Task<ActionResult<BuildingRouteResponse>> CreateRoute([FromBody] BuildingRouteRequest request)
     {
-        var getInternalRoute = await buildingRoutesService.CreateRoute(request.ToId, request.FromId ?? default)
+        var getOperation = await buildingRoutesService.CreateRoute(request.ToId, request.FromId ?? default)
             .ConfigureAwait(false);
-        if (getInternalRoute.IsFailure)
-        {
-            var apiError = getInternalRoute.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
         
-        var publicRoute = mapper.Map<BuildingRouteResponse>(getInternalRoute.Data);
-        return Ok(publicRoute);
+        return getOperation.IsFailure
+            ? StatusCode(getOperation.ApiError.StatusCode, getOperation.ApiError.ToErrorDto())
+            : Ok(mapper.Map<BuildingRouteResponse>(getOperation.Data));
     }
 }

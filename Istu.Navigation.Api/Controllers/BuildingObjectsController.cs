@@ -12,24 +12,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route(ApiRoutes.BuildingObjects.BuildingsObjectsApi)]
-public class BuildingObjectsController(
-    IBuildingObjectsService objectsService,
-    IMapper mapper)
-    : ControllerBase
+[Route(ApiRoutes.BuildingObjectsRoutes.BuildingsObjectsApi)]
+public class BuildingObjectsController : ControllerBase
 {
-    [HttpPatch]
-    [Route(ApiRoutes.BuildingObjects.UpdatePart)]
-    [AuthorizationFilter(UserRole.Admin)]
-    
-    public Task<ActionResult<CreateBuildingObjectResponse>> Update([FromBody] UpdateObjectRequest request)
+    private readonly IBuildingObjectsService objectsService;
+    private readonly IMapper mapper;
+
+    public BuildingObjectsController(IBuildingObjectsService objectsService,
+        IMapper mapper)
     {
-        throw new NotImplementedException();
+        this.objectsService = objectsService;
+        this.mapper = mapper;
     }
 
-    
     [HttpPost]
-    [Route(ApiRoutes.BuildingObjects.CreatePart)]
+    [Route(ApiRoutes.BuildingObjectsRoutes.CreatePart)]
     [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<CreateBuildingObjectResponse>> Create([FromBody] CreateBuildingObjectRequest request)
     {
@@ -38,59 +35,64 @@ public class BuildingObjectsController(
         var createOperation = await objectsService.CreateAsync(buildingObject);
 
         if (createOperation.IsFailure)
-        {
-            var apiError = createOperation.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-        
-        return Ok(new CreateBuildingObjectResponse() { BuildingObjectId = createOperation.Data });
+            return StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
+
+        return Ok(new CreateBuildingObjectResponse { BuildingObjectId = createOperation.Data });
     }
 
-    [HttpGet]
-    [Route(ApiRoutes.BuildingObjects.GetAllPart)]
-    [AuthorizationFilter(UserRole.User)]
-    public async Task<ActionResult<List<BuildingObjectDto>>> GetAll([FromQuery] BuildingObjectFilter filter)
+    [HttpPatch]
+    [Route(ApiRoutes.BuildingObjectsRoutes.UpdatePart)]
+    [AuthorizationFilter(UserRole.Admin)]
+    public async Task<ActionResult<CreateBuildingObjectResponse>> Update([FromBody] UpdateObjectRequest request)
     {
-        var getObjects = await objectsService.GetAllByFilterAsync(filter)
-            .ConfigureAwait(false);
-        if (getObjects.IsFailure)
-        {
-            var apiError = getObjects.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
+        var updateOperation = await objectsService.PatchAsync(request.BuildingObjectId,
+            request.UpdatedTitle,
+            request.UpdatedDescription,
+            request.UpdatedType,
+            request.UpdatedPosition?.X,
+            request.UpdatedPosition?.Y).ConfigureAwait(false);
+        if (updateOperation.IsFailure)
+            return StatusCode(updateOperation.ApiError.StatusCode, updateOperation.ApiError.ToErrorDto());
 
-        var publicObjects = mapper.Map<List<BuildingObjectDto>>(getObjects.Data);
-        return Ok(publicObjects);
+        return NoContent();
     }
 
-    [HttpGet]
-    [Route(ApiRoutes.BuildingObjects.GetByIdPart)]
-    [AuthorizationFilter(UserRole.User)]
-    public async Task<ActionResult<BuildingObjectDto>> GetById(Guid objectId)
-    {
-        var getObject = await objectsService.GetByIdAsync(objectId).ConfigureAwait(false);
-        if (getObject.IsFailure)
-        {
-            var apiError = getObject.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
-        var publicObjects = mapper.Map<BuildingObjectDto>(getObject.Data);
-        return Ok(publicObjects);
-    }
-    
     [HttpDelete]
-    [Route(ApiRoutes.BuildingObjects.DeletePart)]
+    [Route(ApiRoutes.BuildingObjectsRoutes.DeletePart)]
     [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<BuildingObjectDto>> Delete(Guid objectId)
     {
-        var getObject = await objectsService.DeleteAsync([objectId]).ConfigureAwait(false);
-        if (getObject.IsFailure)
-        {
-            var apiError = getObject.ApiError;
-            return StatusCode(apiError.StatusCode, apiError.ToErrorDto());
-        }
-
+        var deleteOperation = await objectsService.DeleteAsync([objectId]).ConfigureAwait(false);
+        if (deleteOperation.IsFailure)
+            return StatusCode(deleteOperation.ApiError.StatusCode, deleteOperation.ApiError.ToErrorDto());
+        
         return NoContent();
+    }
+
+    [HttpGet]
+    [Route(ApiRoutes.BuildingObjectsRoutes.GetAllPart)]
+    [AuthorizationFilter(UserRole.User)]
+    public async Task<ActionResult<List<BuildingObjectDto>>> GetAll([FromQuery] BuildingObjectFilter filter)
+    {
+        var getOperation = await objectsService.GetAllByFilterAsync(filter)
+            .ConfigureAwait(false);
+        if (getOperation.IsFailure)
+            return StatusCode(getOperation.ApiError.StatusCode, getOperation.ApiError.ToErrorDto());
+
+        var publicObjects = mapper.Map<List<BuildingObjectDto>>(getOperation.Data);
+        return Ok(publicObjects);
+    }
+
+    [HttpGet]
+    [Route(ApiRoutes.BuildingObjectsRoutes.GetByIdPart)]
+    [AuthorizationFilter(UserRole.User)]
+    public async Task<ActionResult<BuildingObjectDto>> GetById(Guid objectId)
+    {
+        var getOperation = await objectsService.GetByIdAsync(objectId).ConfigureAwait(false);
+        if (getOperation.IsFailure)
+            return StatusCode(getOperation.ApiError.StatusCode, getOperation.ApiError.ToErrorDto());
+
+        var publicObjects = mapper.Map<BuildingObjectDto>(getOperation.Data);
+        return Ok(publicObjects);
     }
 }

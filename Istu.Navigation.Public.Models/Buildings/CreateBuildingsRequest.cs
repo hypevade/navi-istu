@@ -11,5 +11,5 @@ public class CreateBuildingRequest
     public string? Description { get; set; }
     
     public string? Keywords { get; set; }
-    public required PositionDto Position { get; set; }
+    public required ExternalPositionDto ExternalPosition { get; set; }
 }

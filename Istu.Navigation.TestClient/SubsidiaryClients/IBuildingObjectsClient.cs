@@ -24,13 +24,13 @@ public class BuildingObjectsClient : BaseClient, IBuildingObjectsClient
 
     public async Task<OperationResult<BuildingObjectDto>> GetBuildingObjectByIdAsync(Guid buildingObjectId)
     {
-        var route = ApiRoutes.BuildingObjects.GetWithIdRoute(buildingObjectId);
+        var route = ApiRoutes.BuildingObjectsRoutes.GetWithIdRoute(buildingObjectId);
         return await GetAsync<BuildingObjectDto>(route).ConfigureAwait(false); 
     }
 
     public Task<OperationResult<List<BuildingObjectDto>>> GetAllByFilterAsync(BuildingObjectFilter filter)
     {
-        var route = ApiRoutes.BuildingObjects.GetAllRoute();
+        var route = ApiRoutes.BuildingObjectsRoutes.GetAllRoute();
         var queries = new Dictionary<string, string?>();
 
         if (filter.BuildingId != null)
@@ -51,7 +51,7 @@ public class BuildingObjectsClient : BaseClient, IBuildingObjectsClient
 
     public Task<OperationResult<CreateBuildingObjectResponse>> CreateBuildingObjectAsync(CreateBuildingObjectRequest request)
     {
-        var route = ApiRoutes.BuildingObjects.CreateRoute();
+        var route = ApiRoutes.BuildingObjectsRoutes.CreateRoute();
         return PostAsync<CreateBuildingObjectRequest, CreateBuildingObjectResponse>(route, request);
     }
 
@@ -62,7 +62,7 @@ public class BuildingObjectsClient : BaseClient, IBuildingObjectsClient
 
     public Task<OperationResult> DeleteBuildingObjectAsync(Guid buildingObjectId)
     {
-        var route = ApiRoutes.Buildings.DeleteBuildingRoute(buildingObjectId);
+        var route = ApiRoutes.BuildingsRoutes.DeleteBuildingRoute(buildingObjectId);
         return DeleteAsync(route);
     }
 }

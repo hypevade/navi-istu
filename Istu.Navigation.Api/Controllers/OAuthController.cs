@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route(ApiRoutes.OAuth.OauthApi)]
+[Route(ApiRoutes.OAuthRoutes.OauthApi)]
 public class OAuthController : ControllerBase
 {
     private readonly ILogger<OAuthController> logger;
@@ -19,7 +19,7 @@ public class OAuthController : ControllerBase
         this.istuService = istuService;
     }
 
-    [HttpGet(ApiRoutes.OAuth.AuthenticatePart)]
+    [HttpGet(ApiRoutes.OAuthRoutes.AuthenticatePart)]
     public IActionResult AuthenticateUser()
     {
         var getUrl = istuService.GenerateRedirectUrl();
@@ -30,23 +30,24 @@ public class OAuthController : ControllerBase
         return Redirect(getUrl.Data);
     }
 
-    [HttpGet(ApiRoutes.OAuth.CallBackPart)]
+    [HttpGet(ApiRoutes.OAuthRoutes.CallBackPart)]
     public async Task<IActionResult> OAuthCallback(string code)
     {
         if (string.IsNullOrEmpty(code))
             return UsersApiErrors.CodeNotValidError().ToActionResult();
 
-        var getTokenOperation = await istuService.ExchangeCodeForTokenAsync(code).ConfigureAwait(false);
-        if (getTokenOperation.IsFailure)
-            return getTokenOperation.ApiError.ToActionResult();
+        var getOperation = await istuService.ExchangeCodeForTokenAsync(code).ConfigureAwait(false);
+        if (getOperation.IsFailure)
+            return getOperation.ApiError.ToActionResult();
 
-        var userInfo = await istuService.GetUserInfo(getTokenOperation.Data.AccessToken).ConfigureAwait(false);
+        var userInfo = await istuService.GetUserInfo(getOperation.Data.AccessToken).ConfigureAwait(false);
         if (userInfo.IsFailure)
             return userInfo.ApiError.ToActionResult();
 
         var registerUserOperation = await istuService.RegisterIstuUser(userInfo.Data,
-            getTokenOperation.Data.AccessToken,
-            getTokenOperation.Data.RefreshToken);
+            getOperation.Data.AccessToken,
+            getOperation.Data.RefreshToken);
+        
         if (registerUserOperation.IsFailure)
             return registerUserOperation.ApiError.ToActionResult();
 

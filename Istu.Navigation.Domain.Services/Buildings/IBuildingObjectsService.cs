@@ -13,7 +13,7 @@ namespace Istu.Navigation.Domain.Services.Buildings;
 public interface IBuildingObjectsService
 {
     public Task<OperationResult<Guid>> CreateAsync(BuildingObject buildingObject);
-    public Task<OperationResult> PatchAsync(List<BuildingObject> buildingObjects);
+    public Task<OperationResult> PatchAsync(Guid buildingObjectId, string? title, string? description, BuildingObjectType? type, double? x, double? y);
     public Task<OperationResult> DeleteAsync(List<Guid> buildingObjectsIds);
     public Task<OperationResult<BuildingObject>> GetByIdAsync(Guid id);
     public Task<OperationResult<List<BuildingObject>>> GetAllByFilterAsync(BuildingObjectFilter filter);
@@ -40,40 +40,41 @@ public class BuildingObjectsService : IBuildingObjectsService
         var check = await CheckBuildingObject(buildingObject).ConfigureAwait(false);
         if (check.IsFailure)
             return OperationResult<Guid>.Failure(check.ApiError);
+        
         var entity = mapper.Map<BuildingObjectEntity>(buildingObject);
         var result = await buildingObjectsRepository.AddAsync(entity).ConfigureAwait(false);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
-        //Todo: прокидывать keywords
         if (entity.Title is not null)
             luceneService.AddDocument(result.Id, ContentType.Object, entity.Title, buildingObject.Keywords ?? "", buildingObject.Description ?? "");
+        
         return OperationResult<Guid>.Success(result.Id);
     }
 
-    public async Task<OperationResult> PatchAsync(List<BuildingObject> buildingObjects)
+    public Task<OperationResult> PatchAsync(Guid buildingObjectId, string? title, string? description, BuildingObjectType? type, double? x,
+        double? y)
     {
-        foreach (var buildingObject in buildingObjects)
-        {
-            var check = await CheckBuildingObject(buildingObject, checkExist: false).ConfigureAwait(false);
-            if (check.IsFailure)
-                return check;
-        }
+        var buildingObject = buildingObjectsRepository.GetByIdAsync(buildingObjectId).Result;
+        if (buildingObject is null)
+            return Task.FromResult(OperationResult.Failure(BuildingObjectsApiErrors.BuildingObjectNotFoundError(buildingObjectId)));
 
-        var buildingObjectsEntity = mapper.Map<List<BuildingObjectEntity>>(buildingObjects);
-        buildingObjectsRepository.UpdateRange(buildingObjectsEntity);
-        await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
-
-        return OperationResult.Success();
+        if (title != null) buildingObject.Title = title;
+        if (description != null) buildingObject.Description = description;
+        if (type.HasValue) buildingObject.Type = type.Value;
+        if (x.HasValue) buildingObject.X = x.Value;
+        if (y.HasValue) buildingObject.Y = y.Value;
+        
+        buildingObjectsRepository.Update(buildingObject);
+        buildingObjectsRepository.SaveChangesAsync();
+        
+        return Task.FromResult(OperationResult.Success());
     }
 
     public async Task<OperationResult> DeleteAsync(List<Guid> buildingObjectsIds)
     {
         await buildingObjectsRepository.RemoveRangeAsync(buildingObjectsIds).ConfigureAwait(false);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
-        
-        foreach (var id in buildingObjectsIds)
-        {
-            luceneService.DeleteDocument(id);
-        }
+
+        buildingObjectsIds.ForEach(id => luceneService.DeleteDocument(id));
         
         return OperationResult.Success();
     }
@@ -83,6 +84,7 @@ public class BuildingObjectsService : IBuildingObjectsService
         var buildingObject = await buildingObjectsRepository.GetByIdAsync(id).ConfigureAwait(false);
         if (buildingObject is null)
             return OperationResult<BuildingObject>.Failure(BuildingObjectsApiErrors.BuildingObjectNotFoundError(id));
+        
         var result = mapper.Map<BuildingObject>(buildingObject);
         return OperationResult<BuildingObject>.Success(result);
     }
@@ -94,13 +96,13 @@ public class BuildingObjectsService : IBuildingObjectsService
         return OperationResult<List<BuildingObject>>.Success(result);
     }
 
-    private async Task<OperationResult> CheckBuildingObject(BuildingObject buildingObject, bool checkExist = true)
+    private async Task<OperationResult> CheckBuildingObject(BuildingObject buildingObject)
     {
         var checkX = BuildingObject.CoordinateIsValid(buildingObject.X);
         var checkY = BuildingObject.CoordinateIsValid(buildingObject.Y);
         if (!checkY || !checkX)
-            return OperationResult.Failure(
-                BuildingObjectsApiErrors.InvalidCoordinatesError(buildingObject.X, buildingObject.Y));
+            return
+                OperationResult.Failure(BuildingObjectsApiErrors.InvalidCoordinatesError(buildingObject.X, buildingObject.Y));
 
         var getBuilding = await buildingsRepository.GetByIdAsync(buildingObject.BuildingId).ConfigureAwait(false);
         if (getBuilding is null)
