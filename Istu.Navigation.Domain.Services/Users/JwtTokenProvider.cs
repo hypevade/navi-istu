@@ -46,6 +46,8 @@ public abstract class JwtTokenProvider
     {
         try
         {
+            if(string.IsNullOrWhiteSpace(token))
+                return OperationResult<ClaimsPrincipal>.Failure(UsersApiErrors.TokenIsNotValidError());
             var tokenHandler = new JwtSecurityTokenHandler();
             var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken ar);
 
