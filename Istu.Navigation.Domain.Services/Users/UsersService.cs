@@ -118,7 +118,7 @@ public class UsersService : IUsersService
     private async Task<string> UpdateRefreshToken(UserEntity user)
     {
         var newRefreshToken = refreshTokenProvider.GenerateToken(user);
-        usersRepository.UpdateRefreshToken(user.Id, newRefreshToken);
+        await usersRepository.UpdateRefreshTokenAsync(user.Id, newRefreshToken).ConfigureAwait(false);
         await usersRepository.SaveChangesAsync().ConfigureAwait(false);
         return newRefreshToken;
     }

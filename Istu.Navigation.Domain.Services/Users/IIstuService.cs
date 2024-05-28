@@ -2,18 +2,16 @@ using System.Net.Http.Headers;
 using Istu.Navigation.Domain.Models.Entities.User;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Repositories.Users;
-using Istu.Navigation.Domain.Services.Users;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace Istu.Navigation.Domain.Services;
+namespace Istu.Navigation.Domain.Services.Users;
 
 public interface IIstuService
 {
-    User GetUserInfo(Guid userId);
     Task<OperationResult<TokenResponse>> ExchangeCodeForTokenAsync(string code);
     OperationResult<string> GenerateRedirectUrl();
 
@@ -45,11 +43,6 @@ public class IstuService : IIstuService
         this.usersRepository = usersRepository;
         this.accessTokenProvider = accessTokenProvider;
         this.refreshTokenProvider = refreshTokenProvider;
-    }
-
-    public User GetUserInfo(Guid userId)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<OperationResult<IstuUserInfo>> GetUserInfo(string istuAccessToken)
@@ -111,7 +104,7 @@ public class IstuService : IIstuService
         var accessToken = accessTokenProvider.GenerateToken(existedUser);
         var refreshToken = refreshTokenProvider.GenerateToken(existedUser);
 
-        usersRepository.UpdateRefreshToken(existedUser.Id, refreshToken);
+        await usersRepository.UpdateRefreshTokenAsync(existedUser.Id, refreshToken).ConfigureAwait(false);
         var istuUser = IstuUser.FromEntity(existedUser);
 
         istuUser.AccessToken = accessToken;

@@ -9,7 +9,7 @@ namespace Istu.Navigation.Domain.Repositories.Users;
 public interface IUsersRepository : IRepository<UserEntity>
 {
     public Task<UserEntity?> GetByEmailAsync(string email);
-    public void UpdateRefreshToken(Guid userId, string refreshToken);
+    public Task UpdateRefreshTokenAsync(Guid userId, string refreshToken);
 }
 public class UsersRepository(AppDbContext context): Repository<UserEntity>(context), IUsersRepository 
 {
@@ -17,13 +17,14 @@ public class UsersRepository(AppDbContext context): Repository<UserEntity>(conte
     {
         return DbSet.FirstOrDefaultAsync(x => x.Email == email);
     }
-
-    public void UpdateRefreshToken(Guid userId, string refreshToken)
+    public async Task UpdateRefreshTokenAsync(Guid userId, string refreshToken)
     {
-        var user = DbSet.FirstOrDefault(x => x.Id == userId);
+        var user = await DbSet.FirstOrDefaultAsync(x => x.Id == userId);
         if (user is null)
             return;
+
         user.RefreshToken = refreshToken;
-        DbSet.Update(user);
+        Context.Entry(user).State = EntityState.Modified;
+        await Context.SaveChangesAsync();
     }
 }
