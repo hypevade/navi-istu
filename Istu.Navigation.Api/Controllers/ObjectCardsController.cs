@@ -7,6 +7,7 @@ using Istu.Navigation.Domain.Models.Cards;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.Cards;
+using Istu.Navigation.Domain.Services.ExternalRoutes;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Public.Models.Cards;
 using Microsoft.AspNetCore.Mvc;

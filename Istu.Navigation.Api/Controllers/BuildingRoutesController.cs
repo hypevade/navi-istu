@@ -3,6 +3,7 @@ using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Models.Users;
+using Istu.Navigation.Domain.Services.BuildingRoutes;
 using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Public.Models.BuildingRoutes;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ public class BuildingRoutesController: ControllerBase
     [Route(ApiRoutes.BuildingRoutes.CreatePart)]
     public async Task<ActionResult<BuildingRouteResponse>> CreateRoute([FromBody] BuildingRouteRequest request)
     {
-        var getOperation = await buildingRoutesService.CreateRoute(request.ToId, request.FromId ?? default)
+        var getOperation = await buildingRoutesService.CreateRouteAsync(request.ToId, request.FromId ?? default)
             .ConfigureAwait(false);
         
         return getOperation.IsFailure

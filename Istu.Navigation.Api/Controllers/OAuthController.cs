@@ -2,6 +2,7 @@ using AutoMapper;
 using Istu.Navigation.Api.Extensions;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Services;
+using Istu.Navigation.Domain.Services.Users;
 using Istu.Navigation.Infrastructure.Errors.UsersApiErrors;
 using Istu.Navigation.Public.Models.Users;
 using Microsoft.AspNetCore.Mvc;

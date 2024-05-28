@@ -9,7 +9,7 @@ namespace Istu.Navigation.Domain.Services.Buildings;
 public interface IFileStorage
 {
     public Task<OperationResult> UploadAsync(IFormFile file, string filename);
-    public Task<OperationResult<FileInfo>> DownloadAsync(string title);
+    public Task<OperationResult<FileInfo>> DownloadAsync(string filename);
 }
 
 public class FileStorage : IFileStorage
@@ -35,17 +35,14 @@ public class FileStorage : IFileStorage
         return OperationResult.Success();
     }
 
-    public async Task<OperationResult<FileInfo>> DownloadAsync(string title)
+    public async Task<OperationResult<FileInfo>> DownloadAsync(string filename)
     {
-        var filePath = Path.Combine(storagePath, title);
+        var filePath = Path.Combine(storagePath, filename);
 
         if (!File.Exists(filePath))
-        {
             return OperationResult<FileInfo>.Failure(ImagesApiErrors.EmptyImageError());
-        }
-
+        
         var fileContents = await File.ReadAllBytesAsync(filePath).ConfigureAwait(false);
-        var fileInfo = new FileInfo(title, fileContents);
-        return OperationResult<FileInfo>.Success(fileInfo);
+        return OperationResult<FileInfo>.Success(new FileInfo(filename, fileContents));
     }
 }

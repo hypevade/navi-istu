@@ -18,11 +18,16 @@ public interface IRefreshTokenProvider
     public OperationResult<ClaimsPrincipal> ValidateToken(string token);
 }
 
-public class RefreshTokenProvider(IOptions<JwtOptions> options, TokenValidationParameters validationParameters, ILogger<RefreshTokenProvider> logger)
-    : JwtTokenProvider(validationParameters, logger), IRefreshTokenProvider
+public class RefreshTokenProvider : JwtTokenProvider, IRefreshTokenProvider
 {
-    private readonly JwtOptions options = options.Value;
-    private readonly TokenValidationParameters validationParameters = validationParameters;
+    private readonly JwtOptions options;
+    private readonly TokenValidationParameters validationParameters;
+
+    public RefreshTokenProvider(IOptions<JwtOptions> options, TokenValidationParameters validationParameters, ILogger<RefreshTokenProvider> logger) : base(validationParameters, logger)
+    {
+        this.options = options.Value;
+        this.validationParameters = validationParameters;
+    }
 
     public Guid? GetUserId(string token)
     {

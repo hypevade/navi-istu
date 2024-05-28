@@ -18,11 +18,17 @@ public interface IAccessTokenProvider
     public OperationResult<(Guid Id, UserRole Role)> GetUser(string token);
 }
 
-public class AccessTokenProvider(IOptions<JwtOptions> options, TokenValidationParameters validationParameters, ILogger<JwtTokenProvider> logger)
-    : JwtTokenProvider(validationParameters, logger), IAccessTokenProvider
+public class AccessTokenProvider : JwtTokenProvider, IAccessTokenProvider
 {
-    private readonly JwtOptions options = options.Value;
-    private readonly TokenValidationParameters validationParameters = validationParameters;
+    private readonly JwtOptions options;
+    private readonly TokenValidationParameters validationParameters;
+
+    public AccessTokenProvider(IOptions<JwtOptions> options, TokenValidationParameters validationParameters,
+        ILogger<JwtTokenProvider> logger) : base(validationParameters, logger)
+    {
+        this.options = options.Value;
+        this.validationParameters = validationParameters;
+    }
 
     public override string GenerateToken(User user)
     {

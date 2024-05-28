@@ -3,6 +3,7 @@ using Istu.Navigation.Domain.Models.Cards;
 using Istu.Navigation.Domain.Models.Entities;
 using Istu.Navigation.Domain.Models.ExternalRoutes;
 using Istu.Navigation.Domain.Repositories.Buildings;
+using Istu.Navigation.Domain.Services.ExternalRoutes;
 using Istu.Navigation.Infrastructure.EF.Filters;
 using Istu.Navigation.Infrastructure.Errors;
 using Istu.Navigation.Infrastructure.Errors.RoutesApiErrors;

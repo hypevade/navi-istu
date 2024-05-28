@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Directory = System.IO.Directory;
 
-namespace Istu.Navigation.Domain.Services;
+namespace Istu.Navigation.Domain.Services.ExternalRoutes;
 
 public interface ILuceneService
 {

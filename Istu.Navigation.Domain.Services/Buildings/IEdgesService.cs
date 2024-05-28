@@ -10,15 +10,22 @@ namespace Istu.Navigation.Domain.Services.Buildings;
 public interface IEdgesService
 {
     public Task<OperationResult<List<Edge>>> GetAllByFilterAsync(EdgeFilter filter);
-    public Task<OperationResult<Edge>> GetByIdAsync(Guid edgeId);
-    public Task<OperationResult<Guid>> Create(Guid fromId, Guid toId);
     public Task<OperationResult<List<Guid>>> CreateRangeAsync(List<(Guid fromId, Guid toId)> edges);
     public Task<OperationResult> DeleteAsync(Guid fromId, Guid toId);
     public Task<OperationResult> DeleteAsync(Guid edgeId);
 }
 
-public class EdgesService(IEdgesRepository repository, IBuildingObjectsService objectsService) : IEdgesService
+public class EdgesService : IEdgesService
 {
+    private readonly IEdgesRepository repository;
+    private readonly IBuildingObjectsService objectsService;
+
+    public EdgesService(IEdgesRepository repository, IBuildingObjectsService objectsService)
+    {
+        this.repository = repository;
+        this.objectsService = objectsService;
+    }
+
     public async Task<OperationResult<List<Edge>>> GetAllByFilterAsync(EdgeFilter filter)
     {
         var edgeEntities = await repository.GetAllByFilterAsync(filter).ConfigureAwait(false);
@@ -46,14 +53,6 @@ public class EdgesService(IEdgesRepository repository, IBuildingObjectsService o
             return OperationResult<Edge>.Failure(getToObj.ApiError);
 
         return OperationResult<Edge>.Success(new Edge(edgeId, getFromObj.Data, getToObj.Data, edge.FloorNumber));
-    }
-
-    public async Task<OperationResult<Guid>> Create(Guid fromId, Guid toId)
-    {
-        var result = await CreateRangeAsync([(fromId, toId)]).ConfigureAwait(false);
-        return result.IsSuccess
-            ? OperationResult<Guid>.Success(result.Data.First())
-            : OperationResult<Guid>.Failure(result.ApiError);
     }
 
     public async Task<OperationResult<List<Guid>>> CreateRangeAsync(List<(Guid fromId, Guid toId)> edges)
@@ -118,8 +117,7 @@ public class EdgesService(IEdgesRepository repository, IBuildingObjectsService o
     {
         if (fromId == toId)
             return OperationResult<EdgeEntity>.Failure(EdgesApiErrors.EdgeFromToSameError(fromId, toId));
-
-
+        
         var fromObj = await objectsService.GetByIdAsync(fromId).ConfigureAwait(false);
         if (fromObj.IsFailure)
             return OperationResult<EdgeEntity>.Failure(fromObj.ApiError);

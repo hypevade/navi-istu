@@ -1,20 +1,32 @@
 ﻿using Istu.Navigation.Domain.Models.BuildingRoutes;
-using Istu.Navigation.Domain.Services.BuildingRoutes;
+using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Infrastructure.Errors;
 
-namespace Istu.Navigation.Domain.Services.Buildings;
+namespace Istu.Navigation.Domain.Services.BuildingRoutes;
 
 public interface IBuildingRoutesService
 {
-    Task<OperationResult<BuildingRoute>> CreateRoute(Guid toId, Guid fromId = default);
+    Task<OperationResult<BuildingRoute>> CreateRouteAsync(Guid toId, Guid fromId = default);
 }
-public class BuildingRoutesService(
-    IBuildingObjectsService objectService,
-    IBuildingsService service,
-    IRouteSearcher searcher,
-    IFloorsBuilder floorsBuilder) : IBuildingRoutesService
+public class BuildingRoutesService : IBuildingRoutesService
 {
-    public async Task<OperationResult<BuildingRoute>> CreateRoute(Guid toId, Guid fromId = default)
+    private readonly IBuildingObjectsService objectService;
+    private readonly IBuildingsService service;
+    private readonly IRouteSearcher searcher;
+    private readonly IFloorsBuilder floorsBuilder;
+
+    public BuildingRoutesService(IBuildingObjectsService objectService,
+        IBuildingsService service,
+        IRouteSearcher searcher,
+        IFloorsBuilder floorsBuilder)
+    {
+        this.objectService = objectService;
+        this.service = service;
+        this.searcher = searcher;
+        this.floorsBuilder = floorsBuilder;
+    }
+
+    public async Task<OperationResult<BuildingRoute>> CreateRouteAsync(Guid toId, Guid fromId = default)
     {
         //TODO: Добавить  поддержку, когда fromID = default
         var getOperation  = await GetTwoObjects(fromId, toId).ConfigureAwait(false);
