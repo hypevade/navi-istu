@@ -45,8 +45,9 @@ public class BuildingObjectsService : IBuildingObjectsService
         var entity = mapper.Map<BuildingObjectEntity>(buildingObject);
         var result = await buildingObjectsRepository.AddAsync(entity).ConfigureAwait(false);
         await buildingObjectsRepository.SaveChangesAsync().ConfigureAwait(false);
-        if (entity.Title is not null)
-            luceneService.AddDocument(result.Id, ContentType.Object, entity.Title, buildingObject.Keywords ?? "", buildingObject.Description ?? "");
+        if (entity.Type.IsPublicObject())
+            luceneService.AddDocument(result.Id, ContentType.Object, entity.Title ?? entity.Type.GetRussianName(),
+                buildingObject.Keywords ?? "", buildingObject.Description ?? "");
         
         return OperationResult<Guid>.Success(result.Id);
     }

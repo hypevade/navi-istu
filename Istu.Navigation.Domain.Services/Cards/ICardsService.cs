@@ -10,7 +10,7 @@ namespace Istu.Navigation.Domain.Services.Cards;
 
 public interface ICardsService
 {
-    public Task<OperationResult<Card>> GetCard(Guid objectId);
+    public Task<OperationResult<Card>> GetCardAsync(Guid objectId);
 }
 
 public class CardsService : ICardsService
@@ -30,7 +30,7 @@ public class CardsService : ICardsService
         this.buildingObjectsService = buildingObjectsService;
     }
 
-    public async Task<OperationResult<Card>> GetCard(Guid objectId)
+    public async Task<OperationResult<Card>> GetCardAsync(Guid objectId)
     {
         var getBuildingCardOperation = await GetBuildingCard(objectId).ConfigureAwait(false);
         if (getBuildingCardOperation.IsFailure && getBuildingCardOperation.ApiError.Urn !=

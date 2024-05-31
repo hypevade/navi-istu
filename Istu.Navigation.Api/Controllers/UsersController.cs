@@ -12,19 +12,16 @@ using LoginRequest = Istu.Navigation.Public.Models.Users.LoginRequest;
 
 namespace Istu.Navigation.Api.Controllers;
 
-[ApiController]
-[Route(ApiRoutes.UsersRoutes.UsersApi)]
+[ApiController] [Route(ApiRoutes.UsersRoutes.UsersApi)]
 public class UsersController : ControllerBase
 {
     private readonly IUsersService usersService;
     private readonly IMapper mapper;
-    private readonly ILogger<UsersController> logger1;
+    private readonly ILogger<UsersController> logger;
 
     public UsersController(IUsersService usersService, IMapper mapper, ILogger<UsersController> logger)
     {
-        logger1 = logger;
-        this.usersService = usersService;
-        this.mapper = mapper;
+        this.logger = logger; this.usersService = usersService; this.mapper = mapper;
     }
 
     [HttpPost]
@@ -62,11 +59,10 @@ public class UsersController : ControllerBase
     }
     
     [HttpGet]
-    [Route(ApiRoutes.UsersRoutes.GetUserInfoPart)]
-    [AuthorizationFilter(UserRole.User)]
+    [Route(ApiRoutes.UsersRoutes.GetUserInfoPart)] [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<UserDto>> GetUserInfo()
     {
-        var userId = HttpContext.GetUserId(logger1);
+        var userId = HttpContext.GetUserId(logger);
         if (userId is null)
             return Unauthorized();
 
@@ -89,7 +85,6 @@ public class UsersController : ControllerBase
             return StatusCode(error.StatusCode, error.ToErrorDto());
         }
         var extractedToken = JwtTokenHelper.ExtractToken(headerValue.ToString());
-        
         var refreshToken =
             await usersService.RefreshToken(extractedToken)
                 .ConfigureAwait(false);
@@ -100,14 +95,12 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ApiRoutes.UsersRoutes.GetUserSchedulePart)]
-    [AuthorizationFilter(UserRole.Student)]
+    [Route(ApiRoutes.UsersRoutes.GetUserSchedulePart)] [AuthorizationFilter(UserRole.Student)]
     public async Task<ActionResult<List<Lesson>>> GetUserSchedule()
     {
-        var userId = HttpContext.GetUserId(logger1);
+        var userId = HttpContext.GetUserId(logger);
         if (userId is null)
             return Unauthorized();
-       
         var getLessonsOperation = await usersService.GetUserSchedule(userId.Value).ConfigureAwait(false);
         return getLessonsOperation.IsFailure
             ? StatusCode(getLessonsOperation.ApiError.StatusCode, getLessonsOperation.ApiError.ToErrorDto())

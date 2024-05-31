@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
 
-[ApiController]
-[Route(ApiRoutes.OAuthRoutes.OauthApi)]
+[ApiController] [Route(ApiRoutes.OAuthRoutes.OauthApi)]
 public class OAuthController : ControllerBase
 {
     private readonly ILogger<OAuthController> logger;
@@ -19,9 +18,7 @@ public class OAuthController : ControllerBase
 
     public OAuthController(ILogger<OAuthController> logger, IIstuService istuService, IMapper mapper)
     {
-        this.logger = logger;
-        this.istuService = istuService;
-        this.mapper = mapper;
+        this.logger = logger; this.istuService = istuService; this.mapper = mapper;
     }
 
     [HttpGet(ApiRoutes.OAuthRoutes.AuthenticatePart)]
@@ -58,8 +55,6 @@ public class OAuthController : ControllerBase
         
         if (registerUserOperation.IsFailure)
             return StatusCode(registerUserOperation.ApiError.StatusCode,registerUserOperation.ApiError.ToErrorDto());
-        
-
         HttpContext.Response.Headers.Append("Authorization", $"Bearer {registerUserOperation.Data.AccessToken}");
         HttpContext.Response.Headers.Append("Refresh", $"Bearer {registerUserOperation.Data.RefreshToken}");
         var response = new LoginResponse
@@ -68,7 +63,6 @@ public class OAuthController : ControllerBase
             AccessToken = registerUserOperation.Data.AccessToken!,
             RefreshToken = registerUserOperation.Data.RefreshToken!
         };
-            
         return Ok(response);
     }
 }

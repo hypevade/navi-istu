@@ -21,9 +21,19 @@ public interface IBuildingsService
     public Task<OperationResult<List<Building>>> GetAllByFilterAsync(BuildingFilter filter);
 }
 
-public class BuildingsService(IBuildingsRepository repository, IFloorsService service, ILuceneService luceneService)
-    : IBuildingsService
+public class BuildingsService : IBuildingsService
 {
+    private readonly IBuildingsRepository repository;
+    private readonly IFloorsService service;
+    private readonly ILuceneService luceneService;
+
+    public BuildingsService(IBuildingsRepository repository, IFloorsService service, ILuceneService luceneService)
+    {
+        this.repository = repository;
+        this.service = service;
+        this.luceneService = luceneService;
+    }
+
     public async Task<OperationResult<Guid>> CreateAsync(string title, double latitude, double longitude,
         string address, string?  keywords = null,string? description = null)
     {

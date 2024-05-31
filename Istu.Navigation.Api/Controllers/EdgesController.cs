@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
 
-[ApiController]
-[Route(ApiRoutes.BuildingEdgesRoutes.EdgesApi)]
+[ApiController] [Route(ApiRoutes.BuildingEdgesRoutes.EdgesApi)]
 public class EdgesController : ControllerBase
 {
     private readonly IEdgesService edgesService;
@@ -20,13 +19,11 @@ public class EdgesController : ControllerBase
 
     public EdgesController(IEdgesService edgesService, IMapper mapper)
     {
-        this.edgesService = edgesService;
-        this.mapper = mapper;
+        this.edgesService = edgesService; this.mapper = mapper;
     }
     
     [HttpPost]
-    [Route(ApiRoutes.BuildingEdgesRoutes.CreatePart)]
-    [AuthorizationFilter(UserRole.Admin)]
+    [Route(ApiRoutes.BuildingEdgesRoutes.CreatePart)] [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<CreateEdgesResponse>> CreateEdges([FromBody] CreateEdgesRequest request)
     {
         var edges = request.Edges.Select(x => (x.FromId, x.ToId)).ToList();
@@ -38,8 +35,7 @@ public class EdgesController : ControllerBase
     }
     
     [HttpGet]
-    [Route(ApiRoutes.BuildingEdgesRoutes.GetAllPart)]
-    [AuthorizationFilter(UserRole.User)]
+    [Route(ApiRoutes.BuildingEdgesRoutes.GetAllPart)] [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<EdgeDto>>> GetAllEdges([FromQuery] EdgeFilter filter)
     {
         var getOperation = await edgesService.GetAllByFilterAsync(filter).ConfigureAwait(false);
@@ -50,8 +46,7 @@ public class EdgesController : ControllerBase
     }
 
     [HttpDelete]
-    [Route(ApiRoutes.BuildingEdgesRoutes.DeletePart)]
-    [AuthorizationFilter(UserRole.Admin)]
+    [Route(ApiRoutes.BuildingEdgesRoutes.DeletePart)] [AuthorizationFilter(UserRole.Admin)]
     public async Task<IActionResult> DeleteEdge(Guid edgeId)
     {
         var deleteOperation = await edgesService.DeleteAsync(edgeId).ConfigureAwait(false);

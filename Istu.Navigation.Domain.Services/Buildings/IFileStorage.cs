@@ -10,6 +10,7 @@ public interface IFileStorage
 {
     public Task<OperationResult> UploadAsync(IFormFile file, string filename);
     public Task<OperationResult<FileInfo>> DownloadAsync(string filename);
+    public Task<OperationResult> DeleteAsync(string filename);
 }
 
 public class FileStorage : IFileStorage
@@ -44,5 +45,23 @@ public class FileStorage : IFileStorage
         
         var fileContents = await File.ReadAllBytesAsync(filePath).ConfigureAwait(false);
         return OperationResult<FileInfo>.Success(new FileInfo(filename, fileContents));
+    }
+    
+    public async Task<OperationResult> DeleteAsync(string filename)
+    {
+        var filePath = Path.Combine(storagePath, filename);
+
+        if (!File.Exists(filePath))
+            return OperationResult.Failure(ImagesApiErrors.ImageNotFoundError());
+
+        try
+        {
+            await Task.Run(() => File.Delete(filePath));
+            return OperationResult.Success();
+        }
+        catch (Exception ex)
+        {
+            return OperationResult.Failure(CommonErrors.InternalServerError());
+        }
     }
 }

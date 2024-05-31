@@ -30,8 +30,9 @@ public class BuildingObjectsRepository(AppDbContext context)
         if (filter.Floor.HasValue)
             query = query.Where(e => e.Floor == filter.Floor.Value);
 
-        if (filter.Types != null && filter.Types.Any())
-            query = query.Where(e => filter.Types.Contains(e.Type.ToString()));
+        if (filter.Type.HasValue)
+            query = query.Where(e => e.Type == filter.Type.Value);
+            
 
         query = query.Skip(filter.Skip).Take(filter.Take);
 

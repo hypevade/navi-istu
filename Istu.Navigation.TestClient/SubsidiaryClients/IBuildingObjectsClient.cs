@@ -41,8 +41,6 @@ public class BuildingObjectsClient : BaseClient, IBuildingObjectsClient
             queries.Add(nameof(filter.BuildingObjectId), filter.BuildingObjectId.ToString());
         if (filter.Floor != null)
             queries.Add(nameof(filter.Floor), filter.Floor.ToString());
-        if (filter.Types != null)
-            queries.Add(nameof(filter.Types), string.Join(',', filter.Types));
 
         queries.Add(nameof(filter.Skip), filter.Skip.ToString());
         queries.Add(nameof(filter.Take), filter.Take.ToString());

@@ -10,8 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
 
-[ApiController]
-[Route(ApiRoutes.BuildingsRoutes.BuildingsApi)]
+[ApiController] [Route(ApiRoutes.BuildingsRoutes.BuildingsApi)]
 public class BuildingsController : ControllerBase
 {
     private readonly IMapper mapper;
@@ -24,15 +23,12 @@ public class BuildingsController : ControllerBase
         IFloorsService floorsService,
         IFloorsBuilder floorsBuilder)
     {
-        this.mapper = mapper;
-        this.buildingsService = buildingsService;
-        this.floorsService = floorsService;
+        this.mapper = mapper; this.buildingsService = buildingsService; this.floorsService = floorsService;
         this.floorsBuilder = floorsBuilder;
     }
 
     [HttpPost]
-    [Route(ApiRoutes.BuildingsRoutes.CreateBuildingPart)]
-    [AuthorizationFilter(UserRole.Admin)]
+    [Route(ApiRoutes.BuildingsRoutes.CreateBuildingPart)] [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<CreateBuildingResponse>> Create([FromBody] CreateBuildingRequest request)
     {
         var createOperation = await buildingsService
@@ -45,8 +41,7 @@ public class BuildingsController : ControllerBase
     }
     
     [HttpPatch]
-    [Route(ApiRoutes.BuildingsRoutes.UpdateBuildingPart)]
-    [AuthorizationFilter(UserRole.Admin)]
+    [Route(ApiRoutes.BuildingsRoutes.UpdateBuildingPart)] [AuthorizationFilter(UserRole.Admin)]
     public async Task<IActionResult> Update([FromBody] UpdateBuildingRequest request)
     {
         var update = await buildingsService
@@ -60,8 +55,7 @@ public class BuildingsController : ControllerBase
     }
 
     [HttpDelete]
-    [Route(ApiRoutes.BuildingsRoutes.DeleteBuildingPart)]
-    [AuthorizationFilter(UserRole.Admin)]
+    [Route(ApiRoutes.BuildingsRoutes.DeleteBuildingPart)] [AuthorizationFilter(UserRole.Admin)]
     public async Task<IActionResult> Delete(Guid buildingId)
     {
         var delete = await buildingsService.DeleteAsync(buildingId).ConfigureAwait(false);
@@ -71,8 +65,7 @@ public class BuildingsController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ApiRoutes.BuildingsRoutes.GetBuildingPart)]
-    [AuthorizationFilter(UserRole.User)]
+    [Route(ApiRoutes.BuildingsRoutes.GetBuildingPart)] [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<BuildingDto>> GetById(Guid buildingId)
     {
         var getOperation = await buildingsService.GetByIdAsync(buildingId).ConfigureAwait(false);
@@ -82,8 +75,7 @@ public class BuildingsController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ApiRoutes.BuildingsRoutes.GetAllBuildingsPart)]
-    [AuthorizationFilter(UserRole.User)]
+    [Route(ApiRoutes.BuildingsRoutes.GetAllBuildingsPart)] [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<BuildingDto>>> GetAllByFilter([FromQuery] BuildingFilter filter)
     {
         var getOperation = await buildingsService.GetAllByFilterAsync(filter).ConfigureAwait(false);
@@ -94,8 +86,7 @@ public class BuildingsController : ControllerBase
     }
 
     [HttpPost]
-    [Route(ApiRoutes.BuildingsRoutes.CreateFloorPart)]
-    [AuthorizationFilter(UserRole.Admin)]
+    [Route(ApiRoutes.BuildingsRoutes.CreateFloorPart)] [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<CreateFloorResponse>> CreateFloor(Guid buildingId,
         [FromBody] CreateFloorRequest request)
     {
@@ -107,8 +98,7 @@ public class BuildingsController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ApiRoutes.BuildingsRoutes.GetFloorPart)]
-    [AuthorizationFilter(UserRole.User)]
+    [Route(ApiRoutes.BuildingsRoutes.GetFloorPart)] [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<FloorDto>> GetFloor(Guid buildingId, int floorNumber)
     {
         var getOperation = await floorsBuilder.GetFloor(buildingId, floorNumber)
@@ -131,8 +121,7 @@ public class BuildingsController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ApiRoutes.BuildingsRoutes.GetFloorsPart)]
-    [AuthorizationFilter(UserRole.User)]
+    [Route(ApiRoutes.BuildingsRoutes.GetFloorsPart)] [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<FloorDto>>> GetFloorsByBuilding(Guid buildingId)
     {
         var getOperation = await floorsBuilder.GetFloorsByBuilding(buildingId).ConfigureAwait(false);

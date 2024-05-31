@@ -6,16 +6,13 @@ using Istu.Navigation.Domain.Models.ExternalRoutes;
 using Istu.Navigation.Domain.Models.Users;
 using Istu.Navigation.Domain.Services.Buildings;
 using Istu.Navigation.Domain.Services.ExternalRoutes;
-using Istu.Navigation.Infrastructure.Errors;
-using Istu.Navigation.Infrastructure.Errors.ExternalRoutesApiErrors;
 using Istu.Navigation.Public.Models.ExternalRoutes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route(ApiRoutes.ExternalRoutes.ExternalRoutesApi)]
-[AuthorizationFilter(UserRole.User)]
+[Route(ApiRoutes.ExternalRoutes.ExternalRoutesApi)] [AuthorizationFilter(UserRole.User)]
 public class ExternalRoutesController : ControllerBase
 {
     private readonly IBuildingsService buildingsService;
@@ -26,9 +23,7 @@ public class ExternalRoutesController : ControllerBase
         IExternalRoutesSearcher routesSearcher,
         IMapper mapper)
     {
-        this.buildingsService = buildingsService;
-        this.routesSearcher = routesSearcher;
-        this.mapper = mapper;
+        this.buildingsService = buildingsService; this.routesSearcher = routesSearcher; this.mapper = mapper;
     }
 
     [HttpPost]

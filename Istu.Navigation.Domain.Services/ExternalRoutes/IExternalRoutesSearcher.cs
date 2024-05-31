@@ -14,9 +14,17 @@ public interface IExternalRoutesSearcher
     public OperationResult<ExternalRoute> FindRoute(ExternalPoint startPoint, ExternalPoint endPoint, ExternalRouteType type); 
 }
 
-public class ExternalRoutesSearcher(Router router, IOptions<MapOptions> options) : IExternalRoutesSearcher
+public class ExternalRoutesSearcher : IExternalRoutesSearcher
 {
-    private readonly MapOptions mapOptions = options.Value;
+    private readonly MapOptions mapOptions;
+    private readonly Router router;
+
+    public ExternalRoutesSearcher(Router router, IOptions<MapOptions> options)
+    {
+        this.router = router;
+        mapOptions = options.Value;
+    }
+
     public OperationResult<ExternalRoute> FindRoute(ExternalPoint startPoint, ExternalPoint endPoint, ExternalRouteType type)
     {
         if (!CheckPoint(startPoint))

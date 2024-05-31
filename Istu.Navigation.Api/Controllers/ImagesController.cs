@@ -10,8 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route(ApiRoutes.ImagesRoutes.ImagesApi)]
-[AuthorizationFilter(UserRole.User)]
+[Route(ApiRoutes.ImagesRoutes.ImagesApi)] [AuthorizationFilter(UserRole.User)]
 public class ImagesController : ControllerBase
 {
     private readonly IImageService imageService;
@@ -19,8 +18,7 @@ public class ImagesController : ControllerBase
 
     public ImagesController(IImageService imageService, IMapper mapper)
     {
-        this.imageService = imageService;
-        this.mapper = mapper;
+        this.imageService = imageService; this.mapper = mapper;
     }
 
     [MaxFileSize(10485760)]
@@ -28,7 +26,6 @@ public class ImagesController : ControllerBase
     public async Task<ActionResult<Guid>> Create(IFormFile file, Guid objectId)
     {
         var uploadOperation = await imageService.CreateAsync(file, objectId).ConfigureAwait(false);
-        
         return uploadOperation.IsFailure
             ? StatusCode(uploadOperation.ApiError.StatusCode, uploadOperation.ApiError.ToErrorDto())
             : Ok(uploadOperation.Data);
@@ -38,7 +35,6 @@ public class ImagesController : ControllerBase
     public async Task<ActionResult<byte[]>> Download(Guid imageId)
     {
         var downloadOperation = await imageService.GetImageByIdAsync(imageId).ConfigureAwait(false);
-        
         if (downloadOperation.IsFailure)
             return StatusCode(downloadOperation.ApiError.StatusCode, downloadOperation.ApiError.ToErrorDto());
         
@@ -49,10 +45,8 @@ public class ImagesController : ControllerBase
     public async Task<ActionResult<ImageInfosResponse>> GetByObject(Guid objectId)
     {
         var downloadOperation = await imageService.GetInfosByObjectIdAsync(objectId).ConfigureAwait(false);
-        
         return downloadOperation.IsFailure
             ? StatusCode(downloadOperation.ApiError.StatusCode, downloadOperation.ApiError.ToErrorDto())
             : Ok(new ImageInfosResponse { Images = mapper.Map<List<ImageInfoDto>>(downloadOperation.Data) });
     }
-    
 }

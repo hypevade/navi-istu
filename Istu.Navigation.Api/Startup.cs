@@ -110,7 +110,6 @@ public class Startup
                     .AllowAnyHeader();
             });
         });
-
         services.AddSwaggerGen(c =>
         {
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -163,7 +162,6 @@ public class Startup
         services.AddScoped<IRefreshTokenProvider, RefreshTokenProvider>();
         services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
-        
         services.AddScoped<ILuceneService, LuceneService>();
 
         services.AddScoped<ICommentsRepository, CommentsRepository>();
@@ -175,7 +173,6 @@ public class Startup
         services.AddScoped<IRouteSearcher, RouteSearcher>();
 
         services.AddScoped<IIstuService, IstuService>();
-
         services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.PropertyNamingPolicy = null;
@@ -192,26 +189,15 @@ public class Startup
     {
         app.UseSwagger();
         app.UseMiddleware<RequestLoggingMiddleware>();
-        
-        //TODO: отключить свагер UI для прода
-        /*if (env.IsDevelopment())
-        {*/
-            app.UseDeveloperExceptionPage();
-            app.UseSwaggerUI();
-        /*}*/
-
+        app.UseDeveloperExceptionPage();
+        app.UseSwaggerUI();
         using var scope = app.ApplicationServices.CreateScope();
-
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         dbContext.Database.EnsureCreated();
-
         app.UseRouting();
-
         app.UseAuthorization();
         app.UseCors("CorsPolicy");
-
         app.UseMiddleware<ErrorHandlingMiddleware>();
-
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
 }

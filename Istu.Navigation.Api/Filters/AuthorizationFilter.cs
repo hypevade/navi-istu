@@ -23,7 +23,6 @@ public class AuthorizationFilter(UserRole minimumRole) : Attribute, IAuthorizati
             context.Result = UsersApiErrors.AuthorizationHeaderIsEmptyError().ToActionResult();
             return;
         }
-
         ValidateToken(context, headerValue.ToString());
     }
 

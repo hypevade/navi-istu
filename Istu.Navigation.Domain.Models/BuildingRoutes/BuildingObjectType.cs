@@ -10,7 +10,7 @@ public enum BuildingObjectType
     Ladder = 5,
     Elevator = 6,
     Entrance = 7,
-    СashRegister = 8,
+    CashRegister = 8,
     Showplace = 9
 }
 
@@ -28,9 +28,17 @@ public static class BuildingObjectTypeExtensions
             BuildingObjectType.Ladder => "Лестница",
             BuildingObjectType.Elevator => "Лифт",
             BuildingObjectType.Entrance => "Вход",
-            BuildingObjectType.СashRegister => "Касса",
+            BuildingObjectType.CashRegister => "Касса",
             BuildingObjectType.Showplace => "Достопримечательность",
             _ => "Неизвестно"
         };
     }
+    
+    public static bool IsPublicObject(this BuildingObjectType type)
+    {
+        return type == BuildingObjectType.Auditorium || type == BuildingObjectType.Cabinet ||
+               type == BuildingObjectType.Cafe || type == BuildingObjectType.CashRegister ||
+               type == BuildingObjectType.Showplace;
+    }
+    
 }

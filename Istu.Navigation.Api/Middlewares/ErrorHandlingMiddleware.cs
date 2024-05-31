@@ -5,9 +5,6 @@ namespace Istu.Navigation.Api.Middlewares;
 
 public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
 {
-    private readonly RequestDelegate next = next;
-    private readonly ILogger<ErrorHandlingMiddleware> logger = logger;
-
     public async Task Invoke(HttpContext context)
     {
         try

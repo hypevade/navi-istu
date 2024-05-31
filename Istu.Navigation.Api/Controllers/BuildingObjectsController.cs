@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
 
-[ApiController]
-[Route(ApiRoutes.BuildingObjectsRoutes.BuildingsObjectsApi)]
+[ApiController] [Route(ApiRoutes.BuildingObjectsRoutes.BuildingsObjectsApi)]
 public class BuildingObjectsController : ControllerBase
 {
     private readonly IBuildingObjectsService objectsService;
@@ -21,19 +20,15 @@ public class BuildingObjectsController : ControllerBase
     public BuildingObjectsController(IBuildingObjectsService objectsService,
         IMapper mapper)
     {
-        this.objectsService = objectsService;
-        this.mapper = mapper;
+        this.objectsService = objectsService; this.mapper = mapper;
     }
 
     [HttpPost]
-    [Route(ApiRoutes.BuildingObjectsRoutes.CreatePart)]
-    [AuthorizationFilter(UserRole.Admin)]
+    [Route(ApiRoutes.BuildingObjectsRoutes.CreatePart)] [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<CreateBuildingObjectResponse>> Create([FromBody] CreateBuildingObjectRequest request)
     {
         var buildingObject = request.ToBuildingObject(Guid.NewGuid());
-
         var createOperation = await objectsService.CreateAsync(buildingObject);
-
         if (createOperation.IsFailure)
             return StatusCode(createOperation.ApiError.StatusCode, createOperation.ApiError.ToErrorDto());
 
@@ -41,16 +36,11 @@ public class BuildingObjectsController : ControllerBase
     }
 
     [HttpPatch]
-    [Route(ApiRoutes.BuildingObjectsRoutes.UpdatePart)]
-    [AuthorizationFilter(UserRole.Admin)]
+    [Route(ApiRoutes.BuildingObjectsRoutes.UpdatePart)] [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<CreateBuildingObjectResponse>> Update([FromBody] UpdateObjectRequest request)
     {
-        var updateOperation = await objectsService.PatchAsync(request.BuildingObjectId,
-            request.UpdatedTitle,
-            request.UpdatedDescription,
-            request.UpdatedType,
-            request.UpdatedPosition?.X,
-            request.UpdatedPosition?.Y).ConfigureAwait(false);
+        var updateOperation = await objectsService.PatchAsync(request.BuildingObjectId, request.UpdatedTitle, request.UpdatedDescription,
+            request.UpdatedType, request.UpdatedPosition?.X, request.UpdatedPosition?.Y).ConfigureAwait(false);
         if (updateOperation.IsFailure)
             return StatusCode(updateOperation.ApiError.StatusCode, updateOperation.ApiError.ToErrorDto());
 
@@ -58,8 +48,7 @@ public class BuildingObjectsController : ControllerBase
     }
 
     [HttpDelete]
-    [Route(ApiRoutes.BuildingObjectsRoutes.DeletePart)]
-    [AuthorizationFilter(UserRole.Admin)]
+    [Route(ApiRoutes.BuildingObjectsRoutes.DeletePart)] [AuthorizationFilter(UserRole.Admin)]
     public async Task<ActionResult<BuildingObjectDto>> Delete(Guid objectId)
     {
         var deleteOperation = await objectsService.DeleteAsync([objectId]).ConfigureAwait(false);
@@ -70,8 +59,7 @@ public class BuildingObjectsController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ApiRoutes.BuildingObjectsRoutes.GetAllPart)]
-    [AuthorizationFilter(UserRole.User)]
+    [Route(ApiRoutes.BuildingObjectsRoutes.GetAllPart)] [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<List<BuildingObjectDto>>> GetAll([FromQuery] BuildingObjectFilter filter)
     {
         var getOperation = await objectsService.GetAllByFilterAsync(filter)
@@ -84,8 +72,7 @@ public class BuildingObjectsController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ApiRoutes.BuildingObjectsRoutes.GetByIdPart)]
-    [AuthorizationFilter(UserRole.User)]
+    [Route(ApiRoutes.BuildingObjectsRoutes.GetByIdPart)] [AuthorizationFilter(UserRole.User)]
     public async Task<ActionResult<BuildingObjectDto>> GetById(Guid objectId)
     {
         var getOperation = await objectsService.GetByIdAsync(objectId).ConfigureAwait(false);

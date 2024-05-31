@@ -5,7 +5,6 @@ using Istu.Navigation.Api.Filters;
 using Istu.Navigation.Api.Paths;
 using Istu.Navigation.Domain.Models.Cards;
 using Istu.Navigation.Domain.Models.Users;
-using Istu.Navigation.Domain.Services;
 using Istu.Navigation.Domain.Services.Cards;
 using Istu.Navigation.Domain.Services.ExternalRoutes;
 using Istu.Navigation.Infrastructure.EF.Filters;
@@ -14,8 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Istu.Navigation.Api.Controllers;
 
-[ApiController]
-[Route(ApiRoutes.CardsRoutes.CardsApi)]
+[ApiController] [Route(ApiRoutes.CardsRoutes.CardsApi)]
 public class ObjectCardsController : ControllerBase
 {
     private readonly ILuceneService service;
@@ -30,10 +28,7 @@ public class ObjectCardsController : ControllerBase
         ICommentsService commentsService,
         ICardsService cardsService)
     {
-        this.service = service;
-        this.mapper = mapper;
-        this.logger = logger;
-        this.commentsService = commentsService;
+        this.service = service; this.mapper = mapper; this.logger = logger; this.commentsService = commentsService;
         this.cardsService = cardsService;
     }
 
@@ -41,7 +36,7 @@ public class ObjectCardsController : ControllerBase
     [Route(ApiRoutes.CardsRoutes.GetByIdPart)]
     public async Task<ActionResult<Card>> GetById(Guid objectId)
     {
-        var getCardOperation = await cardsService.GetCard(objectId).ConfigureAwait(false);
+        var getCardOperation = await cardsService.GetCardAsync(objectId).ConfigureAwait(false);
         return getCardOperation.IsFailure
             ? StatusCode(getCardOperation.ApiError.StatusCode, getCardOperation.ApiError.ToErrorDto())
             : Ok(getCardOperation.Data);
@@ -103,7 +98,6 @@ public class ObjectCardsController : ControllerBase
     public async Task<ActionResult<List<CommentDto>>> GetCommentsByFilter([FromQuery] CommentFilter filter)
     {
         var getOperation = await commentsService.GetCommentsByFilter(filter).ConfigureAwait(false);
-        
         return getOperation.IsFailure
             ? StatusCode(getOperation.ApiError.StatusCode, getOperation.ApiError.ToErrorDto())
             : Ok(mapper.Map<List<CommentDto>>(getOperation.Data));

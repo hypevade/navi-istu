@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Istu.Navigation.Api.Controllers;
 
 [ApiController]
-[Route(ApiRoutes.BuildingRoutes.BuildingsRoutesApi)]
-[AuthorizationFilter(UserRole.User)]
+[Route(ApiRoutes.BuildingRoutes.BuildingsRoutesApi)] [AuthorizationFilter(UserRole.User)]
 public class BuildingRoutesController: ControllerBase
 {
     private readonly IBuildingRoutesService buildingRoutesService;
@@ -20,15 +19,15 @@ public class BuildingRoutesController: ControllerBase
 
     public BuildingRoutesController(IBuildingRoutesService buildingRoutesService, IMapper mapper)
     {
-        this.buildingRoutesService = buildingRoutesService;
-        this.mapper = mapper;
+        this.buildingRoutesService = buildingRoutesService; this.mapper = mapper;
     }
 
     [HttpPost]
     [Route(ApiRoutes.BuildingRoutes.CreatePart)]
     public async Task<ActionResult<BuildingRouteResponse>> CreateRoute([FromBody] BuildingRouteRequest request)
     {
-        var getOperation = await buildingRoutesService.CreateRouteAsync(request.ToId, request.FromId ?? default)
+        var getOperation = await buildingRoutesService.CreateRouteAsync(request.ToId,
+                request.FromId ?? default, request.DisableElevator)
             .ConfigureAwait(false);
         
         return getOperation.IsFailure
