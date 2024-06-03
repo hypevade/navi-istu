@@ -32,18 +32,24 @@ public class RouteSearcher : IRouteSearcher
         var validationResult = ValidateInput(objects, edges, fromBuildingObject, toBuildingObject);
         if (validationResult.IsFailure)
             return OperationResult<List<BuildingObject>>.Failure(validationResult.ApiError);
+        try
+        {
+            var floorGraph = BuildGraph(objects, edges);
 
-        var floorGraph = BuildGraph(objects, edges);
-
-        var pathResult = FindShortestPath(floorGraph, fromBuildingObject, toBuildingObject);
-        if (pathResult.IsFailure)
-            return OperationResult<List<BuildingObject>>.Failure(pathResult.ApiError);
-
-        var path = new List<BuildingObject> { fromBuildingObject };
-        foreach (var edge in pathResult.Data)
-            path.Add(edge.Target);
-        
-        return OperationResult<List<BuildingObject>>.Success(path);
+            var pathResult = FindShortestPath(floorGraph, fromBuildingObject, toBuildingObject);
+            if (pathResult.IsFailure)
+                return OperationResult<List<BuildingObject>>.Failure(pathResult.ApiError);
+            var path = new List<BuildingObject> { fromBuildingObject };
+            foreach (var edge in pathResult.Data)
+                path.Add(edge.Target);
+            return OperationResult<List<BuildingObject>>.Success(path);
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("Unexpected error during building route search: {Error}, from: {From}, to: {To}, edges: {Edges} , objects: {Objects}",
+                e.Message, fromBuildingObject, toBuildingObject, edges.Count, objects.Count);
+            throw;
+        }
     }
 
     private OperationResult ValidateInput(List<BuildingObject> objects, List<Edge> edges, BuildingObject from,
