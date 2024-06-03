@@ -28,7 +28,8 @@ public class PublicMappingProfile : Profile
                 x => x.MapFrom(src => src.From.Id))
             .ForMember(x => x.ToId,
                 x => x.MapFrom(src => src.To.Id));
-        CreateMap<FloorRoute, FloorRouteDto>();
+        CreateMap<FloorRoute, FloorRouteDto>().ForMember(x => x.FloorDto, x => x.MapFrom(src => src.Floor))
+            .ForMember(x => x.Route, x => x.MapFrom(src => src.Route));
         
         CreateMap<BuildingRoute, BuildingRouteResponse>()
             .ForMember(x => x.BuildingId, x => x.MapFrom(src => src.Building.Id))

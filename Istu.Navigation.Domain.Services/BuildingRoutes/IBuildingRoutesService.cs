@@ -82,6 +82,7 @@ public class BuildingRoutesService : IBuildingRoutesService
     private Dictionary<int, List<BuildingObject>> SliceRouteByFloors(List<BuildingObject> totalPath)
     {
         var result = new Dictionary<int, List<BuildingObject>>();
+        
         if (!totalPath.Any())
             return result;
 
@@ -103,10 +104,10 @@ public class BuildingRoutesService : IBuildingRoutesService
         var floorRoutes = new List<FloorRoute>();
         foreach (var floor in floors)
         {
-            if (!routes.ContainsKey(floor.FloorNumber))
-                throw new Exception($"Floor {floor.FloorNumber} not found in routes");
+            if (!routes.TryGetValue(floor.FloorNumber, out var route))
+                route = new List<BuildingObject>();
             
-            floorRoutes.Add(new FloorRoute(floor, routes[floor.FloorNumber]));
+            floorRoutes.Add(new FloorRoute(floor, route));
         }
 
         return floorRoutes;
