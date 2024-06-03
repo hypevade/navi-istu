@@ -42,12 +42,14 @@ public class BuildingRoutesService : IBuildingRoutesService
         if (getFloors.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getFloors.ApiError);
 
-        var objects = getFloors.Data.SelectMany(x => x.Objects).ToList();
+        var edges = getFloors.Data.SelectMany(x => x.Edges).ToList();
+        var objects = edges
+            .SelectMany(edge => new[] { edge.From, edge.To })
+            .Distinct().ToList();
+        
         if (disableElevator)
             objects = objects.Where(x => x.Type != BuildingObjectType.Elevator).ToList();
         
-        var edges = getFloors.Data.SelectMany(x => x.Edges).ToList();
-
         var getFullRoute = searcher.CreateRoute(fromObject, toObject, objects, edges);
         if (getFullRoute.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getFullRoute.ApiError);

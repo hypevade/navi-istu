@@ -8,6 +8,7 @@ public class Edge
         From = from;
         To = to;
         FloorNumber = floorNumber;
+        BuildingId = from.BuildingId;
     }
 
     public Guid Id { get; init; }
@@ -15,4 +16,8 @@ public class Edge
     public int FloorNumber { get; init; }
     public BuildingObject From { get; init; }
     public BuildingObject To { get; init; }
+    public override string ToString()
+    {
+        return $"{From.Id} - {To.Id}";
+    }
 }

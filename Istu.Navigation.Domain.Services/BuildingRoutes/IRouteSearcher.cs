@@ -30,6 +30,7 @@ public class RouteSearcher : IRouteSearcher
         BuildingObject toBuildingObject, List<BuildingObject> objects, List<Edge> edges)
     {
         var validationResult = ValidateInput(objects, edges, fromBuildingObject, toBuildingObject);
+        
         if (validationResult.IsFailure)
             return OperationResult<List<BuildingObject>>.Failure(validationResult.ApiError);
         try
@@ -46,8 +47,9 @@ public class RouteSearcher : IRouteSearcher
         }
         catch (Exception e)
         {
+            
             logger.LogWarning("Unexpected error during building route search: {Error}, from: {From}, to: {To}, edges: {Edges} , objects: {Objects}",
-                e.Message, fromBuildingObject, toBuildingObject, edges.Count, objects.Count);
+                e.Message, fromBuildingObject.Id, toBuildingObject.Id, edges.Count, objects.Count);
             throw;
         }
     }
