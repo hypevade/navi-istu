@@ -6,7 +6,7 @@ namespace Istu.Navigation.Domain.Services.BuildingRoutes;
 
 public interface IBuildingRoutesService
 {
-    Task<OperationResult<BuildingRoute>> CreateRouteAsync(Guid toId, Guid fromId = default, bool disableElevator = false);
+    Task<OperationResult<BuildingRoute>> CreateRouteAsync(Guid toId, Guid fromId = default, bool enableElevator = false);
 }
 public class BuildingRoutesService : IBuildingRoutesService
 {
@@ -26,7 +26,7 @@ public class BuildingRoutesService : IBuildingRoutesService
         this.floorsBuilder = floorsBuilder;
     }
 
-    public async Task<OperationResult<BuildingRoute>> CreateRouteAsync(Guid toId, Guid fromId = default, bool disableElevator = false)
+    public async Task<OperationResult<BuildingRoute>> CreateRouteAsync(Guid toId, Guid fromId = default, bool enableElevator = true)
     {
         //TODO: Добавить  поддержку, когда fromID = default
         var getOperation  = await GetTwoObjects(fromId, toId).ConfigureAwait(false);
@@ -47,7 +47,7 @@ public class BuildingRoutesService : IBuildingRoutesService
             .SelectMany(edge => new[] { edge.From, edge.To })
             .Distinct().ToList();
         
-        if (disableElevator)
+        if (!enableElevator)
             objects = objects.Where(x => x.Type != BuildingObjectType.Elevator).ToList();
         
         var getFullRoute = searcher.CreateRoute(fromObject, toObject, objects, edges);

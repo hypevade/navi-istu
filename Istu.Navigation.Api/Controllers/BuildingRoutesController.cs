@@ -27,7 +27,7 @@ public class BuildingRoutesController: ControllerBase
     public async Task<ActionResult<BuildingRouteResponse>> CreateRoute([FromBody] BuildingRouteRequest request)
     {
         var getOperation = await buildingRoutesService.CreateRouteAsync(request.ToId,
-                request.FromId ?? default, request.DisableElevator)
+                request.FromId ?? default, request.EnableElevator)
             .ConfigureAwait(false);
         
         return getOperation.IsFailure

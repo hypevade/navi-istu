@@ -36,7 +36,7 @@ public class AuthorizationFilter(UserRole minimumRole) : Attribute, IAuthorizati
         }
 
         var tokenHandler = context.HttpContext.RequestServices.GetRequiredService<IAccessTokenProvider>();
-        OperationResult<(Guid Id, UserRole Role)> validateTokenAndGetUserId = tokenHandler.GetUser(token);
+        var validateTokenAndGetUserId = tokenHandler.GetUser(token);
 
         if (validateTokenAndGetUserId.IsFailure)
         {
