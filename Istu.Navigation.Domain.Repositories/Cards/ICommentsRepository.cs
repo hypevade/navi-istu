@@ -17,7 +17,6 @@ public class CommentsRepository(AppDbContext context) : Repository<CommentEntity
     public Task<List<CommentEntity>> GetAllByFilter(CommentFilter filter)
     {
         var query = DbSet.AsQueryable();
-
         if (filter.ObjectId.HasValue)
             query = query.Where(e => e.ObjectId == filter.ObjectId.Value);
 
@@ -28,7 +27,6 @@ public class CommentsRepository(AppDbContext context) : Repository<CommentEntity
             query = query.Where(e => e.CreatorId == filter.UserId.Value);
 
         query = query.Skip(filter.Skip).Take(filter.Take);
-
         return query.ToListAsync();
     }
     
@@ -46,25 +44,16 @@ public class CommentsRepository(AppDbContext context) : Repository<CommentEntity
                 FirstName = user.FirstName,
                 LastName = user.LastName
             };
-        
         if (filter.ObjectId.HasValue)
-        {
             query = query.Where(c => c.ObjectId == filter.ObjectId.Value);
-        }
-
+        
         if (filter.CommentId.HasValue)
-        {
             query = query.Where(c => c.CommentId == filter.CommentId.Value);
-        }
-
+        
         if (filter.UserId.HasValue)
-        {
             query = query.Where(c => c.CreatorId == filter.UserId.Value);
-        }
         
         query = query.Skip(filter.Skip).Take(filter.Take);
-
         return query.ToListAsync();
     }
-    
 }

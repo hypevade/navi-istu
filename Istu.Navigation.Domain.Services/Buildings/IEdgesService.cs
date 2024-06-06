@@ -62,7 +62,6 @@ public class EdgesService : IEdgesService
         foreach (var edge in edges)
         {
             var getEdgeEntity = await CheckEdgeAndGetEntity(edge.fromId, edge.toId).ConfigureAwait(false);
-
             var existEdges = await repository
                 .GetAllByFilterAsync(new EdgeFilter
                     { FromBuildingObjectId = edge.fromId, ToBuildingObjectId = edge.toId }).ConfigureAwait(false);
@@ -72,15 +71,11 @@ public class EdgesService : IEdgesService
                 existingEdges.Add(existEdge.Id);
                 continue;
             }
-
             if (getEdgeEntity.IsFailure)
-            {
                 return OperationResult<List<Guid>>.Failure(getEdgeEntity.ApiError);
-            }
-
+            
             edgeEntities.Add(getEdgeEntity.Data);
         }
-
         var addedEdges = await repository.AddRangeAsync(edgeEntities).ConfigureAwait(false);
         await repository.SaveChangesAsync().ConfigureAwait(false);
 
@@ -92,7 +87,6 @@ public class EdgesService : IEdgesService
         var edges = await repository.FindAsync(x =>
                 x.FromObject == fromId && x.ToObject == toId || x.FromObject == toId && x.ToObject == fromId)
             .ConfigureAwait(false);
-
         if (edges.Count == 0)
             return OperationResult.Success();
 
@@ -101,10 +95,7 @@ public class EdgesService : IEdgesService
         return OperationResult.Success();
     }
 
-    public Task<OperationResult> DeleteAsync(Guid edgeId)
-    {
-        return DeleteRange([edgeId]);
-    }
+    public Task<OperationResult> DeleteAsync(Guid edgeId) => DeleteRange([edgeId]);
 
     public async Task<OperationResult> DeleteRange(List<Guid> edgeIds)
     {

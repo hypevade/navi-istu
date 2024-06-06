@@ -28,7 +28,6 @@ public class BuildingRoutesService : IBuildingRoutesService
 
     public async Task<OperationResult<BuildingRoute>> CreateRouteAsync(Guid toId, Guid fromId = default, bool enableElevator = true)
     {
-        //TODO: Добавить  поддержку, когда fromID = default
         var getOperation  = await GetTwoObjects(fromId, toId).ConfigureAwait(false);
         if (getOperation.IsFailure)
             return OperationResult<BuildingRoute>.Failure(getOperation.ApiError);

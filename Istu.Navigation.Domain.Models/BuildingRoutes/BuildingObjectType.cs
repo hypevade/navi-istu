@@ -11,7 +11,9 @@ public enum BuildingObjectType
     Elevator = 6,
     Entrance = 7,
     CashRegister = 8,
-    Showplace = 9
+    Showplace = 9,
+    Wardrobe = 10,
+    SportArea = 11
 }
 
 public static class BuildingObjectTypeExtensions
@@ -30,6 +32,9 @@ public static class BuildingObjectTypeExtensions
             BuildingObjectType.Entrance => "Вход",
             BuildingObjectType.CashRegister => "Касса",
             BuildingObjectType.Showplace => "Достопримечательность",
+            BuildingObjectType.Wardrobe => "Гардероб",
+            BuildingObjectType.SportArea => "Спортивная зона",
+            
             _ => "Неизвестно"
         };
     }
