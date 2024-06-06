@@ -72,7 +72,8 @@ public class FloorsBuilder : IFloorsBuilder
         var buildingObjectFilter = new BuildingObjectFilter
         {
             BuildingId = buildingId,
-            Floor = floorNumber
+            Floor = floorNumber,
+            Take = int.MaxValue
         };
         var objects = await buildingObjectsService.GetAllByFilterAsync(buildingObjectFilter).ConfigureAwait(false);
 
@@ -82,7 +83,8 @@ public class FloorsBuilder : IFloorsBuilder
         var edgeFilter = new EdgeFilter
         {
             BuildingId = buildingId,
-            Floor = floorNumber
+            Floor = floorNumber,
+            Take = int.MaxValue
         };
         var edges = await edgesService.GetAllByFilterAsync(edgeFilter).ConfigureAwait(false);
 
