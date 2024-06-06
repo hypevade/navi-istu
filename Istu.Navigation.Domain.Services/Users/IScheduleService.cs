@@ -25,7 +25,7 @@ public class MockedScheduleService : IScheduleService
         {
             new()
             {
-                Audience = "3-12",
+                Audience = "1-1",
                 Lector = "Чернышев К.С.",
                 StartTime = new DateTime(year, month, day, 6, 10, 0, DateTimeKind.Utc),
                 EndTime = new DateTime(year, month, day, 7, 40, 0, DateTimeKind.Utc),
@@ -33,7 +33,7 @@ public class MockedScheduleService : IScheduleService
             },
             new()
             {
-                Audience = "3-2",
+                Audience = "1-111",
                 Lector = "Чернышев К.С.",
                 StartTime = new DateTime(year, month, day, 8, 20, 0, DateTimeKind.Utc),
                 EndTime = new DateTime(year, month, day, 9, 50, 0, DateTimeKind.Utc),
