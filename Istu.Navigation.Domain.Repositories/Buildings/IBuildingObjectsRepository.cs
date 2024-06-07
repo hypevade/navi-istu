@@ -32,9 +32,9 @@ public class BuildingObjectsRepository(AppDbContext context)
 
         if (filter.Type.HasValue)
             query = query.Where(e => e.Type == filter.Type.Value);
-            
 
-        query = query.Skip(filter.Skip).Take(filter.Take);
+
+        query = query.OrderBy(x => x.Title).Skip(filter.Skip).Take(filter.Take);
 
         return query.ToListAsync();
     }

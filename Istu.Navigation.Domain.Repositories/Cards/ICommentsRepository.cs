@@ -26,7 +26,7 @@ public class CommentsRepository(AppDbContext context) : Repository<CommentEntity
         if (filter.UserId.HasValue)
             query = query.Where(e => e.CreatorId == filter.UserId.Value);
 
-        query = query.Skip(filter.Skip).Take(filter.Take);
+        query = query.OrderBy(x=>x.CreationDate).Skip(filter.Skip).Take(filter.Take);
         return query.ToListAsync();
     }
     
@@ -53,7 +53,7 @@ public class CommentsRepository(AppDbContext context) : Repository<CommentEntity
         if (filter.UserId.HasValue)
             query = query.Where(c => c.CreatorId == filter.UserId.Value);
         
-        query = query.Skip(filter.Skip).Take(filter.Take);
+        query = query.OrderBy(x=>x.CreationDate).Skip(filter.Skip).Take(filter.Take);
         return query.ToListAsync();
     }
 }

@@ -30,8 +30,8 @@ public class BuildingsRepository : Repository<BuildingEntity> , IBuildingsReposi
         {
             query = query.Where(e=> e.Title == filter.Title);
         }
-        
-        query = query.Skip(filter.Skip).Take(filter.Take);
+
+        query = query.OrderBy(x => x.Title).Skip(filter.Skip).Take(filter.Take);
 
         return query.ToListAsync();
     }

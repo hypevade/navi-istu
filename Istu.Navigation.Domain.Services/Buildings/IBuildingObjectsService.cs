@@ -94,6 +94,7 @@ public class BuildingObjectsService : IBuildingObjectsService
     public async Task<OperationResult<List<BuildingObject>>> GetAllByFilterAsync(BuildingObjectFilter filter)
     {
         var buildingObjectEntities = await buildingObjectsRepository.GetAllByFilterAsync(filter).ConfigureAwait(false);
+        
         var result = mapper.Map<List<BuildingObject>>(buildingObjectEntities);
         return OperationResult<List<BuildingObject>>.Success(result);
     }

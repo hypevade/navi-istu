@@ -47,7 +47,7 @@ public class EdgesRepository : Repository<EdgeEntity>, IEdgesRepository
                 break;
         }
 
-        query = query.Skip(filter.Skip).Take(filter.Take);
+        query = query.OrderBy(x=>x.FromObject).Skip(filter.Skip).Take(filter.Take);
 
         return query.ToListAsync();
     }
