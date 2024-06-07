@@ -74,7 +74,11 @@ public class RouteSearcher : IRouteSearcher
         var graph = new AdjacencyGraph<BuildingObject, Edge<BuildingObject>>();
 
         objects.ForEach(o => graph.AddVertex(o));
-        edges.ForEach(edge => graph.AddEdge(new Edge<BuildingObject>(edge.From, edge.To)));
+        edges.ForEach(edge =>
+        {
+            graph.AddEdge(new Edge<BuildingObject>(edge.From, edge.To));
+            graph.AddEdge(new Edge<BuildingObject>(edge.To, edge.From));
+        });
 
         return graph;
     }
