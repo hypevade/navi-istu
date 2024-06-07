@@ -66,6 +66,7 @@ public class LuceneService : ILuceneService
         {
             logger.LogWarning($"Lucene index not found, exception: {e}");
         }
+        results = results.OrderBy(x=>x.Title).ToList();
 
         return results;
     }
