@@ -38,7 +38,15 @@ public class MockedScheduleService : IScheduleService
                 StartTime = new DateTime(year, month, day, 8, 20, 0, DateTimeKind.Utc),
                 EndTime = new DateTime(year, month, day, 9, 50, 0, DateTimeKind.Utc),
                 Title = "Практика 'Основы программирования'"
-            }
+            },
+            new()
+            {
+                Audience = "1-218",
+                Lector = "Белых В.В.",
+                StartTime = new DateTime(year, month, day, 10, 00, 0, DateTimeKind.Utc),
+                EndTime = new DateTime(year, month, day, 11, 30, 0, DateTimeKind.Utc),
+                Title = "Практика 'Физика'"
+            },
         };
         foreach (var lesson in lessons)
         {
